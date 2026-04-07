@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model QuizQuestion {
+  id          String      @id @default(cuid())
+  slug        String      @unique
+  title       String
+  description String?
+  order       Int
+  options     QuizOption[]
+}
+
+model QuizOption {
+  id         String       @id @default(cuid())
+  questionId String
+  label      String
+  order      Int
+  weights    Json
+  question   QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model QuizSession {
+  id              String             @id @default(cuid())
+  status          String
+  currentQuestion Int                @default(0)
+  personalityCode String?
+  result          PersonalityResult?
+  answers         QuizAnswer[]
+  createdAt       DateTime           @default(now())
+  completedAt     DateTime?
+}
+
+model QuizAnswer {
+  id         String      @id @default(cuid())
+  sessionId  String
+  questionId String
+  optionId   String
+  createdAt  DateTime    @default(now())
+  session    QuizSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model PersonalityResult {
+  id              String                  @id @default(cuid())
+  sessionId       String                  @unique
+  personalityCode String
+  practicalScore  Int
+  emotionalScore  Int
+  savingScore     Int
+  qualityScore    Int
+  comfortScore    Int
+  drivingScore    Int
+  brandScore      Int
+  valueScore      Int
+  session         QuizSession             @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  recommendations VehicleRecommendation[]
+}
+
+model Vehicle {
+  id               String                 @id @default(cuid())
+  slug             String                 @unique
+  brand            String
+  series           String
+  modelName        String
+  priceMin         Int
+  priceMax         Int
+  energyType       String
+  bodyType         String
+  heroImage        String
+  summary          String
+  recommendation   String
+  dimensionWeights VehicleDimensionWeight?
+  recommendations  VehicleRecommendation[]
+}
+
+model VehicleDimensionWeight {
+  id         String  @id @default(cuid())
+  vehicleId  String  @unique
+  practical  Int
+  emotional  Int
+  saving     Int
+  quality    Int
+  comfort    Int
+  driving    Int
+  brand      Int
+  value      Int
+  vehicle    Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+}
+
+model VehicleRecommendation {
+  id       String            @id @default(cuid())
+  resultId String
+  vehicleId String
+  rank     Int
+  score    Int
+  reason   String
+  result   PersonalityResult @relation(fields: [resultId], references: [id], onDelete: Cascade)
+  vehicle  Vehicle           @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+}
+
+model BuyingGuide {
+  id                 String   @id @default(cuid())
+  slug               String   @unique
+  title              String
+  excerpt            String
+  body               String
+  relatedVehicleSlugs String[]
+}
