@@ -13,7 +13,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="zh-CN">
-      <body className="min-h-screen bg-stone-50 text-slate-900">
+      <body className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
         <SiteHeader />
         {children}
         <SiteFooter />

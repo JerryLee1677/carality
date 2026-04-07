@@ -2,7 +2,263 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-stone-50 text-slate-900;
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+@layer base {
+  :root {
+    --color-bg: #f5efe6;
+    --color-bg-alt: #ebe2d4;
+    --color-panel: rgba(255, 252, 248, 0.82);
+    --color-panel-strong: rgba(255, 248, 239, 0.94);
+    --color-line: rgba(37, 43, 49, 0.08);
+    --color-line-strong: rgba(37, 43, 49, 0.18);
+    --color-text: #1f262d;
+    --color-muted: #5f686f;
+    --color-accent: #d96a2c;
+    --color-accent-soft: rgba(217, 106, 44, 0.12);
+    --color-accent-2: #2b7a78;
+    --color-road: radial-gradient(circle at top, rgba(217, 106, 44, 0.1), transparent 34%),
+      linear-gradient(180deg, #fbf7f2 0%, #f5efe6 46%, #ede4d7 100%);
+    --shadow-panel: 0 18px 48px rgba(57, 44, 22, 0.08);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent 18%),
+      repeating-linear-gradient(
+        90deg,
+        transparent 0,
+        transparent 72px,
+        rgba(31, 38, 45, 0.025) 72px,
+        rgba(31, 38, 45, 0.025) 73px
+      ),
+      var(--color-road);
+    color: var(--color-text);
+    font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 25%),
+      radial-gradient(circle at 18% 18%, rgba(217, 106, 44, 0.08), transparent 24%),
+      radial-gradient(circle at 82% 8%, rgba(43, 122, 120, 0.08), transparent 18%);
+    opacity: 0.9;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image:
+      linear-gradient(rgba(31, 38, 45, 0.18) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(31, 38, 45, 0.18) 1px, transparent 1px);
+    background-size: 140px 140px;
+    mask-image: radial-gradient(circle at center, black 55%, transparent 100%);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .display-font {
+    font-family: "Arial Narrow", "Aptos Narrow", "Franklin Gothic Medium", sans-serif;
+    letter-spacing: 0.02em;
+  }
+
+  a,
+  button {
+    transition:
+      transform 180ms ease,
+      opacity 180ms ease,
+      border-color 180ms ease,
+      background-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+}
+
+@layer components {
+  .shell {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .dashboard-panel {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 250, 243, 0.68)),
+      var(--color-panel);
+    border: 1px solid var(--color-line);
+    box-shadow: var(--shadow-panel);
+    backdrop-filter: blur(14px);
+  }
+
+  .dashboard-panel-strong {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 248, 239, 0.82)),
+      var(--color-panel-strong);
+    border: 1px solid var(--color-line-strong);
+    box-shadow: var(--shadow-panel);
+    backdrop-filter: blur(16px);
+  }
+
+  .metric-chip {
+    @apply inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.24em];
+    color: var(--color-accent-2);
+    border: 1px solid rgba(43, 122, 120, 0.16);
+    background: rgba(43, 122, 120, 0.08);
+  }
+
+  .race-button {
+    @apply inline-flex min-h-11 items-center justify-center rounded-full px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em];
+    font-family: "Arial Narrow", "Aptos Narrow", "Franklin Gothic Medium", sans-serif;
+  }
+
+  .race-button-primary {
+    background: linear-gradient(135deg, var(--color-accent) 0%, #ef9a65 100%);
+    color: #fffaf5;
+    box-shadow: 0 10px 26px rgba(217, 106, 44, 0.2);
+  }
+
+  .race-button-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 32px rgba(217, 106, 44, 0.24);
+  }
+
+  .race-button-ghost {
+    border: 1px solid var(--color-line-strong);
+    background: rgba(255, 255, 255, 0.52);
+    color: var(--color-text);
+  }
+
+  .race-button-ghost:hover {
+    transform: translateY(-1px);
+    border-color: rgba(31, 38, 45, 0.24);
+    background: rgba(255, 255, 255, 0.82);
+  }
+
+  .tach-ring {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tach-ring::before {
+    content: "";
+    position: absolute;
+    inset: 8%;
+    border-radius: 9999px;
+    border: 1px dashed rgba(31, 38, 45, 0.12);
+    animation: spin-wheel 20s linear infinite;
+  }
+
+  .tach-ring::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    background:
+      conic-gradient(
+        from 180deg,
+        transparent 0deg,
+        rgba(43, 122, 120, 0.16) 55deg,
+        rgba(217, 106, 44, 0.42) 105deg,
+        transparent 135deg,
+        transparent 360deg
+      );
+    filter: blur(24px);
+    opacity: 0.58;
+    animation: sweep-light 6s ease-in-out infinite;
+  }
+
+  .option-panel {
+    @apply relative overflow-hidden rounded-[1.6rem] p-4 sm:p-5;
+    border: 1px solid var(--color-line);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(250, 245, 239, 0.72));
+  }
+
+  .option-panel:hover {
+    transform: translateY(-2px);
+    border-color: rgba(217, 106, 44, 0.4);
+    box-shadow: 0 16px 28px rgba(217, 106, 44, 0.1);
+  }
+
+  .panel-stripe::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  }
+
+  .mobile-scroller {
+    @apply flex gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible;
+    scrollbar-width: none;
+  }
+
+  .mobile-scroller::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes spin-wheel {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sweep-light {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(0.98);
+    opacity: 0.45;
+  }
+  50% {
+    transform: rotate(35deg) scale(1.03);
+    opacity: 0.72;
+  }
+}
+
+@keyframes gear-shift {
+  0% {
+    transform: translateY(18px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes road-flow {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 240px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }
