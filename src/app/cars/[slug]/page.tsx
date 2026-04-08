@@ -16,7 +16,7 @@ export default async function CarDetailPage({
   return (
     <main className="mx-auto max-w-5xl px-6 py-16">
       <h1 className="text-4xl font-semibold tracking-tight">
-        {vehicle.brand} {vehicle.series} {vehicle.modelName}
+        {vehicle.brand} {vehicle.series}
       </h1>
       <p className="mt-4 text-slate-600">{vehicle.summary}</p>
       <div className="mt-8 grid gap-4 rounded-3xl bg-white p-8 shadow-sm">

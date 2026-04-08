@@ -1,18 +1,15 @@
 import { NextResponse } from "next/server";
-import { quizRepository } from "@/modules/quiz/repository/quiz-repository";
+import { assessmentApiFetch } from "@/lib/assessment-api";
 
 export async function POST(
   _request: Request,
   context: { params: Promise<{ sessionId: string }> },
 ) {
   const { sessionId } = await context.params;
-  const result = await quizRepository.completeSession(sessionId);
+  const response = await assessmentApiFetch(`/assessment/sessions/${sessionId}/complete`, {
+    method: "POST",
+  });
+  const result = await response.json();
 
-  return NextResponse.json(
-    {
-      sessionId,
-      personalityCode: result.personalityCode,
-    },
-    { status: 201 },
-  );
+  return NextResponse.json(result);
 }

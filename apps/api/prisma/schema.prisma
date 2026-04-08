@@ -1,0 +1,279 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum QuestionType {
+  LIFE_STYLE
+  CAR_USAGE
+}
+
+enum QuestionStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum SessionStatus {
+  DRAFT
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+enum AssessmentMode {
+  QUICK
+  STANDARD
+}
+
+enum EffectTargetType {
+  HARD_CONSTRAINT
+  PERSONALITY_TRAIT
+  VEHICLE_PREFERENCE
+  BRANCH_SIGNAL
+}
+
+enum RuleOperator {
+  EQ
+  NEQ
+  GT
+  GTE
+  LT
+  LTE
+}
+
+model Question {
+  id                 String               @id @default(cuid())
+  slug               String               @unique
+  title              String
+  description        String?
+  type               QuestionType
+  branchKey          String?
+  isAnchor           Boolean              @default(false)
+  priority           Int                  @default(0)
+  discrimination     Int                  @default(0)
+  status             QuestionStatus       @default(DRAFT)
+  minSessionStep     Int?
+  maxSessionStep     Int?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  options            QuestionOption[]
+  assessmentAnswers  AssessmentAnswer[]
+  sessionCandidates  SessionQuestionCandidate[]
+  outgoingRules      QuestionBranchRule[] @relation("RuleSourceQuestion")
+  candidateQuestions QuestionBranchRule[] @relation("RuleCandidateQuestion")
+}
+
+model QuestionOption {
+  id                  String                 @id @default(cuid())
+  questionId          String
+  label               String
+  description         String?
+  order               Int
+  isTerminal          Boolean                @default(false)
+  question            Question               @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  effects             OptionEffect[]
+  sourceBranchRules   QuestionBranchRule[]   @relation("RuleSourceOption")
+  assessmentAnswers   AssessmentAnswer[]
+
+  @@unique([questionId, order])
+}
+
+model OptionEffect {
+  id          String           @id @default(cuid())
+  optionId    String
+  targetType  EffectTargetType
+  targetKey   String
+  weightDelta Decimal          @db.Decimal(8, 2)
+  option      QuestionOption   @relation(fields: [optionId], references: [id], onDelete: Cascade)
+}
+
+model QuestionBranchRule {
+  id                   String         @id @default(cuid())
+  sourceQuestionId     String
+  sourceOptionId       String?
+  targetBranchKey      String
+  candidateQuestionId  String?
+  traitKey             String?
+  traitOperator        RuleOperator?
+  traitThreshold       Decimal?       @db.Decimal(8, 2)
+  priority             Int            @default(0)
+  sourceQuestion       Question       @relation("RuleSourceQuestion", fields: [sourceQuestionId], references: [id], onDelete: Cascade)
+  sourceOption         QuestionOption? @relation("RuleSourceOption", fields: [sourceOptionId], references: [id], onDelete: SetNull)
+  candidateQuestion    Question?      @relation("RuleCandidateQuestion", fields: [candidateQuestionId], references: [id], onDelete: SetNull)
+}
+
+model AssessmentSession {
+  id                  String                     @id @default(cuid())
+  status              SessionStatus              @default(DRAFT)
+  mode                AssessmentMode             @default(STANDARD)
+  targetQuestionCount Int                        @default(56)
+  currentBranchKey    String?
+  currentQuestionId   String?
+  stepIndex           Int                        @default(0)
+  lifeQuestionCount   Int                        @default(0)
+  carQuestionCount    Int                        @default(0)
+  startedAt           DateTime                   @default(now())
+  completedAt         DateTime?
+  answers             AssessmentAnswer[]
+  traitSnapshots      SessionTraitSnapshot[]
+  result              SessionResult?
+  questionCandidates  SessionQuestionCandidate[]
+}
+
+model AssessmentAnswer {
+  id                String             @id @default(cuid())
+  sessionId         String
+  questionId        String
+  optionId          String
+  stepIndex         Int
+  answeredAt        DateTime           @default(now())
+  session           AssessmentSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  question          Question           @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  option            QuestionOption     @relation(fields: [optionId], references: [id], onDelete: Restrict)
+
+  @@unique([sessionId, questionId])
+  @@unique([sessionId, stepIndex])
+}
+
+model SessionTraitSnapshot {
+  id          String             @id @default(cuid())
+  sessionId   String
+  stepIndex   Int
+  traitKey    String
+  traitValue  Decimal            @db.Decimal(8, 2)
+  targetType  EffectTargetType
+  session     AssessmentSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, stepIndex])
+}
+
+model SessionQuestionCandidate {
+  id            String             @id @default(cuid())
+  sessionId     String
+  stepIndex     Int
+  questionId    String
+  branchFit     Decimal?           @db.Decimal(8, 2)
+  infoGain      Decimal?           @db.Decimal(8, 2)
+  rankingScore  Decimal?           @db.Decimal(8, 2)
+  wasSelected   Boolean            @default(false)
+  session       AssessmentSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  question      Question           @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, stepIndex])
+}
+
+model PersonalityProfile {
+  id               String          @id @default(cuid())
+  code             String          @unique
+  name             String
+  summary          String
+  detail           String
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  rules            PersonalityProfileRule[]
+  sessionResults   SessionResult[]
+}
+
+model PersonalityProfileRule {
+  id            String             @id @default(cuid())
+  profileId     String
+  targetKey     String
+  traitOperator RuleOperator
+  traitThreshold Decimal           @db.Decimal(8, 2)
+  weight        Decimal            @db.Decimal(8, 2)
+  profile       PersonalityProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+}
+
+model Vehicle {
+  id                     String                        @id @default(cuid())
+  slug                   String                        @unique
+  brand                  String
+  series                 String
+  modelName              String
+  priceMin               Int
+  priceMax               Int
+  energyType             String
+  bodyType               String
+  summary                String
+  recommendation         String
+  status                 String                        @default("active")
+  createdAt              DateTime                      @default(now())
+  updatedAt              DateTime                      @updatedAt
+  traitWeights           VehicleTraitWeight[]
+  constraintRules        VehicleConstraintRule[]
+  tagMappings            VehicleTagMapping[]
+  sessionRecommendations SessionVehicleRecommendation[]
+}
+
+model VehicleTraitWeight {
+  id         String   @id @default(cuid())
+  vehicleId  String
+  targetType EffectTargetType
+  targetKey  String
+  weight     Decimal  @db.Decimal(8, 2)
+  vehicle    Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@unique([vehicleId, targetType, targetKey])
+}
+
+model VehicleConstraintRule {
+  id             String           @id @default(cuid())
+  vehicleId      String
+  targetType     EffectTargetType
+  targetKey      String
+  traitOperator  RuleOperator
+  traitThreshold Decimal          @db.Decimal(8, 2)
+  vehicle        Vehicle          @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId, targetType, targetKey])
+}
+
+model VehicleTag {
+  id        String             @id @default(cuid())
+  slug      String             @unique
+  label     String
+  mappings  VehicleTagMapping[]
+}
+
+model VehicleTagMapping {
+  id         String      @id @default(cuid())
+  vehicleId  String
+  tagId      String
+  vehicle    Vehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  tag        VehicleTag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([vehicleId, tagId])
+}
+
+model SessionResult {
+  id                   String                         @id @default(cuid())
+  sessionId            String                         @unique
+  personalityProfileId String
+  confidenceScore      Decimal?                       @db.Decimal(8, 2)
+  summary              String
+  explanation          String
+  createdAt            DateTime                       @default(now())
+  session              AssessmentSession              @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  personalityProfile   PersonalityProfile             @relation(fields: [personalityProfileId], references: [id], onDelete: Restrict)
+  recommendations      SessionVehicleRecommendation[]
+}
+
+model SessionVehicleRecommendation {
+  id             String        @id @default(cuid())
+  resultId       String
+  vehicleId      String
+  rank           Int
+  score          Decimal       @db.Decimal(10, 2)
+  reason         String
+  result         SessionResult @relation(fields: [resultId], references: [id], onDelete: Cascade)
+  vehicle        Vehicle       @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@unique([resultId, rank])
+}

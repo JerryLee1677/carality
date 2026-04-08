@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { StartQuizButton } from "@/components/quiz/start-quiz-button";
 
 export default function QuizPage() {
   return (
@@ -11,14 +11,14 @@ export default function QuizPage() {
             <span className="block text-[var(--color-accent)]">汽车人格测试</span>
           </h1>
           <p className="mt-5 max-w-xl text-base leading-8 text-[var(--color-muted)]">
-            这不是传统性格测试。你会回答更贴近真实购车决策的 12 道题，系统会直接输出你的四字母汽车人格，以及 1 台最优推荐车型和 3 台备选。
+            这不是传统性格测试。你可以选择更轻的极速版，或者更充分的标准版。系统会围绕真实购车决策连续追问，最后给出汽车人格和车型推荐。
           </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             {[
-              ["12", "连续题目"],
+              ["24 / 56", "两种题量"],
               ["匿名", "无需登录"],
-              ["约 2 分钟", "完成测试"],
+              ["约 4 / 9 分钟", "完成测试"],
             ].map(([value, label]) => (
               <div key={label} className="rounded-[1.4rem] border border-[var(--color-line)] bg-white/65 p-4">
                 <p className="display-font text-3xl uppercase text-[var(--color-accent)]">
@@ -31,12 +31,29 @@ export default function QuizPage() {
             ))}
           </div>
 
-          <Link
-            href="/quiz/local-session"
-            className="race-button race-button-primary mt-8 px-7 py-4"
-          >
-            点火进入正式答题
-          </Link>
+          <div className="mt-8 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-[1.6rem] border border-[var(--color-line)] bg-white/70 p-5">
+              <p className="display-font text-sm uppercase tracking-[0.26em] text-[var(--color-accent)]">
+                极速版
+              </p>
+              <p className="mt-3 text-3xl font-semibold text-[var(--color-text)]">24 题</p>
+              <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
+                适合快速得到方向判断。会覆盖预算、家庭、补能、驾驶风格和核心偏好，但解释颗粒度更粗。
+              </p>
+              <StartQuizButton mode="quick" />
+            </div>
+
+            <div className="rounded-[1.6rem] border border-[var(--color-line)] bg-[rgba(217,106,44,0.08)] p-5">
+              <p className="display-font text-sm uppercase tracking-[0.26em] text-[var(--color-accent-2)]">
+                标准版
+              </p>
+              <p className="mt-3 text-3xl font-semibold text-[var(--color-text)]">56 题</p>
+              <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
+                适合更认真地做一次。会展开更多生活决策、场景约束、能源接受度和品牌取向，推荐更稳定。
+              </p>
+              <StartQuizButton mode="standard" />
+            </div>
+          </div>
         </div>
 
         <div className="grid gap-4">

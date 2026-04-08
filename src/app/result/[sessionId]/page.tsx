@@ -1,46 +1,25 @@
+import React from "react";
 import Link from "next/link";
-import { questions } from "@/data/quiz/questions";
-import { recommendationRepository } from "@/modules/recommendation/repository/recommendation-repository";
-import { buildPersonalityCode } from "@/modules/quiz/domain/build-personality-code";
-import { scoreAnswers } from "@/modules/quiz/domain/score-answer";
-
-function parseAnswerIndexes(raw: string | undefined) {
-  if (!raw) {
-    return [];
-  }
-
-  return raw
-    .split(",")
-    .map((value) => Number.parseInt(value, 10))
-    .filter((value) => Number.isInteger(value) && value >= 0);
-}
+import { assessmentApiFetch } from "@/lib/assessment-api";
+import type { AssessmentResult } from "@/lib/assessment-session";
 
 export default async function ResultPage({
-  searchParams,
+  params,
 }: {
-  searchParams: Promise<{ answers?: string }>;
+  params: Promise<{ sessionId: string }>;
 }) {
-  const { answers } = await searchParams;
-  const answerIndexes = parseAnswerIndexes(answers);
-
-  const scoredAnswers = questions
-    .map((question, index) => question.options[answerIndexes[index]])
-    .filter(
-      (
-        option,
-      ): option is (typeof questions)[number]["options"][number] => Boolean(option),
-    )
-    .map((option) => ({ weights: option.weights }));
-
-  const scores = scoreAnswers(scoredAnswers);
-  const personalityCode = buildPersonalityCode(scores);
-  const recommendations = recommendationRepository.getRankedRecommendations(scores);
+  const { sessionId } = await params;
+  const response = await assessmentApiFetch(`/assessment/sessions/${sessionId}/result`, {
+    method: "GET",
+  });
+  const result = (await response.json()) as AssessmentResult;
+  const recommendations = result.recommendations;
   const [topVehicle, ...alternatives] = recommendations;
 
   return (
     <main className="shell py-8 sm:py-10">
-      {topVehicle ? (
-        <section className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+      <section className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+        {topVehicle ? (
           <div className="dashboard-panel-strong relative overflow-hidden rounded-[2rem] p-6 sm:p-8">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-accent)] to-transparent" />
             <div className="metric-chip">Top Recommendation</div>
@@ -49,9 +28,7 @@ export default async function ResultPage({
             </p>
             <h1 className="mt-3 text-4xl font-semibold leading-tight sm:text-6xl">
               {topVehicle.brand}
-              <span className="block text-[var(--color-accent)]">
-                {topVehicle.series} {topVehicle.modelName}
-              </span>
+              <span className="block text-[var(--color-accent)]">{topVehicle.series}</span>
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-8 text-[var(--color-muted)]">
               {topVehicle.reason}
@@ -63,7 +40,7 @@ export default async function ResultPage({
                   匹配分
                 </p>
                 <p className="mt-2 display-font text-4xl uppercase text-[var(--color-accent)]">
-                  {topVehicle.matchScore}
+                  {topVehicle.score}
                 </p>
               </div>
               <div className="rounded-[1.4rem] border border-[var(--color-line)] bg-white/70 p-4 sm:col-span-2">
@@ -88,39 +65,65 @@ export default async function ResultPage({
               </Link>
             </div>
           </div>
-
-          <div className="dashboard-panel rounded-[2rem] p-6 sm:p-8">
-            <p className="display-font text-sm uppercase tracking-[0.28em] text-[var(--color-accent-2)]">
-              你的汽车人格
+        ) : (
+          <section className="dashboard-panel-strong relative overflow-hidden rounded-[2rem] p-6 sm:p-8">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-accent)] to-transparent" />
+            <div className="metric-chip">Result Pending</div>
+            <p className="mt-5 text-sm uppercase tracking-[0.22em] text-[var(--color-muted)]">
+              本次测试已完成
             </p>
-            <h2 className="mt-3 display-font text-[4.4rem] font-semibold uppercase leading-none text-[var(--color-text)] sm:text-[5.6rem]">
-              {personalityCode}
-            </h2>
-            <p className="mt-4 text-base leading-8 text-[var(--color-muted)]">
-              这个结果代表你在四组决策维度中的主导倾向，方便你后续继续筛车型、看参数和比配置。
+            <h1 className="mt-3 text-3xl font-semibold leading-tight sm:text-5xl">
+              人格画像已生成
+              <span className="block text-[var(--color-accent)]">推荐车型仍在整理中</span>
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-8 text-[var(--color-muted)]">
+              已成功生成你的汽车人格标签。当前没有可展示的车型推荐时，仍会保留画像结果，便于后续继续分析或补充推荐。
             </p>
 
-            <div className="mt-8 grid grid-cols-2 gap-3">
-              {[
-                ["P / E", `${scores.practical}:${scores.emotional}`],
-                ["S / Q", `${scores.saving}:${scores.quality}`],
-                ["C / D", `${scores.comfort}:${scores.driving}`],
-                ["B / V", `${scores.brand}:${scores.value}`],
-              ].map(([label, value]) => (
-                <div
-                  key={label}
-                  className="rounded-[1.35rem] border border-[var(--color-line)] bg-white/62 p-4"
-                >
-                  <p className="display-font text-xl uppercase text-[var(--color-accent-2)]">
-                    {label}
-                  </p>
-                  <p className="mt-2 text-sm text-[var(--color-muted)]">{value}</p>
-                </div>
-              ))}
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-[1.4rem] border border-[var(--color-line)] bg-white/70 p-4">
+                <p className="display-font text-xs uppercase tracking-[0.24em] text-[var(--color-muted)]">
+                  推荐数量
+                </p>
+                <p className="mt-2 display-font text-4xl uppercase text-[var(--color-accent)]">0</p>
+              </div>
+              <div className="rounded-[1.4rem] border border-[var(--color-line)] bg-white/70 p-4">
+                <p className="display-font text-xs uppercase tracking-[0.24em] text-[var(--color-muted)]">
+                  当前状态
+                </p>
+                <p className="mt-2 text-sm leading-7 text-[var(--color-text)]">
+                  人格结果已保留，可继续回看标签与摘要。
+                </p>
+              </div>
             </div>
+          </section>
+        )}
+
+        <div className="dashboard-panel rounded-[2rem] p-6 sm:p-8">
+          <p className="display-font text-sm uppercase tracking-[0.28em] text-[var(--color-accent-2)]">
+            你的汽车人格
+          </p>
+          <h2 className="mt-3 display-font text-[4.4rem] font-semibold uppercase leading-none text-[var(--color-text)] sm:text-[5.6rem]">
+            {result.personalityProfile.code}
+          </h2>
+          <p className="mt-4 text-base leading-8 text-[var(--color-muted)]">
+            {result.personalityProfile.summary}
+          </p>
+
+          <div className="mt-8 grid gap-3">
+            {[
+              ["画像名称", result.personalityProfile.name],
+              ["会话编号", result.sessionId],
+              ["推荐数量", `${result.recommendations.length} 台`],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-[1.35rem] border border-[var(--color-line)] bg-white/62 p-4">
+                <p className="display-font text-xl uppercase text-[var(--color-accent-2)]">{label}</p>
+                <p className="mt-2 text-sm text-[var(--color-muted)]">{value}</p>
+              </div>
+            ))}
           </div>
-        </section>
-      ) : null}
+        </div>
+      </section>
 
       {alternatives.length > 0 ? (
         <section className="mt-8">
@@ -145,7 +148,6 @@ export default async function ResultPage({
                 <p className="display-font text-2xl text-[var(--color-text)]">
                   {vehicle.brand} {vehicle.series}
                 </p>
-                <p className="mt-2 text-sm text-[var(--color-accent-2)]">{vehicle.modelName}</p>
                 <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
                   {vehicle.reason}
                 </p>
