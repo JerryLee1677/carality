@@ -19,6 +19,79 @@ type AggregatedTraits = {
   byTargetType: Partial<Record<TraitTargetType, Record<string, number>>>;
 };
 
+const DISPLAY_PERSONALITY_PROFILES: Record<
+  string,
+  {
+    name: string;
+    summary: string;
+  }
+> = {
+  PSCV: {
+    name: "务实省心型",
+    summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
+  },
+  PSCB: {
+    name: "体面务实型",
+    summary: "你希望一台车既省心舒适，也有成熟品牌带来的体面感和安心感。",
+  },
+  PSDV: {
+    name: "理性驾趣型",
+    summary: "你在意驾驶乐趣和车辆反应，但前提仍是成本可控、选择划算，不会为情绪感完全失去理性。",
+  },
+  PSDB: {
+    name: "克制性能型",
+    summary: "你想要驾控和品牌带来的满足感，但依然会把理性和实际价值放在前面。",
+  },
+  PQCV: {
+    name: "品质实用型",
+    summary: "你愿意为更完整的品质体验付费，但核心仍是舒适、稳定和长期使用价值。",
+  },
+  PQCB: {
+    name: "成熟品质型",
+    summary: "你看重舒适、质感和品牌成熟度，希望整台车在体验和体面感上都比较均衡。",
+  },
+  PQDV: {
+    name: "精致驾控型",
+    summary: "你追求更完整的驾驶质感和配置体验，同时仍会认真衡量一台车是否值得入手。",
+  },
+  PQDB: {
+    name: "格调性能型",
+    summary: "你偏爱更高级的驾控体验和品牌质感，买车时很看重整体格调和完成度。",
+  },
+  ESCV: {
+    name: "感受家用型",
+    summary: "你容易被顺手、舒服和整体感受打动，但最终仍偏向舒适、省心和高性价比。",
+  },
+  ESCB: {
+    name: "感性体面型",
+    summary: "你喜欢顺眼、舒服、有面子的车，不一定追求极致参数，但很重视感受是否到位。",
+  },
+  ESDV: {
+    name: "玩乐超值型",
+    summary: "你重视驾驶乐趣和新鲜感，但不想为品牌溢价多花钱，更希望把钱花在体验本身上。",
+  },
+  ESDB: {
+    name: "外放驾趣型",
+    summary: "你希望车有个性、有乐趣、有存在感，最好还能兼顾足够鲜明的品牌表达。",
+  },
+  EQCV: {
+    name: "高配舒享型",
+    summary: "你更在意座舱体验、配置完整度和舒适感，偏好长期使用中持续让人满意的车。",
+  },
+  EQCB: {
+    name: "豪华舒享型",
+    summary: "你注重品牌、品质、舒适和体面，买车时会优先考虑整体体验是否足够高级。",
+  },
+  EQDV: {
+    name: "科技驾趣型",
+    summary: "你看重科技、性能和品质完成度，希望一台车本身就能持续提供兴奋感和新鲜感。",
+  },
+  EQDB: {
+    name: "旗舰表达型",
+    summary: "你追求品牌、科技、驾控和辨识度，买车同时也在买表达和气场。",
+  },
+};
+
 type AssessmentDbClient = Pick<
   PrismaService,
   | "assessmentSession"
@@ -395,10 +468,8 @@ export class AssessmentService {
     return {
       sessionId: result.sessionId,
       personalityProfile: {
-        code: this.buildDisplayPersonalityCode(aggregatedTraits),
+        ...this.buildDisplayPersonalityProfile(aggregatedTraits),
         archetypeCode: selectedProfile.code,
-        name: selectedProfile.name,
-        summary: selectedProfile.summary,
       },
       recommendations: rankedRecommendations.map((vehicle) => ({
         slug: vehicle.slug,
@@ -545,10 +616,8 @@ export class AssessmentService {
     return {
       sessionId: session.result.sessionId,
       personalityProfile: {
-        code: this.buildDisplayPersonalityCode(aggregatedTraits),
+        ...this.buildDisplayPersonalityProfile(aggregatedTraits),
         archetypeCode: session.result.personalityProfile.code,
-        name: session.result.personalityProfile.name,
-        summary: session.result.personalityProfile.summary,
       },
       recommendations: session.result.recommendations.map((item) => ({
         slug: item.vehicle.slug,
@@ -682,7 +751,7 @@ export class AssessmentService {
     );
     const labels = topTraits.map((trait) => trait.label);
 
-    if (this.getCorePreferencePenalty(aggregatedTraits, traitWeights) > 0) {
+    if (this.getMissingCorePreferencePenalty(aggregatedTraits, traitWeights) > 0) {
       return `你当前更看重${labels.join("、")}，但这台车与这些优先项的重合度较低。`;
     }
 
@@ -731,20 +800,67 @@ export class AssessmentService {
       traitThreshold: number | { toString(): string };
     }> = [],
   ) {
-    const baseScore = traitWeights.reduce((total, weight) => {
-      const traitValue = this.getTraitValue(aggregatedTraits, weight.targetKey, weight.targetType);
-      return total + traitValue * Number(weight.weight);
-    }, 0);
+    const preferenceAlignment = this.getAlignmentScore(
+      aggregatedTraits,
+      traitWeights,
+      "VEHICLE_PREFERENCE",
+      2,
+    );
+    const personalityAlignment = this.getAlignmentScore(
+      aggregatedTraits,
+      traitWeights,
+      "PERSONALITY_TRAIT",
+      2,
+    );
+    const constraintFit = this.getConstraintFitScore(constraintRules, aggregatedTraits);
+    const corePenalty = this.getMissingCorePreferencePenalty(aggregatedTraits, traitWeights);
 
     return Math.max(
       0,
-      baseScore -
-        this.getCorePreferencePenalty(aggregatedTraits, traitWeights) -
-        this.getConstraintPenalty(constraintRules, aggregatedTraits),
+      Math.round(
+        preferenceAlignment * 0.55 + personalityAlignment * 0.1 + constraintFit * 0.35 - corePenalty,
+      ),
     );
   }
 
-  private getConstraintPenalty(
+  private getAlignmentScore(
+    aggregatedTraits: AggregatedTraits,
+    traitWeights: Array<{
+      targetType: TraitTargetType;
+      targetKey: string;
+      weight: number | { toString(): string };
+    }>,
+    targetType: "VEHICLE_PREFERENCE" | "PERSONALITY_TRAIT",
+    limit: number,
+  ) {
+    const prioritizedTraits = Object.entries(aggregatedTraits.byTargetType[targetType] ?? {})
+      .filter(([, value]) => value > 0)
+      .sort((left, right) => right[1] - left[1])
+      .slice(0, limit);
+
+    if (prioritizedTraits.length === 0) {
+      return 60;
+    }
+
+    const totalImportance = prioritizedTraits.reduce((total, [, value]) => total + value * value, 0);
+
+    if (totalImportance === 0) {
+      return 60;
+    }
+
+    const matchedImportance = prioritizedTraits.reduce((total, [traitKey, value]) => {
+      const matchedWeight = traitWeights.find(
+        (weight) => weight.targetType === targetType && weight.targetKey === traitKey,
+      );
+      const normalizedWeight = Math.min(1, Number(matchedWeight?.weight ?? 0) / 10);
+
+      return total + value * value * normalizedWeight;
+    }, 0);
+
+    return Math.round((matchedImportance / totalImportance) * 100);
+  }
+
+  private getConstraintFitScore(
     constraintRules: Array<{
       targetType: TraitTargetType;
       targetKey: string;
@@ -754,23 +870,24 @@ export class AssessmentService {
     aggregatedTraits: AggregatedTraits,
   ) {
     if (constraintRules.length === 0) {
-      return 0;
+      return 100;
     }
 
-    return constraintRules.reduce((penalty, rule) => {
+    const matchedCount = constraintRules.reduce((count, rule) => {
       const traitValue = this.getTraitValue(aggregatedTraits, rule.targetKey, rule.targetType);
       const threshold = Number(rule.traitThreshold);
 
       if (this.matchesBranchRule(traitValue, rule.traitOperator, threshold)) {
-        return penalty;
+        return count + 1;
       }
 
-      const distance = Math.abs(traitValue - threshold);
-      return penalty + 60 + distance * 12;
+      return count;
     }, 0);
+
+    return Math.round((matchedCount / constraintRules.length) * 100);
   }
 
-  private getCorePreferencePenalty(
+  private getMissingCorePreferencePenalty(
     aggregatedTraits: AggregatedTraits,
     traitWeights: Array<{
       targetType: TraitTargetType;
@@ -778,27 +895,22 @@ export class AssessmentService {
       weight: number | { toString(): string };
     }>,
   ) {
-    const strongestPreferences = Object.entries(
-      aggregatedTraits.byTargetType.VEHICLE_PREFERENCE ?? {},
-    )
-      .filter(([, value]) => value >= 4)
+    const strongestPreferences = Object.entries(aggregatedTraits.byTargetType.VEHICLE_PREFERENCE ?? {})
+      .filter(([, value]) => value > 0)
       .sort((left, right) => right[1] - left[1])
       .slice(0, 2);
-
-    if (strongestPreferences.length < 2) {
-      return 0;
-    }
 
     return strongestPreferences.reduce((penalty, [traitKey, traitValue]) => {
       const matchedWeight = traitWeights.find(
         (weight) => weight.targetType === "VEHICLE_PREFERENCE" && weight.targetKey === traitKey,
       );
+      const normalizedWeight = Math.min(1, Number(matchedWeight?.weight ?? 0) / 10);
 
-      if (matchedWeight && Number(matchedWeight.weight) >= 6) {
+      if (normalizedWeight >= 0.6) {
         return penalty;
       }
 
-      return penalty + traitValue * 8;
+      return penalty + ((0.6 - normalizedWeight) / 0.6) * Math.min(20, traitValue * 3);
     }, 0);
   }
 
@@ -868,6 +980,20 @@ export class AssessmentService {
     const letter4 = brandScore > valueScore ? "B" : "V";
 
     return `${letter1}${letter2}${letter3}${letter4}`;
+  }
+
+  private buildDisplayPersonalityProfile(aggregatedTraits: AggregatedTraits) {
+    const code = this.buildDisplayPersonalityCode(aggregatedTraits);
+    const profile = DISPLAY_PERSONALITY_PROFILES[code] ?? {
+      name: "购车人格",
+      summary: "你的购车选择有稳定偏好，建议结合预算、场景和体验重点继续细看车型。",
+    };
+
+    return {
+      code,
+      name: profile.name,
+      summary: profile.summary,
+    };
   }
 
   private getTraitValue(

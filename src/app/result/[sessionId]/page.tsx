@@ -3,6 +3,20 @@ import Link from "next/link";
 import { assessmentApiFetch } from "@/lib/assessment-api";
 import type { AssessmentResult } from "@/lib/assessment-session";
 
+function extractMatchedPreferences(reason: string) {
+  const matched = reason.match(/你当前更看重(.+?)(，这台车|，但这台车)/);
+
+  if (!matched?.[1]) {
+    return [];
+  }
+
+  return matched[1]
+    .split("、")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 3);
+}
+
 export default async function ResultPage({
   params,
 }: {
@@ -15,6 +29,7 @@ export default async function ResultPage({
   const result = (await response.json()) as AssessmentResult;
   const recommendations = result.recommendations;
   const [topVehicle, ...alternatives] = recommendations;
+  const topVehiclePreferences = topVehicle ? extractMatchedPreferences(topVehicle.reason) : [];
 
   return (
     <main className="shell py-8 sm:py-10">
@@ -52,6 +67,24 @@ export default async function ResultPage({
                 </p>
               </div>
             </div>
+
+            {topVehiclePreferences.length > 0 ? (
+              <div className="mt-5 rounded-[1.4rem] border border-[var(--color-line)] bg-white/70 p-4">
+                <p className="display-font text-xs uppercase tracking-[0.24em] text-[var(--color-muted)]">
+                  命中的核心偏好
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {topVehiclePreferences.map((preference) => (
+                    <span
+                      key={preference}
+                      className="rounded-full border border-[var(--color-line)] bg-[rgba(217,106,44,0.1)] px-3 py-1 text-sm text-[var(--color-text)]"
+                    >
+                      {preference}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link

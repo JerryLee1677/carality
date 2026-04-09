@@ -130,8 +130,9 @@ export const vehicles = [
     tags: ["technology", "expression"],
     traitWeights: [
       weight("VEHICLE_PREFERENCE", "smart_features", 10),
+      weight("VEHICLE_PREFERENCE", "driving_engagement", 8),
       weight("VEHICLE_PREFERENCE", "design_presence", 8),
-      weight("VEHICLE_PREFERENCE", "brand_expression", 7),
+      weight("VEHICLE_PREFERENCE", "brand_expression", 8),
       weight("PERSONALITY_TRAIT", "novelty_seeking", 8),
     ],
     constraintRules: [
@@ -684,9 +685,9 @@ export const vehicles = [
     recommendation: "适合有补能条件、想要家用纯电 SUV 的用户",
     tags: ["family", "ev"],
     traitWeights: [
-      weight("VEHICLE_PREFERENCE", "comfort_space", 7),
+      weight("VEHICLE_PREFERENCE", "comfort_space", 8),
       weight("VEHICLE_PREFERENCE", "smart_features", 6),
-      weight("VEHICLE_PREFERENCE", "daily_reliability", 6),
+      weight("VEHICLE_PREFERENCE", "daily_reliability", 8),
       weight("PERSONALITY_TRAIT", "stability_preference", 5),
     ],
     constraintRules: [
@@ -708,8 +709,8 @@ export const vehicles = [
     recommendation: "适合想要合资纯电平台、空间和稳定性兼顾的用户",
     tags: ["family", "ev"],
     traitWeights: [
-      weight("VEHICLE_PREFERENCE", "comfort_space", 7),
-      weight("VEHICLE_PREFERENCE", "daily_reliability", 7),
+      weight("VEHICLE_PREFERENCE", "comfort_space", 8),
+      weight("VEHICLE_PREFERENCE", "daily_reliability", 8),
       weight("VEHICLE_PREFERENCE", "smart_features", 6),
       weight("PERSONALITY_TRAIT", "planning_bias", 5),
     ],
@@ -732,7 +733,7 @@ export const vehicles = [
     recommendation: "适合预算中等、喜欢驾驶反馈和紧凑车身的用户",
     tags: ["driving", "balanced"],
     traitWeights: [
-      weight("VEHICLE_PREFERENCE", "driving_engagement", 7),
+      weight("VEHICLE_PREFERENCE", "driving_engagement", 8),
       weight("VEHICLE_PREFERENCE", "design_presence", 5),
       weight("VEHICLE_PREFERENCE", "brand_expression", 5),
       weight("PERSONALITY_TRAIT", "control_preference", 6),
@@ -756,7 +757,7 @@ export const vehicles = [
     recommendation: "适合预算克制、希望空间和通勤体验均衡的用户",
     tags: ["commute", "value"],
     traitWeights: [
-      weight("VEHICLE_PREFERENCE", "daily_reliability", 7),
+      weight("VEHICLE_PREFERENCE", "daily_reliability", 8),
       weight("VEHICLE_PREFERENCE", "comfort_space", 6),
       weight("VEHICLE_PREFERENCE", "running_cost", 6),
       weight("PERSONALITY_TRAIT", "stability_preference", 5),
@@ -780,7 +781,7 @@ export const vehicles = [
     recommendation: "适合看重预算和合资基础口碑的用户",
     tags: ["commute", "value"],
     traitWeights: [
-      weight("VEHICLE_PREFERENCE", "running_cost", 7),
+      weight("VEHICLE_PREFERENCE", "running_cost", 8),
       weight("VEHICLE_PREFERENCE", "daily_reliability", 6),
       weight("VEHICLE_PREFERENCE", "comfort_space", 5),
       weight("PERSONALITY_TRAIT", "cost_control", 6),
@@ -900,9 +901,9 @@ export const vehicles = [
     recommendation: "适合通勤和家用兼顾、又愿意接受插混的用户",
     tags: ["commute", "technology"],
     traitWeights: [
-      weight("VEHICLE_PREFERENCE", "comfort_space", 7),
+      weight("VEHICLE_PREFERENCE", "comfort_space", 8),
       weight("VEHICLE_PREFERENCE", "running_cost", 7),
-      weight("VEHICLE_PREFERENCE", "daily_reliability", 7),
+      weight("VEHICLE_PREFERENCE", "daily_reliability", 8),
       weight("PERSONALITY_TRAIT", "planning_bias", 6),
     ],
     constraintRules: [
@@ -948,7 +949,7 @@ export const vehicles = [
     recommendation: "适合预算中等、想要一些操控感和设计感的用户",
     tags: ["driving", "balanced"],
     traitWeights: [
-      weight("VEHICLE_PREFERENCE", "driving_engagement", 7),
+      weight("VEHICLE_PREFERENCE", "driving_engagement", 8),
       weight("VEHICLE_PREFERENCE", "design_presence", 5),
       weight("VEHICLE_PREFERENCE", "running_cost", 6),
       weight("PERSONALITY_TRAIT", "control_preference", 6),
@@ -972,7 +973,7 @@ export const vehicles = [
     recommendation: "适合有补能条件、希望纯电但又偏向传统品牌的人",
     tags: ["technology", "ev"],
     traitWeights: [
-      weight("VEHICLE_PREFERENCE", "smart_features", 7),
+      weight("VEHICLE_PREFERENCE", "smart_features", 8),
       weight("VEHICLE_PREFERENCE", "driving_engagement", 6),
       weight("VEHICLE_PREFERENCE", "design_presence", 5),
       weight("PERSONALITY_TRAIT", "novelty_seeking", 5),
@@ -996,7 +997,7 @@ export const vehicles = [
     recommendation: "适合预算适中、以城市代步为主的年轻用户",
     tags: ["commute", "value"],
     traitWeights: [
-      weight("VEHICLE_PREFERENCE", "running_cost", 7),
+      weight("VEHICLE_PREFERENCE", "running_cost", 8),
       weight("VEHICLE_PREFERENCE", "daily_reliability", 6),
       weight("VEHICLE_PREFERENCE", "driving_engagement", 4),
       weight("PERSONALITY_TRAIT", "cost_control", 6),
@@ -1020,7 +1021,7 @@ export const vehicles = [
     recommendation: "适合想要城市灵活性和一定驾驶感平衡的用户",
     tags: ["balanced", "driving"],
     traitWeights: [
-      weight("VEHICLE_PREFERENCE", "driving_engagement", 6),
+      weight("VEHICLE_PREFERENCE", "driving_engagement", 8),
       weight("VEHICLE_PREFERENCE", "design_presence", 5),
       weight("VEHICLE_PREFERENCE", "daily_reliability", 7),
       weight("PERSONALITY_TRAIT", "control_preference", 5),
@@ -1092,7 +1093,7 @@ export const vehicles = [
     recommendation: "适合有补能条件、预算中等、希望纯电家用的用户",
     tags: ["family", "ev"],
     traitWeights: [
-      weight("VEHICLE_PREFERENCE", "smart_features", 6),
+      weight("VEHICLE_PREFERENCE", "smart_features", 8),
       weight("VEHICLE_PREFERENCE", "comfort_space", 6),
       weight("VEHICLE_PREFERENCE", "running_cost", 7),
       weight("PERSONALITY_TRAIT", "novelty_seeking", 4),
@@ -1212,8 +1213,8 @@ export const vehicles = [
     recommendation: "适合喜欢设计调性、又不想上新能源的用户",
     tags: ["balanced", "expression"],
     traitWeights: [
-      weight("VEHICLE_PREFERENCE", "design_presence", 6),
-      weight("VEHICLE_PREFERENCE", "driving_engagement", 6),
+      weight("VEHICLE_PREFERENCE", "design_presence", 8),
+      weight("VEHICLE_PREFERENCE", "driving_engagement", 8),
       weight("VEHICLE_PREFERENCE", "daily_reliability", 5),
       weight("PERSONALITY_TRAIT", "expression_drive", 5),
     ],
@@ -1260,7 +1261,7 @@ export const vehicles = [
     recommendation: "适合城市场景、预算中等、愿意接受插混的年轻用户",
     tags: ["commute", "technology"],
     traitWeights: [
-      weight("VEHICLE_PREFERENCE", "smart_features", 6),
+      weight("VEHICLE_PREFERENCE", "smart_features", 8),
       weight("VEHICLE_PREFERENCE", "design_presence", 6),
       weight("VEHICLE_PREFERENCE", "running_cost", 7),
       weight("PERSONALITY_TRAIT", "novelty_seeking", 5),
@@ -1332,8 +1333,8 @@ export const vehicles = [
     recommendation: "适合预算适中、有补能条件、偏爱年轻设计的用户",
     tags: ["ev", "expression"],
     traitWeights: [
-      weight("VEHICLE_PREFERENCE", "smart_features", 7),
-      weight("VEHICLE_PREFERENCE", "design_presence", 7),
+      weight("VEHICLE_PREFERENCE", "smart_features", 8),
+      weight("VEHICLE_PREFERENCE", "design_presence", 8),
       weight("VEHICLE_PREFERENCE", "running_cost", 7),
       weight("PERSONALITY_TRAIT", "novelty_seeking", 5),
     ],
@@ -1500,8 +1501,8 @@ export const vehicles = [
     recommendation: "适合预算理性、偏传统动力、同时希望配置不差的用户",
     tags: ["value", "commute"],
     traitWeights: [
-      weight("VEHICLE_PREFERENCE", "running_cost", 7),
-      weight("VEHICLE_PREFERENCE", "comfort_space", 7),
+      weight("VEHICLE_PREFERENCE", "running_cost", 8),
+      weight("VEHICLE_PREFERENCE", "comfort_space", 8),
       weight("VEHICLE_PREFERENCE", "design_presence", 6),
       weight("PERSONALITY_TRAIT", "cost_control", 6),
     ],

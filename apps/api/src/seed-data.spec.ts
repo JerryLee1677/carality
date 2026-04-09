@@ -38,6 +38,16 @@ describe("assessment seed data", () => {
     expect(vehicles.every((vehicle) => vehicle.constraintRules.length >= 2)).toBe(true);
   });
 
+  it("gives every vehicle at least one dominant preference trait", () => {
+    expect(
+      vehicles.every((vehicle) =>
+        vehicle.traitWeights.some(
+          (weight) => weight.targetType === "VEHICLE_PREFERENCE" && weight.weight >= 8,
+        ),
+      ),
+    ).toBe(true);
+  });
+
   it("keeps vehicle slugs unique at model level", () => {
     const slugs = vehicles.map((vehicle) => vehicle.slug);
     const uniqueSlugs = new Set(slugs);
@@ -64,6 +74,28 @@ describe("assessment seed data", () => {
         "lynkco-900",
       ]),
     );
+  });
+
+  it("keeps the benchmark tech/performance and commuter models clearly differentiated", () => {
+    const bySlug = new Map(vehicles.map((vehicle) => [vehicle.slug, vehicle]));
+    const preferenceWeight = (slug: string, targetKey: string) =>
+      bySlug
+        .get(slug)
+        ?.traitWeights.find(
+          (weight) => weight.targetType === "VEHICLE_PREFERENCE" && weight.targetKey === targetKey,
+        )?.weight ?? 0;
+
+    expect(preferenceWeight("xiaomi-su7", "smart_features")).toBeGreaterThanOrEqual(9);
+    expect(preferenceWeight("xiaomi-su7", "driving_engagement")).toBeGreaterThanOrEqual(8);
+    expect(preferenceWeight("tesla-model-3", "smart_features")).toBeGreaterThanOrEqual(9);
+    expect(preferenceWeight("tesla-model-3", "driving_engagement")).toBeGreaterThanOrEqual(8);
+    expect(preferenceWeight("lynkco-03-plus", "driving_engagement")).toBeGreaterThanOrEqual(9);
+    expect(preferenceWeight("honda-civic", "driving_engagement")).toBeGreaterThanOrEqual(8);
+    expect(preferenceWeight("honda-integra", "driving_engagement")).toBeGreaterThanOrEqual(8);
+    expect(preferenceWeight("nissan-sylphy", "smart_features")).toBeLessThanOrEqual(2);
+    expect(preferenceWeight("nissan-sylphy", "driving_engagement")).toBeLessThanOrEqual(2);
+    expect(preferenceWeight("volkswagen-sagitar", "smart_features")).toBeLessThanOrEqual(3);
+    expect(preferenceWeight("volkswagen-sagitar", "driving_engagement")).toBeLessThanOrEqual(4);
   });
 
   it("keeps personality profiles rule-driven", () => {

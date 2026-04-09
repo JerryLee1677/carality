@@ -450,8 +450,8 @@ describe("AssessmentService", () => {
       {
         id: "profile_steady",
         code: "STEADY_PRAGMATIST",
-        name: "稳健务实型",
-        summary: "做决定偏稳，重视长期成本、确定性和日常便利。",
+        name: "务实省心型",
+        summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
         detail: "detail",
         rules: [
           {
@@ -571,8 +571,8 @@ describe("AssessmentService", () => {
       personalityProfile: {
         code: "PSCV",
         archetypeCode: "STEADY_PRAGMATIST",
-        name: "稳健务实型",
-        summary: "做决定偏稳，重视长期成本、确定性和日常便利。",
+        name: "务实省心型",
+        summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
       },
       recommendations: [
         {
@@ -580,7 +580,7 @@ describe("AssessmentService", () => {
           brand: "比亚迪",
           series: "宋 PLUS",
           rank: 1,
-          score: 88,
+          score: 95,
           reason: "你当前更看重家庭适配、稳定性、长期使用成本，这台车在这些维度上最贴合你的选择。",
         },
         {
@@ -588,7 +588,7 @@ describe("AssessmentService", () => {
           brand: "特斯拉",
           series: "Model 3",
           rank: 2,
-          score: 0,
+          score: 14,
           reason: "你当前更看重家庭适配、稳定性、长期使用成本，但这台车与这些优先项的重合度较低。",
         },
       ],
@@ -613,8 +613,8 @@ describe("AssessmentService", () => {
         sessionId: "session_complete_1",
         personalityProfileId: "profile_steady",
         confidenceScore: 1,
-        summary: "做决定偏稳，重视长期成本、确定性和日常便利。",
-        explanation: "稳健务实型",
+        summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
+        explanation: "务实省心型",
       },
       select: {
         id: true,
@@ -627,14 +627,14 @@ describe("AssessmentService", () => {
           resultId: "result_1",
           vehicleId: "vehicle_1",
           rank: 1,
-          score: 88,
+          score: 95,
           reason: "你当前更看重家庭适配、稳定性、长期使用成本，这台车在这些维度上最贴合你的选择。",
         },
         {
           resultId: "result_1",
           vehicleId: "vehicle_2",
           rank: 2,
-          score: 0,
+          score: 14,
           reason: "你当前更看重家庭适配、稳定性、长期使用成本，但这台车与这些优先项的重合度较低。",
         },
       ],
@@ -783,8 +783,8 @@ describe("AssessmentService", () => {
       personalityProfile: {
         code: "PSCV",
         archetypeCode: "STEADY_PRAGMATIST",
-        name: "稳健务实型",
-        summary: "做决定偏稳，重视长期成本、确定性和日常便利。",
+        name: "务实省心型",
+        summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
       },
       recommendations: [
         {
@@ -792,8 +792,8 @@ describe("AssessmentService", () => {
           brand: "丰田",
           series: "凯美瑞",
           rank: 1,
-          score: 30,
-          reason: "你当前更看重稳定性、家庭适配，这台车在这些维度上最贴合你的选择。",
+          score: 39,
+          reason: "你当前更看重稳定性、家庭适配，但这台车与这些优先项的重合度较低。",
         },
       ],
     });
@@ -804,8 +804,8 @@ describe("AssessmentService", () => {
           resultId: "result_constraints_1",
           vehicleId: "vehicle_pass",
           rank: 1,
-          score: 30,
-          reason: "你当前更看重稳定性、家庭适配，这台车在这些维度上最贴合你的选择。",
+          score: 39,
+          reason: "你当前更看重稳定性、家庭适配，但这台车与这些优先项的重合度较低。",
         },
       ],
     });
@@ -904,8 +904,8 @@ describe("AssessmentService", () => {
       personalityProfile: {
         code: "PSCV",
         archetypeCode: "STEADY_PRAGMATIST",
-        name: "稳健务实型",
-        summary: "summary",
+        name: "务实省心型",
+        summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
       },
       recommendations: [
         {
@@ -913,7 +913,7 @@ describe("AssessmentService", () => {
           brand: "品牌B",
           series: "系列B",
           rank: 1,
-          score: 50,
+          score: 90,
           reason: "你当前更看重shared_signal、shared_signal，这台车在这些维度上最贴合你的选择。",
         },
         {
@@ -921,8 +921,8 @@ describe("AssessmentService", () => {
           brand: "品牌A",
           series: "系列A",
           rank: 2,
-          score: 10,
-          reason: "你当前更看重shared_signal、shared_signal，这台车在这些维度上最贴合你的选择。",
+          score: 30,
+          reason: "你当前更看重shared_signal、shared_signal，但这台车与这些优先项的重合度较低。",
         },
       ],
     });
@@ -1122,8 +1122,8 @@ describe("AssessmentService", () => {
       personalityProfile: {
         code: "PSCV",
         archetypeCode: "STEADY_PRAGMATIST",
-        name: "稳健务实型",
-        summary: "summary",
+        name: "务实省心型",
+        summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
       },
       recommendations: [
         {
@@ -1131,7 +1131,7 @@ describe("AssessmentService", () => {
           brand: "品牌D",
           series: "系列D",
           rank: 1,
-          score: 50,
+          score: 90,
           reason: "你当前更看重shared_signal、shared_signal，这台车在这些维度上最贴合你的选择。",
         },
       ],
@@ -1235,8 +1235,8 @@ describe("AssessmentService", () => {
       personalityProfile: {
         code: "PSDV",
         archetypeCode: "EXPRESSIVE_EXPLORER",
-        name: "表达探索型",
-        summary: "summary",
+        name: "理性驾趣型",
+        summary: "你在意驾驶乐趣和车辆反应，但前提仍是成本可控、选择划算，不会为情绪感完全失去理性。",
       },
       recommendations: [
         {
@@ -1244,7 +1244,7 @@ describe("AssessmentService", () => {
           brand: "品牌性能",
           series: "系列性能",
           rank: 1,
-          score: 100,
+          score: 90,
           reason: "你当前更看重智能体验、驾驶乐趣、长期使用成本，这台车在这些维度上最贴合你的选择。",
         },
         {
@@ -1252,7 +1252,7 @@ describe("AssessmentService", () => {
           brand: "品牌通勤",
           series: "系列通勤",
           rank: 2,
-          score: 40,
+          score: 15,
           reason: "你当前更看重智能体验、驾驶乐趣、长期使用成本，但这台车与这些优先项的重合度较低。",
         },
       ],
@@ -1522,8 +1522,8 @@ describe("AssessmentService", () => {
         personalityProfile: {
           code: "PSCV",
           archetypeCode: "STEADY_PRAGMATIST",
-          name: "稳健务实型",
-          summary: "做决定偏稳，重视长期成本、确定性和日常便利。",
+          name: "务实省心型",
+          summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
         },
         recommendations: [
           {
@@ -1531,7 +1531,7 @@ describe("AssessmentService", () => {
             brand: "比亚迪",
             series: "宋 PLUS",
             rank: 1,
-            score: 88,
+            score: 95,
             reason: "你当前更看重家庭适配、稳定性、长期使用成本，这台车在这些维度上最贴合你的选择。",
           },
         ],
@@ -1910,8 +1910,8 @@ describe("AssessmentService", () => {
       {
         id: "profile_steady",
         code: "STEADY_PRAGMATIST",
-        name: "稳健务实型",
-        summary: "做决定偏稳，重视长期成本、确定性和日常便利。",
+        name: "务实省心型",
+        summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
         detail: "detail",
         rules: [
           {
@@ -2065,8 +2065,8 @@ describe("AssessmentService", () => {
       personalityProfile: {
         code: "PSCV",
         archetypeCode: "STEADY_PRAGMATIST",
-        name: "稳健务实型",
-        summary: "做决定偏稳，重视长期成本、确定性和日常便利。",
+        name: "务实省心型",
+        summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
       },
       recommendations: [
         {
