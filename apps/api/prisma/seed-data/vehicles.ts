@@ -9,6 +9,19 @@ type ConstraintRule = {
   traitThreshold: number;
 };
 
+type VehicleCoreScores = {
+  handlingScore: number;
+  comfortScore: number;
+  spaceScore: number;
+  smartScore: number;
+  powerScore: number;
+  economyScore: number;
+  brandScore: number;
+  designScore: number;
+  reliabilityScore: number;
+  familyScore: number;
+};
+
 function weight(targetType: EffectTargetType, targetKey: string, value: number) {
   return { targetType, targetKey, weight: value } as const;
 }
@@ -20,6 +33,52 @@ function constraint(targetKey: string, traitOperator: RuleOperator, traitThresho
     traitOperator,
     traitThreshold,
   };
+}
+
+function clampScore(value: number) {
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function preferenceWeight(
+  traitWeights: ReadonlyArray<{ targetType: EffectTargetType; targetKey: string; weight: number }>,
+  targetKey: string,
+) {
+  return (
+    traitWeights.find(
+      (weight) => weight.targetType === "VEHICLE_PREFERENCE" && weight.targetKey === targetKey,
+    )?.weight ?? 0
+  );
+}
+
+function deriveCoreScores(
+  traitWeights: ReadonlyArray<{ targetType: EffectTargetType; targetKey: string; weight: number }>,
+  overrides?: Partial<VehicleCoreScores>,
+): VehicleCoreScores {
+  const driving = preferenceWeight(traitWeights, "driving_engagement");
+  const comfort = preferenceWeight(traitWeights, "comfort_space");
+  const family = preferenceWeight(traitWeights, "family_fit");
+  const smart = preferenceWeight(traitWeights, "smart_features");
+  const runningCost = preferenceWeight(traitWeights, "running_cost");
+  const brand = preferenceWeight(traitWeights, "brand_expression");
+  const design = preferenceWeight(traitWeights, "design_presence");
+  const reliability = preferenceWeight(traitWeights, "daily_reliability");
+  const simplicity = preferenceWeight(traitWeights, "simplicity_reliability");
+
+  const scores: VehicleCoreScores = {
+    handlingScore: clampScore(20 + driving * 8),
+    comfortScore: clampScore(20 + comfort * 8),
+    spaceScore: clampScore(18 + comfort * 4 + family * 4),
+    smartScore: clampScore(18 + smart * 8),
+    powerScore: clampScore(18 + driving * 7 + design * 2),
+    economyScore: clampScore(18 + runningCost * 7 + simplicity * 2),
+    brandScore: clampScore(18 + brand * 8),
+    designScore: clampScore(18 + design * 7 + brand * 2),
+    reliabilityScore: clampScore(18 + reliability * 7 + simplicity * 2),
+    familyScore: clampScore(18 + family * 7 + comfort * 2),
+    ...overrides,
+  };
+
+  return scores;
 }
 
 function vehicle(input: {
@@ -36,10 +95,14 @@ function vehicle(input: {
   tags: readonly string[];
   traitWeights: ReadonlyArray<{ targetType: EffectTargetType; targetKey: string; weight: number }>;
   constraintRules: ReadonlyArray<ConstraintRule>;
+  coreScores?: Partial<VehicleCoreScores>;
 }) {
+  const coreScores = deriveCoreScores(input.traitWeights, input.coreScores);
+
   return {
     ...input,
-    modelName: "",
+    coreScores,
+    ...coreScores,
   };
 }
 
@@ -140,6 +203,18 @@ export const vehicles = [
       constraint("charging_access", "GTE", 3),
       constraint("energy_acceptance_ev", "GTE", 3),
     ],
+    coreScores: {
+      handlingScore: 87,
+      comfortScore: 71,
+      spaceScore: 61,
+      smartScore: 95,
+      powerScore: 91,
+      economyScore: 56,
+      brandScore: 74,
+      designScore: 90,
+      reliabilityScore: 63,
+      familyScore: 45,
+    },
   }),
   vehicle({
     slug: "li-auto-l6",
@@ -164,6 +239,18 @@ export const vehicles = [
       constraint("family_size", "GTE", 3),
       constraint("energy_acceptance_phev", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 58,
+      comfortScore: 89,
+      spaceScore: 90,
+      smartScore: 84,
+      powerScore: 72,
+      economyScore: 67,
+      brandScore: 68,
+      designScore: 70,
+      reliabilityScore: 72,
+      familyScore: 92,
+    },
   }),
   vehicle({
     slug: "mazda-cx-5",
@@ -236,6 +323,18 @@ export const vehicles = [
       constraint("family_size", "GTE", 2),
       constraint("has_elder_passengers", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 58,
+      comfortScore: 82,
+      spaceScore: 80,
+      smartScore: 46,
+      powerScore: 60,
+      economyScore: 77,
+      brandScore: 58,
+      designScore: 50,
+      reliabilityScore: 84,
+      familyScore: 82,
+    },
   }),
   vehicle({
     slug: "zeekr-007",
@@ -286,6 +385,18 @@ export const vehicles = [
       constraint("energy_acceptance_ice", "GTE", 3),
       constraint("monthly_payment_sensitivity", "GTE", 3),
     ],
+    coreScores: {
+      handlingScore: 38,
+      comfortScore: 76,
+      spaceScore: 66,
+      smartScore: 24,
+      powerScore: 34,
+      economyScore: 82,
+      brandScore: 42,
+      designScore: 35,
+      reliabilityScore: 78,
+      familyScore: 61,
+    },
   }),
   vehicle({
     slug: "volkswagen-tiguan-l",
@@ -310,6 +421,18 @@ export const vehicles = [
       constraint("energy_acceptance_ice", "GTE", 3),
       constraint("family_size", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 53,
+      comfortScore: 77,
+      spaceScore: 79,
+      smartScore: 34,
+      powerScore: 57,
+      economyScore: 63,
+      brandScore: 60,
+      designScore: 47,
+      reliabilityScore: 74,
+      familyScore: 80,
+    },
   }),
   vehicle({
     slug: "nio-es6",
@@ -407,6 +530,18 @@ export const vehicles = [
       constraint("parking_constraint", "GTE", 3),
       constraint("energy_acceptance_ice", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 62,
+      comfortScore: 48,
+      spaceScore: 52,
+      smartScore: 22,
+      powerScore: 42,
+      economyScore: 84,
+      brandScore: 44,
+      designScore: 48,
+      reliabilityScore: 79,
+      familyScore: 36,
+    },
   }),
   vehicle({
     slug: "mercedes-c-class",
@@ -623,6 +758,18 @@ export const vehicles = [
       constraint("energy_acceptance_ice", "GTE", 3),
       constraint("intercity_highway_usage", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 55,
+      comfortScore: 80,
+      spaceScore: 78,
+      smartScore: 38,
+      powerScore: 61,
+      economyScore: 66,
+      brandScore: 63,
+      designScore: 50,
+      reliabilityScore: 76,
+      familyScore: 69,
+    },
   }),
   vehicle({
     slug: "volkswagen-tiguan-l-pro",
@@ -647,6 +794,18 @@ export const vehicles = [
       constraint("family_size", "GTE", 2),
       constraint("energy_acceptance_ice", "GTE", 3),
     ],
+    coreScores: {
+      handlingScore: 56,
+      comfortScore: 80,
+      spaceScore: 82,
+      smartScore: 44,
+      powerScore: 60,
+      economyScore: 62,
+      brandScore: 62,
+      designScore: 52,
+      reliabilityScore: 75,
+      familyScore: 82,
+    },
   }),
   vehicle({
     slug: "volkswagen-id3",
@@ -671,6 +830,18 @@ export const vehicles = [
       constraint("charging_access", "GTE", 3),
       constraint("energy_acceptance_ev", "GTE", 3),
     ],
+    coreScores: {
+      handlingScore: 61,
+      comfortScore: 60,
+      spaceScore: 52,
+      smartScore: 60,
+      powerScore: 58,
+      economyScore: 82,
+      brandScore: 56,
+      designScore: 58,
+      reliabilityScore: 72,
+      familyScore: 44,
+    },
   }),
   vehicle({
     slug: "volkswagen-id4-x",
@@ -695,6 +866,18 @@ export const vehicles = [
       constraint("charging_access", "GTE", 3),
       constraint("energy_acceptance_ev", "GTE", 3),
     ],
+    coreScores: {
+      handlingScore: 56,
+      comfortScore: 78,
+      spaceScore: 80,
+      smartScore: 62,
+      powerScore: 60,
+      economyScore: 79,
+      brandScore: 58,
+      designScore: 55,
+      reliabilityScore: 74,
+      familyScore: 79,
+    },
   }),
   vehicle({
     slug: "volkswagen-id4-crozz",
@@ -719,6 +902,18 @@ export const vehicles = [
       constraint("charging_access", "GTE", 3),
       constraint("energy_acceptance_ev", "GTE", 3),
     ],
+    coreScores: {
+      handlingScore: 55,
+      comfortScore: 78,
+      spaceScore: 79,
+      smartScore: 60,
+      powerScore: 59,
+      economyScore: 78,
+      brandScore: 58,
+      designScore: 53,
+      reliabilityScore: 75,
+      familyScore: 78,
+    },
   }),
   vehicle({
     slug: "volkswagen-golf",
@@ -743,6 +938,18 @@ export const vehicles = [
       constraint("energy_acceptance_ice", "GTE", 3),
       constraint("parking_constraint", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 76,
+      comfortScore: 58,
+      spaceScore: 48,
+      smartScore: 34,
+      powerScore: 66,
+      economyScore: 62,
+      brandScore: 61,
+      designScore: 63,
+      reliabilityScore: 68,
+      familyScore: 38,
+    },
   }),
   vehicle({
     slug: "volkswagen-sagitar",
@@ -767,6 +974,18 @@ export const vehicles = [
       constraint("energy_acceptance_ice", "GTE", 3),
       constraint("monthly_payment_sensitivity", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 46,
+      comfortScore: 68,
+      spaceScore: 63,
+      smartScore: 28,
+      powerScore: 45,
+      economyScore: 74,
+      brandScore: 51,
+      designScore: 43,
+      reliabilityScore: 71,
+      familyScore: 58,
+    },
   }),
   vehicle({
     slug: "volkswagen-bora",
@@ -791,6 +1010,18 @@ export const vehicles = [
       constraint("energy_acceptance_ice", "GTE", 3),
       constraint("monthly_payment_sensitivity", "GTE", 3),
     ],
+    coreScores: {
+      handlingScore: 42,
+      comfortScore: 63,
+      spaceScore: 58,
+      smartScore: 24,
+      powerScore: 40,
+      economyScore: 76,
+      brandScore: 47,
+      designScore: 38,
+      reliabilityScore: 67,
+      familyScore: 52,
+    },
   }),
   vehicle({
     slug: "volkswagen-lavida-xinrui",
@@ -815,6 +1046,18 @@ export const vehicles = [
       constraint("energy_acceptance_ice", "GTE", 3),
       constraint("monthly_payment_sensitivity", "GTE", 4),
     ],
+    coreScores: {
+      handlingScore: 39,
+      comfortScore: 60,
+      spaceScore: 56,
+      smartScore: 20,
+      powerScore: 36,
+      economyScore: 79,
+      brandScore: 45,
+      designScore: 34,
+      reliabilityScore: 64,
+      familyScore: 49,
+    },
   }),
   vehicle({
     slug: "volkswagen-teramont-pro",
@@ -839,6 +1082,18 @@ export const vehicles = [
       constraint("family_size", "GTE", 3),
       constraint("cargo_space_need", "GTE", 3),
     ],
+    coreScores: {
+      handlingScore: 48,
+      comfortScore: 85,
+      spaceScore: 92,
+      smartScore: 46,
+      powerScore: 63,
+      economyScore: 50,
+      brandScore: 66,
+      designScore: 58,
+      reliabilityScore: 69,
+      familyScore: 91,
+    },
   }),
   vehicle({
     slug: "volkswagen-viloran",
@@ -863,6 +1118,18 @@ export const vehicles = [
       constraint("family_size", "GTE", 4),
       constraint("has_elder_passengers", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 36,
+      comfortScore: 92,
+      spaceScore: 94,
+      smartScore: 42,
+      powerScore: 52,
+      economyScore: 48,
+      brandScore: 63,
+      designScore: 52,
+      reliabilityScore: 71,
+      familyScore: 94,
+    },
   }),
   vehicle({
     slug: "volkswagen-touran-l",
@@ -887,6 +1154,18 @@ export const vehicles = [
       constraint("family_size", "GTE", 3),
       constraint("energy_acceptance_ice", "GTE", 3),
     ],
+    coreScores: {
+      handlingScore: 40,
+      comfortScore: 78,
+      spaceScore: 86,
+      smartScore: 28,
+      powerScore: 42,
+      economyScore: 67,
+      brandScore: 50,
+      designScore: 36,
+      reliabilityScore: 70,
+      familyScore: 86,
+    },
   }),
   vehicle({
     slug: "honda-accord",
@@ -911,6 +1190,18 @@ export const vehicles = [
       constraint("energy_acceptance_phev", "GTE", 2),
       constraint("intercity_highway_usage", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 58,
+      comfortScore: 78,
+      spaceScore: 77,
+      smartScore: 55,
+      powerScore: 63,
+      economyScore: 78,
+      brandScore: 62,
+      designScore: 58,
+      reliabilityScore: 79,
+      familyScore: 69,
+    },
   }),
   vehicle({
     slug: "honda-breeze-ehev",
@@ -935,6 +1226,18 @@ export const vehicles = [
       constraint("family_size", "GTE", 2),
       constraint("has_children", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 56,
+      comfortScore: 81,
+      spaceScore: 80,
+      smartScore: 48,
+      powerScore: 60,
+      economyScore: 76,
+      brandScore: 59,
+      designScore: 52,
+      reliabilityScore: 82,
+      familyScore: 80,
+    },
   }),
   vehicle({
     slug: "honda-integra",
@@ -959,6 +1262,18 @@ export const vehicles = [
       constraint("monthly_payment_sensitivity", "GTE", 2),
       constraint("energy_acceptance_ice", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 80,
+      comfortScore: 60,
+      spaceScore: 54,
+      smartScore: 42,
+      powerScore: 73,
+      economyScore: 76,
+      brandScore: 55,
+      designScore: 72,
+      reliabilityScore: 71,
+      familyScore: 44,
+    },
   }),
   vehicle({
     slug: "honda-ens1-p7",
@@ -983,6 +1298,18 @@ export const vehicles = [
       constraint("charging_access", "GTE", 3),
       constraint("energy_acceptance_ev", "GTE", 3),
     ],
+    coreScores: {
+      handlingScore: 62,
+      comfortScore: 67,
+      spaceScore: 65,
+      smartScore: 74,
+      powerScore: 66,
+      economyScore: 77,
+      brandScore: 59,
+      designScore: 61,
+      reliabilityScore: 68,
+      familyScore: 63,
+    },
   }),
   vehicle({
     slug: "honda-vezel",
@@ -1007,6 +1334,18 @@ export const vehicles = [
       constraint("parking_constraint", "GTE", 2),
       constraint("energy_acceptance_ice", "GTE", 3),
     ],
+    coreScores: {
+      handlingScore: 52,
+      comfortScore: 62,
+      spaceScore: 60,
+      smartScore: 30,
+      powerScore: 46,
+      economyScore: 76,
+      brandScore: 51,
+      designScore: 49,
+      reliabilityScore: 72,
+      familyScore: 57,
+    },
   }),
   vehicle({
     slug: "honda-zrv",
@@ -1031,6 +1370,18 @@ export const vehicles = [
       constraint("energy_acceptance_ice", "GTE", 2),
       constraint("parking_constraint", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 70,
+      comfortScore: 64,
+      spaceScore: 60,
+      smartScore: 36,
+      powerScore: 62,
+      economyScore: 68,
+      brandScore: 55,
+      designScore: 63,
+      reliabilityScore: 74,
+      familyScore: 54,
+    },
   }),
   vehicle({
     slug: "honda-odyssey-ehev",
@@ -1055,6 +1406,18 @@ export const vehicles = [
       constraint("family_size", "GTE", 4),
       constraint("has_elder_passengers", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 39,
+      comfortScore: 90,
+      spaceScore: 92,
+      smartScore: 45,
+      powerScore: 51,
+      economyScore: 72,
+      brandScore: 60,
+      designScore: 46,
+      reliabilityScore: 80,
+      familyScore: 93,
+    },
   }),
   vehicle({
     slug: "honda-avancier",
@@ -1079,6 +1442,18 @@ export const vehicles = [
       constraint("energy_acceptance_ice", "GTE", 3),
       constraint("family_size", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 57,
+      comfortScore: 83,
+      spaceScore: 82,
+      smartScore: 35,
+      powerScore: 62,
+      economyScore: 59,
+      brandScore: 61,
+      designScore: 58,
+      reliabilityScore: 72,
+      familyScore: 77,
+    },
   }),
   vehicle({
     slug: "honda-ens2",
@@ -1103,6 +1478,18 @@ export const vehicles = [
       constraint("charging_access", "GTE", 3),
       constraint("energy_acceptance_ev", "GTE", 3),
     ],
+    coreScores: {
+      handlingScore: 58,
+      comfortScore: 68,
+      spaceScore: 69,
+      smartScore: 72,
+      powerScore: 60,
+      economyScore: 80,
+      brandScore: 57,
+      designScore: 57,
+      reliabilityScore: 68,
+      familyScore: 66,
+    },
   }),
   vehicle({
     slug: "lynkco-03-plus",
@@ -1127,6 +1514,18 @@ export const vehicles = [
       constraint("energy_acceptance_ice", "GTE", 3),
       constraint("parking_constraint", "LTE", 4),
     ],
+    coreScores: {
+      handlingScore: 91,
+      comfortScore: 57,
+      spaceScore: 46,
+      smartScore: 55,
+      powerScore: 88,
+      economyScore: 48,
+      brandScore: 76,
+      designScore: 82,
+      reliabilityScore: 60,
+      familyScore: 35,
+    },
   }),
   vehicle({
     slug: "lynkco-08-emp",
@@ -1151,6 +1550,18 @@ export const vehicles = [
       constraint("energy_acceptance_phev", "GTE", 2),
       constraint("family_size", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 69,
+      comfortScore: 81,
+      spaceScore: 79,
+      smartScore: 84,
+      powerScore: 76,
+      economyScore: 70,
+      brandScore: 72,
+      designScore: 79,
+      reliabilityScore: 66,
+      familyScore: 77,
+    },
   }),
   vehicle({
     slug: "lynkco-z10",
@@ -1175,6 +1586,18 @@ export const vehicles = [
       constraint("charging_access", "GTE", 3),
       constraint("energy_acceptance_ev", "GTE", 3),
     ],
+    coreScores: {
+      handlingScore: 84,
+      comfortScore: 68,
+      spaceScore: 60,
+      smartScore: 90,
+      powerScore: 86,
+      economyScore: 63,
+      brandScore: 74,
+      designScore: 86,
+      reliabilityScore: 62,
+      familyScore: 50,
+    },
   }),
   vehicle({
     slug: "lynkco-900",
@@ -1199,6 +1622,18 @@ export const vehicles = [
       constraint("family_size", "GTE", 3),
       constraint("energy_acceptance_phev", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 58,
+      comfortScore: 87,
+      spaceScore: 90,
+      smartScore: 82,
+      powerScore: 72,
+      economyScore: 62,
+      brandScore: 76,
+      designScore: 78,
+      reliabilityScore: 68,
+      familyScore: 90,
+    },
   }),
   vehicle({
     slug: "lynkco-01",
@@ -1223,6 +1658,18 @@ export const vehicles = [
       constraint("energy_acceptance_ice", "GTE", 3),
       constraint("family_size", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 72,
+      comfortScore: 67,
+      spaceScore: 67,
+      smartScore: 42,
+      powerScore: 68,
+      economyScore: 56,
+      brandScore: 68,
+      designScore: 76,
+      reliabilityScore: 60,
+      familyScore: 60,
+    },
   }),
   vehicle({
     slug: "lynkco-05-plus",
@@ -1247,6 +1694,18 @@ export const vehicles = [
       constraint("energy_acceptance_ice", "GTE", 3),
       constraint("parking_constraint", "LTE", 4),
     ],
+    coreScores: {
+      handlingScore: 82,
+      comfortScore: 60,
+      spaceScore: 52,
+      smartScore: 50,
+      powerScore: 80,
+      economyScore: 50,
+      brandScore: 72,
+      designScore: 84,
+      reliabilityScore: 58,
+      familyScore: 43,
+    },
   }),
   vehicle({
     slug: "lynkco-06-emp",
@@ -1271,6 +1730,18 @@ export const vehicles = [
       constraint("energy_acceptance_phev", "GTE", 2),
       constraint("parking_constraint", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 62,
+      comfortScore: 60,
+      spaceScore: 56,
+      smartScore: 76,
+      powerScore: 62,
+      economyScore: 79,
+      brandScore: 65,
+      designScore: 72,
+      reliabilityScore: 67,
+      familyScore: 49,
+    },
   }),
   vehicle({
     slug: "lynkco-07-emp",
@@ -1295,6 +1766,18 @@ export const vehicles = [
       constraint("energy_acceptance_phev", "GTE", 2),
       constraint("intercity_highway_usage", "GTE", 1),
     ],
+    coreScores: {
+      handlingScore: 70,
+      comfortScore: 69,
+      spaceScore: 61,
+      smartScore: 80,
+      powerScore: 71,
+      economyScore: 78,
+      brandScore: 70,
+      designScore: 80,
+      reliabilityScore: 66,
+      familyScore: 53,
+    },
   }),
   vehicle({
     slug: "lynkco-09-emp",
@@ -1319,6 +1802,18 @@ export const vehicles = [
       constraint("long_distance_frequency", "GTE", 2),
       constraint("energy_acceptance_phev", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 63,
+      comfortScore: 83,
+      spaceScore: 86,
+      smartScore: 82,
+      powerScore: 74,
+      economyScore: 65,
+      brandScore: 74,
+      designScore: 74,
+      reliabilityScore: 68,
+      familyScore: 85,
+    },
   }),
   vehicle({
     slug: "lynkco-z20",
@@ -1343,6 +1838,18 @@ export const vehicles = [
       constraint("charging_access", "GTE", 3),
       constraint("energy_acceptance_ev", "GTE", 3),
     ],
+    coreScores: {
+      handlingScore: 68,
+      comfortScore: 61,
+      spaceScore: 58,
+      smartScore: 79,
+      powerScore: 67,
+      economyScore: 81,
+      brandScore: 68,
+      designScore: 82,
+      reliabilityScore: 65,
+      familyScore: 49,
+    },
   }),
   vehicle({
     slug: "lynkco-10-emp",
@@ -1367,6 +1874,18 @@ export const vehicles = [
       constraint("energy_acceptance_phev", "GTE", 2),
       constraint("family_size", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 68,
+      comfortScore: 75,
+      spaceScore: 76,
+      smartScore: 81,
+      powerScore: 72,
+      economyScore: 69,
+      brandScore: 70,
+      designScore: 73,
+      reliabilityScore: 66,
+      familyScore: 74,
+    },
   }),
   vehicle({
     slug: "tesla-model-y",
@@ -1583,6 +2102,18 @@ export const vehicles = [
       constraint("energy_acceptance_ice", "GTE", 3),
       constraint("resale_sensitivity", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 54,
+      comfortScore: 79,
+      spaceScore: 77,
+      smartScore: 34,
+      powerScore: 60,
+      economyScore: 65,
+      brandScore: 62,
+      designScore: 49,
+      reliabilityScore: 77,
+      familyScore: 68,
+    },
   }),
   vehicle({
     slug: "volkswagen-tayron",
@@ -1607,6 +2138,18 @@ export const vehicles = [
       constraint("energy_acceptance_ice", "GTE", 3),
       constraint("family_size", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 54,
+      comfortScore: 79,
+      spaceScore: 80,
+      smartScore: 36,
+      powerScore: 59,
+      economyScore: 61,
+      brandScore: 60,
+      designScore: 48,
+      reliabilityScore: 74,
+      familyScore: 81,
+    },
   }),
   vehicle({
     slug: "toyota-camry",
@@ -1679,6 +2222,18 @@ export const vehicles = [
       constraint("energy_acceptance_ice", "GTE", 3),
       constraint("parking_constraint", "GTE", 2),
     ],
+    coreScores: {
+      handlingScore: 78,
+      comfortScore: 61,
+      spaceScore: 56,
+      smartScore: 38,
+      powerScore: 72,
+      economyScore: 68,
+      brandScore: 56,
+      designScore: 69,
+      reliabilityScore: 73,
+      familyScore: 46,
+    },
   }),
   vehicle({
     slug: "honda-hrv",

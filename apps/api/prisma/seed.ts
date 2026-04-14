@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { PrismaClient } from "../src/generated/prisma/index.js";
 import { personalityProfiles } from "./seed-data/personality-profiles";
 import { questions } from "./seed-data/questions";
 import { vehicles } from "./seed-data/vehicles";
@@ -12,7 +13,6 @@ function requireDatabaseUrl() {
 }
 
 async function resetDatabase() {
-  const { PrismaClient } = await import("@prisma/client");
   const prisma = new PrismaClient();
 
   await prisma.sessionVehicleRecommendation.deleteMany();
@@ -127,6 +127,16 @@ async function seedVehicles(prisma: Awaited<ReturnType<typeof resetDatabase>>) {
         priceMax: vehicle.priceMax,
         energyType: vehicle.energyType,
         bodyType: vehicle.bodyType,
+        handlingScore: vehicle.handlingScore,
+        comfortScore: vehicle.comfortScore,
+        spaceScore: vehicle.spaceScore,
+        smartScore: vehicle.smartScore,
+        powerScore: vehicle.powerScore,
+        economyScore: vehicle.economyScore,
+        brandScore: vehicle.brandScore,
+        designScore: vehicle.designScore,
+        reliabilityScore: vehicle.reliabilityScore,
+        familyScore: vehicle.familyScore,
         summary: vehicle.summary,
         recommendation: vehicle.recommendation,
         traitWeights: {

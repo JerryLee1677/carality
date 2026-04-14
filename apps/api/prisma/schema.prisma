@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -201,6 +202,16 @@ model Vehicle {
   priceMax               Int
   energyType             String
   bodyType               String
+  handlingScore          Int                           @default(0)
+  comfortScore           Int                           @default(0)
+  spaceScore             Int                           @default(0)
+  smartScore             Int                           @default(0)
+  powerScore             Int                           @default(0)
+  economyScore           Int                           @default(0)
+  brandScore             Int                           @default(0)
+  designScore            Int                           @default(0)
+  reliabilityScore       Int                           @default(0)
+  familyScore            Int                           @default(0)
   summary                String
   recommendation         String
   status                 String                        @default("active")

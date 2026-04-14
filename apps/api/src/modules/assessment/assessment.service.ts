@@ -19,6 +19,58 @@ type AggregatedTraits = {
   byTargetType: Partial<Record<TraitTargetType, Record<string, number>>>;
 };
 
+type CorePreferenceKey =
+  | "handling"
+  | "comfort"
+  | "space"
+  | "smart"
+  | "power"
+  | "economy"
+  | "brand"
+  | "design"
+  | "reliability"
+  | "family";
+
+type CorePreferenceVector = Record<CorePreferenceKey, number>;
+
+type VehicleScoreSource = {
+  energyType?: string | null;
+  traitWeights: Array<{
+    targetType: TraitTargetType;
+    targetKey: string;
+    weight: number | { toString(): string };
+  }>;
+  constraintRules: Array<{
+    targetType: TraitTargetType;
+    targetKey: string;
+    traitOperator: "EQ" | "NEQ" | "GT" | "GTE" | "LT" | "LTE";
+    traitThreshold: number | { toString(): string };
+  }>;
+  handlingScore?: number | null;
+  comfortScore?: number | null;
+  spaceScore?: number | null;
+  smartScore?: number | null;
+  powerScore?: number | null;
+  economyScore?: number | null;
+  brandScore?: number | null;
+  designScore?: number | null;
+  reliabilityScore?: number | null;
+  familyScore?: number | null;
+};
+
+const CORE_PREFERENCE_LABELS: Record<CorePreferenceKey, string> = {
+  handling: "操控响应",
+  comfort: "舒适性",
+  space: "空间实用性",
+  smart: "科技配置",
+  power: "动力表现",
+  economy: "使用成本",
+  brand: "品牌感",
+  design: "设计辨识度",
+  reliability: "可靠稳定性",
+  family: "家庭适配",
+};
+
 const DISPLAY_PERSONALITY_PROFILES: Record<
   string,
   {
@@ -404,12 +456,8 @@ export class AssessmentService {
 
     const rankedRecommendations = recommendationPool
       .map((vehicle) => {
-        const score = this.scoreVehicle(
-          vehicle.traitWeights,
-          aggregatedTraits,
-          vehicle.constraintRules,
-        );
-        const reason = this.buildRecommendationReason(aggregatedTraits, vehicle.traitWeights);
+        const score = this.scoreVehicle(vehicle, aggregatedTraits);
+        const reason = this.buildRecommendationReason(aggregatedTraits, vehicle);
 
         return {
           vehicleId: vehicle.id,
@@ -707,59 +755,34 @@ export class AssessmentService {
 
   private buildRecommendationReason(
     aggregatedTraits: AggregatedTraits,
-    traitWeights: Array<{
-      targetType: TraitTargetType;
-      targetKey: string;
-      weight: number | { toString(): string };
-    }>,
+    vehicle: VehicleScoreSource,
   ) {
-    const traitLabels: Record<string, string> = {
-      family_fit: "家庭适配",
-      stability_preference: "稳定性",
-      running_cost: "长期使用成本",
-      smart_features: "智能体验",
-      driving_engagement: "驾驶乐趣",
-      novelty_seeking: "新鲜感",
-      expression_drive: "表达欲",
-    };
+    const vector = this.buildUserPreferenceVector(aggregatedTraits);
+    const vehicleScores = this.getVehicleCoreScores(vehicle);
+    const topDimensions = this.getTopCorePreferenceDimensions(vector, 3);
 
-    const topTraits = (Object.entries(aggregatedTraits.byTargetType) as Array<
-      [TraitTargetType, Record<string, number>]
-    >)
-      .filter(([targetType]) =>
-        targetType === "PERSONALITY_TRAIT" || targetType === "VEHICLE_PREFERENCE",
-      )
-      .flatMap(([targetType, traits]) =>
-        Object.entries(traits).map(([key, value]) => ({
-          targetType,
-          key,
-          label: traitLabels[key] ?? key,
-          value,
-        })),
-      )
-      .filter((trait) => trait.value > 0)
-      .sort((left, right) => right.value - left.value)
-      .slice(0, 3);
+    if (topDimensions.length === 0) {
+      return "这台车和你的主要用车偏好整体比较接近。";
+    }
 
-    const matchedTraits = topTraits.filter((trait) =>
-      traitWeights.some(
-        (weight) =>
-          weight.targetType === trait.targetType &&
-          weight.targetKey === trait.key &&
-          Number(weight.weight) > 0,
-      ),
+    const labels = topDimensions.map(({ key }) => CORE_PREFERENCE_LABELS[key]);
+    const matchedDimensions = topDimensions.filter(
+      ({ key, value }) => vehicleScores[key] >= Math.max(60, value - 12),
     );
-    const labels = topTraits.map((trait) => trait.label);
+    const topAverage =
+      topDimensions.reduce((total, { key }) => total + vehicleScores[key], 0) / topDimensions.length;
 
-    if (this.getMissingCorePreferencePenalty(aggregatedTraits, traitWeights) > 0) {
-      return `你当前更看重${labels.join("、")}，但这台车与这些优先项的重合度较低。`;
+    if (matchedDimensions.length === 0 || topAverage < 55) {
+      return `你当前更看重${labels.join("、")}，但这台车在这些维度上的匹配度偏低。`;
     }
 
-    if (matchedTraits.length > 0) {
-      return `你当前更看重${labels.join("、")}，这台车在这些维度上最贴合你的选择。`;
+    const matchedLabels = matchedDimensions.map(({ key }) => CORE_PREFERENCE_LABELS[key]);
+
+    if (matchedDimensions.length === topDimensions.length) {
+      return `你当前更看重${labels.join("、")}，这台车在这些核心维度上更贴合你的选择。`;
     }
 
-    return `你当前更看重${labels.join("、")}，但这台车与这些优先项的重合度较低。`;
+    return `你当前更看重${labels.join("、")}，这台车在${matchedLabels.join("、")}上更贴合你的选择。`;
   }
 
   private matchesVehicleConstraints(
@@ -786,39 +809,33 @@ export class AssessmentService {
     });
   }
 
-  private scoreVehicle(
-    traitWeights: Array<{
-      targetType: TraitTargetType;
-      targetKey: string;
-      weight: number | { toString(): string };
-    }>,
-    aggregatedTraits: AggregatedTraits,
-    constraintRules: Array<{
-      targetType: TraitTargetType;
-      targetKey: string;
-      traitOperator: "EQ" | "NEQ" | "GT" | "GTE" | "LT" | "LTE";
-      traitThreshold: number | { toString(): string };
-    }> = [],
-  ) {
+  private scoreVehicle(vehicle: VehicleScoreSource, aggregatedTraits: AggregatedTraits) {
     const preferenceAlignment = this.getAlignmentScore(
       aggregatedTraits,
-      traitWeights,
+      vehicle.traitWeights,
       "VEHICLE_PREFERENCE",
-      2,
+      3,
     );
     const personalityAlignment = this.getAlignmentScore(
       aggregatedTraits,
-      traitWeights,
+      vehicle.traitWeights,
       "PERSONALITY_TRAIT",
       2,
     );
-    const constraintFit = this.getConstraintFitScore(constraintRules, aggregatedTraits);
-    const corePenalty = this.getMissingCorePreferencePenalty(aggregatedTraits, traitWeights);
+    const constraintFit = this.getConstraintFitScore(vehicle.constraintRules, aggregatedTraits);
+    const vectorFit = this.getCoreVectorFitScore(aggregatedTraits, vehicle);
+    const energyFit = this.getEnergyAlignmentScore(aggregatedTraits, vehicle);
+    const corePenalty = this.getCoreMismatchPenalty(aggregatedTraits, vehicle);
 
     return Math.max(
       0,
       Math.round(
-        preferenceAlignment * 0.55 + personalityAlignment * 0.1 + constraintFit * 0.35 - corePenalty,
+        vectorFit * 0.62 +
+          energyFit * 0.18 +
+          constraintFit * 0.12 +
+          preferenceAlignment * 0.05 +
+          personalityAlignment * 0.03 -
+          corePenalty,
       ),
     );
   }
@@ -887,31 +904,122 @@ export class AssessmentService {
     return Math.round((matchedCount / constraintRules.length) * 100);
   }
 
-  private getMissingCorePreferencePenalty(
-    aggregatedTraits: AggregatedTraits,
-    traitWeights: Array<{
-      targetType: TraitTargetType;
-      targetKey: string;
-      weight: number | { toString(): string };
-    }>,
-  ) {
-    const strongestPreferences = Object.entries(aggregatedTraits.byTargetType.VEHICLE_PREFERENCE ?? {})
-      .filter(([, value]) => value > 0)
-      .sort((left, right) => right[1] - left[1])
-      .slice(0, 2);
+  private getCoreVectorFitScore(aggregatedTraits: AggregatedTraits, vehicle: VehicleScoreSource) {
+    const vector = this.buildUserPreferenceVector(aggregatedTraits);
+    const vehicleScores = this.getVehicleCoreScores(vehicle);
+    const weightedDimensions = this.getTopCorePreferenceDimensions(vector, 6);
 
-    return strongestPreferences.reduce((penalty, [traitKey, traitValue]) => {
-      const matchedWeight = traitWeights.find(
-        (weight) => weight.targetType === "VEHICLE_PREFERENCE" && weight.targetKey === traitKey,
-      );
-      const normalizedWeight = Math.min(1, Number(matchedWeight?.weight ?? 0) / 10);
+    if (weightedDimensions.length === 0) {
+      const allScores = Object.values(vehicleScores);
+      return Math.round(allScores.reduce((total, value) => total + value, 0) / allScores.length);
+    }
 
-      if (normalizedWeight >= 0.6) {
+    const totalWeight = weightedDimensions.reduce((total, { value }) => total + value, 0);
+
+    if (totalWeight <= 0) {
+      return 60;
+    }
+
+    const totalScore = weightedDimensions.reduce(
+      (total, { key, value }) => total + vehicleScores[key] * value,
+      0,
+    );
+
+    return Math.round(totalScore / totalWeight);
+  }
+
+  private getCoreMismatchPenalty(aggregatedTraits: AggregatedTraits, vehicle: VehicleScoreSource) {
+    const vector = this.buildUserPreferenceVector(aggregatedTraits);
+    const vehicleScores = this.getVehicleCoreScores(vehicle);
+    const strongestDimensions = this.getTopCorePreferenceDimensions(vector, 3);
+
+    return strongestDimensions.reduce((penalty, { key, value }) => {
+      if (value < 45) {
         return penalty;
       }
 
-      return penalty + ((0.6 - normalizedWeight) / 0.6) * Math.min(20, traitValue * 3);
+      const miss = Math.max(0, value - vehicleScores[key] - 8);
+
+      if (miss <= 0) {
+        return penalty;
+      }
+
+      return penalty + Math.min(14, miss * 0.18);
     }, 0);
+  }
+
+  private getEnergyAlignmentScore(aggregatedTraits: AggregatedTraits, vehicle: VehicleScoreSource) {
+    const energyType = (vehicle.energyType ?? "").toUpperCase();
+    const chargingAccess = this.getTraitValue(aggregatedTraits, "charging_access", "HARD_CONSTRAINT");
+    const evAcceptance = this.getTraitValue(
+      aggregatedTraits,
+      "energy_acceptance_ev",
+      "HARD_CONSTRAINT",
+    );
+    const phevAcceptance = this.getTraitValue(
+      aggregatedTraits,
+      "energy_acceptance_phev",
+      "HARD_CONSTRAINT",
+    );
+    const iceAcceptance = this.getTraitValue(
+      aggregatedTraits,
+      "energy_acceptance_ice",
+      "HARD_CONSTRAINT",
+    );
+    const longDistance = this.getTraitValue(
+      aggregatedTraits,
+      "long_distance_frequency",
+      "HARD_CONSTRAINT",
+    );
+    const highwayUsage = this.getTraitValue(
+      aggregatedTraits,
+      "intercity_highway_usage",
+      "HARD_CONSTRAINT",
+    );
+    const scale = (value: number, max: number) =>
+      Math.max(0, Math.min(100, Math.round((value / max) * 100)));
+
+    if (energyType === "EV") {
+      return scale(evAcceptance * 16 + chargingAccess * 9 + this.getTraitValue(aggregatedTraits, "smart_features", "VEHICLE_PREFERENCE") * 2, 130);
+    }
+
+    if (energyType === "PHEV" || energyType === "EREV") {
+      return scale(
+        phevAcceptance * 15 +
+          chargingAccess * 5 +
+          longDistance * 4 +
+          highwayUsage * 3,
+        135,
+      );
+    }
+
+    if (energyType === "HEV") {
+      return scale(
+        iceAcceptance * 10 +
+          phevAcceptance * 4 +
+          longDistance * 4 +
+          highwayUsage * 4 +
+          this.getTraitValue(aggregatedTraits, "running_cost", "VEHICLE_PREFERENCE") * 2,
+        110,
+      );
+    }
+
+    if (energyType === "ICE") {
+      let score = scale(
+        iceAcceptance * 16 + longDistance * 5 + highwayUsage * 4 + this.getTraitValue(aggregatedTraits, "simplicity_reliability", "VEHICLE_PREFERENCE") * 2,
+        130,
+      );
+
+      if (chargingAccess >= 4 && evAcceptance >= 4 && iceAcceptance <= 2) {
+        score = Math.max(0, score - 35);
+      } else if (chargingAccess >= 3 && evAcceptance >= 4 && iceAcceptance <= 3) {
+        score = Math.max(0, score - 20);
+      }
+
+      return score;
+    }
+
+    return 60;
   }
 
   private aggregateTraitSnapshots(
@@ -935,6 +1043,168 @@ export class AssessmentService {
         byTargetType: {},
       },
     );
+  }
+
+  private buildUserPreferenceVector(aggregatedTraits: AggregatedTraits): CorePreferenceVector {
+    const getPreference = (key: string) =>
+      this.getTraitValue(aggregatedTraits, key, "VEHICLE_PREFERENCE");
+    const getPersonality = (key: string) =>
+      this.getTraitValue(aggregatedTraits, key, "PERSONALITY_TRAIT");
+    const getConstraint = (key: string) =>
+      this.getTraitValue(aggregatedTraits, key, "HARD_CONSTRAINT");
+    const scale = (value: number, max: number) => Math.max(0, Math.min(100, Math.round((value / max) * 100)));
+
+    return {
+      handling: scale(
+        getPreference("driving_engagement") * 12 +
+          getPersonality("control_preference") * 10 +
+          getPersonality("expression_drive") * 4 +
+          getConstraint("weekend_trip_frequency") * 2,
+        140,
+      ),
+      comfort: scale(
+        getPreference("comfort_space") * 12 +
+          getPreference("daily_reliability") * 3 +
+          getPersonality("stability_preference") * 6 +
+          getConstraint("has_elder_passengers") * 5 +
+          getConstraint("long_distance_frequency") * 4,
+        140,
+      ),
+      space: scale(
+        getPreference("family_fit") * 12 +
+          getPreference("comfort_space") * 5 +
+          getConstraint("family_size") * 7 +
+          getConstraint("cargo_space_need") * 6 +
+          getConstraint("full_load_frequency") * 5 +
+          getConstraint("suburban_family_usage") * 4,
+        180,
+      ),
+      smart: scale(
+        getPreference("smart_features") * 14 +
+          getPreference("brand_expression") * 2 +
+          getPersonality("novelty_seeking") * 6 +
+          getConstraint("charging_access") * 2,
+        120,
+      ),
+      power: scale(
+        getPreference("driving_engagement") * 11 +
+          getPersonality("control_preference") * 8 +
+          getPersonality("expression_drive") * 4 +
+          getConstraint("budget_level") * 2,
+        120,
+      ),
+      economy: scale(
+        getPreference("running_cost") * 14 +
+          getPreference("simplicity_reliability") * 4 +
+          getPreference("daily_reliability") * 4 +
+          getPersonality("cost_control") * 6 +
+          getConstraint("monthly_payment_sensitivity") * 7,
+        170,
+      ),
+      brand: scale(
+        getPreference("brand_expression") * 14 +
+          getPreference("design_presence") * 3 +
+          getPersonality("expression_drive") * 5 +
+          getPersonality("social_confidence") * 4 +
+          getConstraint("budget_level") * 3,
+        140,
+      ),
+      design: scale(
+        getPreference("design_presence") * 15 +
+          getPreference("brand_expression") * 4 +
+          getPersonality("expression_drive") * 5 +
+          getPersonality("novelty_seeking") * 5,
+        150,
+      ),
+      reliability: scale(
+        getPreference("daily_reliability") * 13 +
+          getPreference("simplicity_reliability") * 8 +
+          getPreference("running_cost") * 3 +
+          getPersonality("stability_preference") * 5 +
+          getPersonality("planning_bias") * 5 +
+          getConstraint("ownership_horizon") * 4 +
+          getConstraint("resale_sensitivity") * 3,
+        190,
+      ),
+      family: scale(
+        getPreference("family_fit") * 13 +
+          getPreference("comfort_space") * 4 +
+          getConstraint("family_size") * 8 +
+          getConstraint("has_children") * 7 +
+          getConstraint("has_elder_passengers") * 4 +
+          getConstraint("suburban_family_usage") * 4 +
+          getConstraint("full_load_frequency") * 4,
+        190,
+      ),
+    };
+  }
+
+  private getTopCorePreferenceDimensions(vector: CorePreferenceVector, limit: number) {
+    return (Object.entries(vector) as Array<[CorePreferenceKey, number]>)
+      .filter(([, value]) => value > 0)
+      .sort((left, right) => right[1] - left[1])
+      .slice(0, limit)
+      .map(([key, value]) => ({ key, value }));
+  }
+
+  private getVehicleCoreScores(vehicle: VehicleScoreSource): CorePreferenceVector {
+    const explicitScores: CorePreferenceVector = {
+      handling: vehicle.handlingScore ?? 0,
+      comfort: vehicle.comfortScore ?? 0,
+      space: vehicle.spaceScore ?? 0,
+      smart: vehicle.smartScore ?? 0,
+      power: vehicle.powerScore ?? 0,
+      economy: vehicle.economyScore ?? 0,
+      brand: vehicle.brandScore ?? 0,
+      design: vehicle.designScore ?? 0,
+      reliability: vehicle.reliabilityScore ?? 0,
+      family: vehicle.familyScore ?? 0,
+    };
+
+    if (Object.values(explicitScores).some((score) => score > 0)) {
+      return explicitScores;
+    }
+
+    return this.deriveVehicleCoreScoresFromTraits(vehicle.traitWeights);
+  }
+
+  private deriveVehicleCoreScoresFromTraits(
+    traitWeights: Array<{
+      targetType: TraitTargetType;
+      targetKey: string;
+      weight: number | { toString(): string };
+    }>,
+  ): CorePreferenceVector {
+    const getWeight = (targetKey: string) =>
+      Number(
+        traitWeights.find(
+          (weight) =>
+            weight.targetType === "VEHICLE_PREFERENCE" && weight.targetKey === targetKey,
+        )?.weight ?? 0,
+      );
+    const clamp = (value: number) => Math.max(0, Math.min(100, Math.round(value)));
+    const driving = getWeight("driving_engagement");
+    const comfort = getWeight("comfort_space");
+    const family = getWeight("family_fit");
+    const smart = getWeight("smart_features");
+    const runningCost = getWeight("running_cost");
+    const brand = getWeight("brand_expression");
+    const design = getWeight("design_presence");
+    const reliability = getWeight("daily_reliability");
+    const simplicity = getWeight("simplicity_reliability");
+
+    return {
+      handling: clamp(20 + driving * 8),
+      comfort: clamp(20 + comfort * 8),
+      space: clamp(18 + comfort * 4 + family * 4),
+      smart: clamp(18 + smart * 8),
+      power: clamp(18 + driving * 7 + design * 2),
+      economy: clamp(18 + runningCost * 7 + simplicity * 2),
+      brand: clamp(18 + brand * 8),
+      design: clamp(18 + design * 7 + brand * 2),
+      reliability: clamp(18 + reliability * 7 + simplicity * 2),
+      family: clamp(18 + family * 7 + comfort * 2),
+    };
   }
 
   private buildDisplayPersonalityCode(aggregatedTraits: AggregatedTraits) {

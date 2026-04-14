@@ -580,16 +580,16 @@ describe("AssessmentService", () => {
           brand: "比亚迪",
           series: "宋 PLUS",
           rank: 1,
-          score: 95,
-          reason: "你当前更看重家庭适配、稳定性、长期使用成本，这台车在这些维度上最贴合你的选择。",
+          score: 68,
+          reason: "你当前更看重空间实用性、家庭适配、使用成本，这台车在家庭适配、使用成本上更贴合你的选择。",
         },
         {
           slug: "tesla-model-3",
           brand: "特斯拉",
           series: "Model 3",
           rank: 2,
-          score: 14,
-          reason: "你当前更看重家庭适配、稳定性、长期使用成本，但这台车与这些优先项的重合度较低。",
+          score: 34,
+          reason: "你当前更看重空间实用性、家庭适配、使用成本，但这台车在这些维度上的匹配度偏低。",
         },
       ],
     });
@@ -627,15 +627,15 @@ describe("AssessmentService", () => {
           resultId: "result_1",
           vehicleId: "vehicle_1",
           rank: 1,
-          score: 95,
-          reason: "你当前更看重家庭适配、稳定性、长期使用成本，这台车在这些维度上最贴合你的选择。",
+          score: 68,
+          reason: "你当前更看重空间实用性、家庭适配、使用成本，这台车在家庭适配、使用成本上更贴合你的选择。",
         },
         {
           resultId: "result_1",
           vehicleId: "vehicle_2",
           rank: 2,
-          score: 14,
-          reason: "你当前更看重家庭适配、稳定性、长期使用成本，但这台车与这些优先项的重合度较低。",
+          score: 34,
+          reason: "你当前更看重空间实用性、家庭适配、使用成本，但这台车在这些维度上的匹配度偏低。",
         },
       ],
     });
@@ -792,8 +792,8 @@ describe("AssessmentService", () => {
           brand: "丰田",
           series: "凯美瑞",
           rank: 1,
-          score: 39,
-          reason: "你当前更看重稳定性、家庭适配，但这台车与这些优先项的重合度较低。",
+          score: 38,
+          reason: "你当前更看重家庭适配、舒适性、空间实用性，但这台车在这些维度上的匹配度偏低。",
         },
       ],
     });
@@ -804,8 +804,8 @@ describe("AssessmentService", () => {
           resultId: "result_constraints_1",
           vehicleId: "vehicle_pass",
           rank: 1,
-          score: 39,
-          reason: "你当前更看重稳定性、家庭适配，但这台车与这些优先项的重合度较低。",
+          score: 38,
+          reason: "你当前更看重家庭适配、舒适性、空间实用性，但这台车在这些维度上的匹配度偏低。",
         },
       ],
     });
@@ -913,16 +913,16 @@ describe("AssessmentService", () => {
           brand: "品牌B",
           series: "系列B",
           rank: 1,
-          score: 90,
-          reason: "你当前更看重shared_signal、shared_signal，这台车在这些维度上最贴合你的选择。",
+          score: 39,
+          reason: "这台车和你的主要用车偏好整体比较接近。",
         },
         {
           slug: "personality-car",
           brand: "品牌A",
           series: "系列A",
           rank: 2,
-          score: 30,
-          reason: "你当前更看重shared_signal、shared_signal，但这台车与这些优先项的重合度较低。",
+          score: 37,
+          reason: "这台车和你的主要用车偏好整体比较接近。",
         },
       ],
     });
@@ -1131,8 +1131,8 @@ describe("AssessmentService", () => {
           brand: "品牌D",
           series: "系列D",
           rank: 1,
-          score: 90,
-          reason: "你当前更看重shared_signal、shared_signal，这台车在这些维度上最贴合你的选择。",
+          score: 39,
+          reason: "这台车和你的主要用车偏好整体比较接近。",
         },
       ],
     });
@@ -1244,18 +1244,265 @@ describe("AssessmentService", () => {
           brand: "品牌性能",
           series: "系列性能",
           rank: 1,
-          score: 90,
-          reason: "你当前更看重智能体验、驾驶乐趣、长期使用成本，这台车在这些维度上最贴合你的选择。",
+          score: 60,
+          reason: "你当前更看重科技配置、使用成本、动力表现，这台车在科技配置、动力表现上更贴合你的选择。",
         },
         {
           slug: "commuter-car",
           brand: "品牌通勤",
           series: "系列通勤",
           rank: 2,
-          score: 15,
-          reason: "你当前更看重智能体验、驾驶乐趣、长期使用成本，但这台车与这些优先项的重合度较低。",
+          score: 42,
+          reason: "你当前更看重科技配置、使用成本、动力表现，但这台车在这些维度上的匹配度偏低。",
         },
       ],
+    });
+  });
+
+  it("prioritizes vehicles whose core scores match a tech-and-handling-heavy preference vector", async () => {
+    const prisma = {
+      assessmentSession: {
+        create: vi.fn(),
+        findUnique: vi.fn().mockResolvedValue({
+          id: "session_core_vector_1",
+          status: "IN_PROGRESS",
+        }),
+        update: vi.fn().mockResolvedValue(undefined),
+      },
+      sessionTraitSnapshot: {
+        createMany: vi.fn(),
+        findMany: vi.fn().mockResolvedValue([
+          { targetType: "HARD_CONSTRAINT", traitKey: "budget_level", traitValue: 4 },
+          { targetType: "HARD_CONSTRAINT", traitKey: "charging_access", traitValue: 4 },
+          { targetType: "HARD_CONSTRAINT", traitKey: "energy_acceptance_ev", traitValue: 4 },
+          { targetType: "VEHICLE_PREFERENCE", traitKey: "smart_features", traitValue: 6 },
+          { targetType: "VEHICLE_PREFERENCE", traitKey: "driving_engagement", traitValue: 6 },
+          { targetType: "VEHICLE_PREFERENCE", traitKey: "brand_expression", traitValue: 3 },
+          { targetType: "VEHICLE_PREFERENCE", traitKey: "design_presence", traitValue: 3 },
+          { targetType: "PERSONALITY_TRAIT", traitKey: "novelty_seeking", traitValue: 3 },
+          { targetType: "PERSONALITY_TRAIT", traitKey: "control_preference", traitValue: 3 },
+          { targetType: "PERSONALITY_TRAIT", traitKey: "expression_drive", traitValue: 2 },
+        ]),
+      },
+      personalityProfile: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "profile_expression",
+            code: "EXPRESSIVE_EXPLORER",
+            name: "表达探索型",
+            summary: "summary",
+            detail: "detail",
+            rules: [],
+          },
+        ]),
+      },
+      vehicle: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "vehicle_commuter",
+            slug: "commuter-sedan",
+            brand: "品牌通勤",
+            series: "通勤轿车",
+            modelName: "",
+            summary: "static",
+            recommendation: "static",
+            status: "active",
+            handlingScore: 42,
+            comfortScore: 70,
+            spaceScore: 68,
+            smartScore: 38,
+            powerScore: 40,
+            economyScore: 88,
+            brandScore: 35,
+            designScore: 36,
+            reliabilityScore: 85,
+            familyScore: 62,
+            constraintRules: [],
+            traitWeights: [
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "running_cost", weight: 10 },
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "daily_reliability", weight: 9 },
+            ],
+          },
+          {
+            id: "vehicle_tech",
+            slug: "tech-performance-ev",
+            brand: "品牌性能",
+            series: "科技性能轿车",
+            modelName: "",
+            summary: "static",
+            recommendation: "static",
+            status: "active",
+            handlingScore: 90,
+            comfortScore: 70,
+            spaceScore: 58,
+            smartScore: 94,
+            powerScore: 92,
+            economyScore: 58,
+            brandScore: 76,
+            designScore: 84,
+            reliabilityScore: 65,
+            familyScore: 44,
+            constraintRules: [],
+            traitWeights: [
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 10 },
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 10 },
+            ],
+          },
+        ]),
+      },
+      sessionResult: {
+        create: vi.fn().mockResolvedValue({
+          id: "result_core_vector_1",
+          sessionId: "session_core_vector_1",
+        }),
+      },
+      sessionVehicleRecommendation: {
+        createMany: vi.fn().mockResolvedValue(undefined),
+      },
+    };
+
+    const service = new AssessmentService(prisma as never, {
+      getInitialQuestion: vi.fn(),
+      getNextQuestion: vi.fn(),
+    } as never);
+
+    const result = await service.completeSession("session_core_vector_1");
+
+    expect(result.recommendations[0]).toMatchObject({
+      slug: "tech-performance-ev",
+      brand: "品牌性能",
+      series: "科技性能轿车",
+      rank: 1,
+    });
+    expect(result.recommendations[1]).toMatchObject({
+      slug: "commuter-sedan",
+      brand: "品牌通勤",
+      series: "通勤轿车",
+      rank: 2,
+    });
+    expect(result.recommendations[0]?.score).toBeGreaterThan(result.recommendations[1]?.score ?? 0);
+  });
+
+  it("prefers EV recommendations when the user has charging access and explicitly accepts EV", async () => {
+    const prisma = {
+      assessmentSession: {
+        create: vi.fn(),
+        findUnique: vi.fn().mockResolvedValue({
+          id: "session_ev_preferred_1",
+          status: "IN_PROGRESS",
+        }),
+        update: vi.fn().mockResolvedValue(undefined),
+      },
+      sessionTraitSnapshot: {
+        createMany: vi.fn(),
+        findMany: vi.fn().mockResolvedValue([
+          { targetType: "HARD_CONSTRAINT", traitKey: "budget_level", traitValue: 4 },
+          { targetType: "HARD_CONSTRAINT", traitKey: "charging_access", traitValue: 5 },
+          { targetType: "HARD_CONSTRAINT", traitKey: "energy_acceptance_ev", traitValue: 5 },
+          { targetType: "HARD_CONSTRAINT", traitKey: "energy_acceptance_ice", traitValue: 2 },
+          { targetType: "VEHICLE_PREFERENCE", traitKey: "smart_features", traitValue: 6 },
+          { targetType: "VEHICLE_PREFERENCE", traitKey: "design_presence", traitValue: 4 },
+          { targetType: "PERSONALITY_TRAIT", traitKey: "novelty_seeking", traitValue: 3 },
+        ]),
+      },
+      personalityProfile: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "profile_expression",
+            code: "EXPRESSIVE_EXPLORER",
+            name: "表达探索型",
+            summary: "summary",
+            detail: "detail",
+            rules: [],
+          },
+        ]),
+      },
+      vehicle: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "vehicle_ice",
+            slug: "premium-ice-suv",
+            brand: "品牌燃油",
+            series: "燃油豪华 SUV",
+            modelName: "",
+            summary: "static",
+            recommendation: "static",
+            status: "active",
+            energyType: "ICE",
+            handlingScore: 78,
+            comfortScore: 90,
+            spaceScore: 88,
+            smartScore: 80,
+            powerScore: 80,
+            economyScore: 68,
+            brandScore: 82,
+            designScore: 82,
+            reliabilityScore: 82,
+            familyScore: 86,
+            constraintRules: [],
+            traitWeights: [
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "comfort_space", weight: 8 },
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "brand_expression", weight: 8 },
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 6 },
+            ],
+          },
+          {
+            id: "vehicle_ev",
+            slug: "smart-ev-sedan",
+            brand: "品牌纯电",
+            series: "智能纯电轿车",
+            modelName: "",
+            summary: "static",
+            recommendation: "static",
+            status: "active",
+            energyType: "EV",
+            handlingScore: 60,
+            comfortScore: 62,
+            spaceScore: 52,
+            smartScore: 88,
+            powerScore: 70,
+            economyScore: 74,
+            brandScore: 58,
+            designScore: 74,
+            reliabilityScore: 60,
+            familyScore: 44,
+            constraintRules: [],
+            traitWeights: [
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 10 },
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "design_presence", weight: 8 },
+            ],
+          },
+        ]),
+      },
+      sessionResult: {
+        create: vi.fn().mockResolvedValue({
+          id: "result_ev_preferred_1",
+          sessionId: "session_ev_preferred_1",
+        }),
+      },
+      sessionVehicleRecommendation: {
+        createMany: vi.fn().mockResolvedValue(undefined),
+      },
+    };
+
+    const service = new AssessmentService(prisma as never, {
+      getInitialQuestion: vi.fn(),
+      getNextQuestion: vi.fn(),
+    } as never);
+
+    const result = await service.completeSession("session_ev_preferred_1");
+
+    expect(result.recommendations[0]).toMatchObject({
+      slug: "smart-ev-sedan",
+      brand: "品牌纯电",
+      series: "智能纯电轿车",
+      rank: 1,
+    });
+    expect(result.recommendations[1]).toMatchObject({
+      slug: "premium-ice-suv",
+      brand: "品牌燃油",
+      series: "燃油豪华 SUV",
+      rank: 2,
     });
   });
 
@@ -1531,8 +1778,8 @@ describe("AssessmentService", () => {
             brand: "比亚迪",
             series: "宋 PLUS",
             rank: 1,
-            score: 95,
-            reason: "你当前更看重家庭适配、稳定性、长期使用成本，这台车在这些维度上最贴合你的选择。",
+            score: 68,
+            reason: "你当前更看重空间实用性、家庭适配、使用成本，这台车在家庭适配、使用成本上更贴合你的选择。",
           },
         ],
       },

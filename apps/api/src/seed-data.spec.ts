@@ -38,6 +38,29 @@ describe("assessment seed data", () => {
     expect(vehicles.every((vehicle) => vehicle.constraintRules.length >= 2)).toBe(true);
   });
 
+  it("stores explicit core scores for every vehicle seed entry", () => {
+    expect(vehicles.every((vehicle) => "coreScores" in vehicle)).toBe(true);
+  });
+
+  it("assigns every vehicle a complete 0-100 core score vector", () => {
+    expect(
+      vehicles.every((vehicle) =>
+        [
+          vehicle.handlingScore,
+          vehicle.comfortScore,
+          vehicle.spaceScore,
+          vehicle.smartScore,
+          vehicle.powerScore,
+          vehicle.economyScore,
+          vehicle.brandScore,
+          vehicle.designScore,
+          vehicle.reliabilityScore,
+          vehicle.familyScore,
+        ].every((score) => Number.isInteger(score) && score >= 0 && score <= 100),
+      ),
+    ).toBe(true);
+  });
+
   it("gives every vehicle at least one dominant preference trait", () => {
     expect(
       vehicles.every((vehicle) =>
@@ -96,6 +119,56 @@ describe("assessment seed data", () => {
     expect(preferenceWeight("nissan-sylphy", "driving_engagement")).toBeLessThanOrEqual(2);
     expect(preferenceWeight("volkswagen-sagitar", "smart_features")).toBeLessThanOrEqual(3);
     expect(preferenceWeight("volkswagen-sagitar", "driving_engagement")).toBeLessThanOrEqual(4);
+  });
+
+  it("keeps core score benchmarks realistic for typical family, commuter, and performance models", () => {
+    const bySlug = new Map(vehicles.map((vehicle) => [vehicle.slug, vehicle]));
+    const xiaomiSu7 = bySlug.get("xiaomi-su7");
+    const nissanSylphy = bySlug.get("nissan-sylphy");
+    const volkswagenSagitar = bySlug.get("volkswagen-sagitar");
+    const liAutoL6 = bySlug.get("li-auto-l6");
+    const lynkco03Plus = bySlug.get("lynkco-03-plus");
+
+    expect(xiaomiSu7?.smartScore).toBeGreaterThanOrEqual(90);
+    expect(xiaomiSu7?.powerScore).toBeGreaterThanOrEqual(85);
+    expect(xiaomiSu7?.handlingScore).toBeGreaterThanOrEqual(80);
+
+    expect(nissanSylphy?.comfortScore).toBeGreaterThanOrEqual(72);
+    expect(nissanSylphy?.familyScore).toBeGreaterThanOrEqual(58);
+    expect(nissanSylphy?.smartScore).toBeLessThanOrEqual(35);
+
+    expect(volkswagenSagitar?.spaceScore).toBeGreaterThanOrEqual(60);
+    expect(volkswagenSagitar?.reliabilityScore).toBeGreaterThanOrEqual(68);
+
+    expect(liAutoL6?.familyScore).toBeGreaterThanOrEqual(88);
+    expect(liAutoL6?.smartScore).toBeGreaterThanOrEqual(80);
+    expect(liAutoL6?.comfortScore).toBeGreaterThanOrEqual(85);
+
+    expect(lynkco03Plus?.handlingScore).toBeGreaterThanOrEqual(88);
+    expect(lynkco03Plus?.powerScore).toBeGreaterThanOrEqual(85);
+    expect(lynkco03Plus?.brandScore).toBeGreaterThanOrEqual(72);
+  });
+
+  it("keeps volkswagen, honda, and lynk & co score anchors internally consistent", () => {
+    const bySlug = new Map(vehicles.map((vehicle) => [vehicle.slug, vehicle]));
+
+    expect(bySlug.get("volkswagen-viloran")?.familyScore).toBeGreaterThanOrEqual(88);
+    expect(bySlug.get("volkswagen-viloran")?.comfortScore).toBeGreaterThanOrEqual(90);
+    expect(bySlug.get("volkswagen-golf")?.handlingScore).toBeGreaterThanOrEqual(74);
+    expect(bySlug.get("volkswagen-id3")?.economyScore).toBeGreaterThanOrEqual(80);
+    expect(bySlug.get("volkswagen-id3")?.smartScore).toBeGreaterThanOrEqual(58);
+
+    expect(bySlug.get("honda-accord")?.comfortScore).toBeGreaterThanOrEqual(75);
+    expect(bySlug.get("honda-breeze-ehev")?.familyScore).toBeGreaterThanOrEqual(74);
+    expect(bySlug.get("honda-odyssey-ehev")?.familyScore).toBeGreaterThanOrEqual(90);
+    expect(bySlug.get("honda-ens2")?.smartScore).toBeGreaterThanOrEqual(70);
+    expect(bySlug.get("honda-zrv")?.handlingScore).toBeGreaterThanOrEqual(68);
+
+    expect(bySlug.get("lynkco-08-emp")?.smartScore).toBeGreaterThanOrEqual(82);
+    expect(bySlug.get("lynkco-z10")?.handlingScore).toBeGreaterThanOrEqual(80);
+    expect(bySlug.get("lynkco-z10")?.smartScore).toBeGreaterThanOrEqual(88);
+    expect(bySlug.get("lynkco-900")?.familyScore).toBeGreaterThanOrEqual(88);
+    expect(bySlug.get("lynkco-06-emp")?.economyScore).toBeGreaterThanOrEqual(76);
   });
 
   it("keeps personality profiles rule-driven", () => {
