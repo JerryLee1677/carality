@@ -4,20 +4,20 @@
 
 @layer base {
   :root {
-    --color-bg: #f5efe6;
-    --color-bg-alt: #ebe2d4;
-    --color-panel: rgba(255, 252, 248, 0.82);
-    --color-panel-strong: rgba(255, 248, 239, 0.94);
-    --color-line: rgba(37, 43, 49, 0.08);
-    --color-line-strong: rgba(37, 43, 49, 0.18);
-    --color-text: #1f262d;
-    --color-muted: #5f686f;
-    --color-accent: #d96a2c;
-    --color-accent-soft: rgba(217, 106, 44, 0.12);
-    --color-accent-2: #2b7a78;
-    --color-road: radial-gradient(circle at top, rgba(217, 106, 44, 0.1), transparent 34%),
-      linear-gradient(180deg, #fbf7f2 0%, #f5efe6 46%, #ede4d7 100%);
-    --shadow-panel: 0 18px 48px rgba(57, 44, 22, 0.08);
+    --color-bg: #f3eee6;
+    --color-bg-alt: #e5ddd1;
+    --color-panel: rgba(255, 252, 247, 0.84);
+    --color-panel-strong: rgba(255, 252, 247, 0.94);
+    --color-line: rgba(28, 33, 38, 0.1);
+    --color-line-strong: rgba(28, 33, 38, 0.2);
+    --color-text: #1c2126;
+    --color-muted: #5f655f;
+    --color-accent: #c86227;
+    --color-accent-soft: rgba(200, 98, 39, 0.1);
+    --color-accent-2: #6e7c69;
+    --color-road: radial-gradient(circle at top, rgba(200, 98, 39, 0.08), transparent 36%),
+      linear-gradient(180deg, #f9f6f0 0%, #f3eee6 48%, #ebe3d8 100%);
+    --shadow-panel: 0 18px 48px rgba(49, 37, 19, 0.08);
   }
 
   * {
@@ -51,8 +51,8 @@
     pointer-events: none;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 25%),
-      radial-gradient(circle at 18% 18%, rgba(217, 106, 44, 0.08), transparent 24%),
-      radial-gradient(circle at 82% 8%, rgba(43, 122, 120, 0.08), transparent 18%);
+      radial-gradient(circle at 18% 18%, rgba(200, 98, 39, 0.08), transparent 24%),
+      radial-gradient(circle at 82% 8%, rgba(110, 124, 105, 0.08), transparent 18%);
     opacity: 0.9;
   }
 
@@ -210,6 +210,183 @@
   .mobile-scroller::-webkit-scrollbar {
     display: none;
   }
+
+  .hero-home {
+    min-height: calc(100vh - 88px);
+    display: flex;
+    align-items: center;
+  }
+
+  .hero-home__section {
+    width: 100%;
+    padding-top: 3rem;
+    padding-bottom: 4rem;
+  }
+
+  .hero-home__content {
+    max-width: 52rem;
+  }
+
+  .hero-home__eyebrow {
+    @apply display-font text-sm uppercase tracking-[0.28em];
+    color: var(--color-accent-2);
+  }
+
+  .hero-home__title {
+    margin-top: 1rem;
+    max-width: 10ch;
+    font-size: clamp(3.4rem, 8vw, 6.6rem);
+    line-height: 0.92;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+
+  .hero-home__body {
+    margin-top: 1.5rem;
+    max-width: 34rem;
+    font-size: 1rem;
+    line-height: 2;
+    color: var(--color-muted);
+  }
+
+  .hero-home__actions {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .personality-result {
+    display: grid;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .personality-result__poster,
+  .personality-result__content {
+    border-radius: 2rem;
+    padding: 1.5rem;
+  }
+
+  .personality-result__poster {
+    text-align: center;
+  }
+
+  .personality-result__image,
+  .personality-result__image-placeholder {
+    width: 100%;
+    min-height: 18rem;
+    border-radius: 1.75rem;
+  }
+
+  .personality-result__image {
+    object-fit: cover;
+  }
+
+  .personality-result__image-placeholder {
+    display: grid;
+    place-items: center;
+    border: 1px dashed var(--color-line-strong);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(242, 234, 223, 0.9)),
+      radial-gradient(circle at top, rgba(200, 98, 39, 0.08), transparent 48%);
+  }
+
+  .personality-result__score {
+    margin-top: 1.5rem;
+    font-family: "Arial Narrow", "Aptos Narrow", "Franklin Gothic Medium", sans-serif;
+    font-size: clamp(3rem, 9vw, 4.75rem);
+    line-height: 1;
+    color: var(--color-accent);
+  }
+
+  .personality-result__score-label {
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .personality-result__title {
+    margin-top: 0.85rem;
+    font-size: clamp(2.6rem, 6vw, 4.8rem);
+    line-height: 0.94;
+    font-weight: 600;
+  }
+
+  .personality-result__subtitle {
+    margin-top: 0.9rem;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--color-accent);
+  }
+
+  .personality-result__summary,
+  .personality-result__copy {
+    margin-top: 1rem;
+    font-size: 1rem;
+    line-height: 1.9;
+    color: var(--color-muted);
+  }
+
+  .personality-result__section {
+    margin-top: 1.5rem;
+  }
+
+  .personality-result__section-title {
+    font-family: "Arial Narrow", "Aptos Narrow", "Franklin Gothic Medium", sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-accent-2);
+  }
+
+  .personality-result__grid {
+    margin-top: 1.25rem;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .personality-result__card {
+    border: 1px solid var(--color-line);
+    border-radius: 1.5rem;
+    background: rgba(255, 255, 255, 0.62);
+    padding: 1rem;
+  }
+
+  .personality-result__list {
+    margin-top: 0.85rem;
+    display: grid;
+    gap: 0.65rem;
+    padding-left: 1rem;
+    color: var(--color-text);
+  }
+
+  .personality-result__dimensions {
+    margin-top: 0.9rem;
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .personality-result__dimension {
+    font-size: 0.92rem;
+    color: var(--color-text);
+  }
+
+  .personality-result__dimension-track {
+    margin-top: 0.45rem;
+    height: 0.55rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(28, 33, 38, 0.08);
+  }
+
+  .personality-result__dimension-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--color-accent), #df945b);
+  }
 }
 
 @keyframes spin-wheel {
@@ -260,5 +437,21 @@
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
+  }
+}
+
+@media (min-width: 640px) {
+  .hero-home__actions {
+    flex-direction: row;
+  }
+}
+
+@media (min-width: 1024px) {
+  .personality-result {
+    grid-template-columns: minmax(18rem, 22rem) minmax(0, 1fr);
+  }
+
+  .personality-result__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

@@ -568,6 +568,25 @@ describe("AssessmentService", () => {
 
     await expect(service.completeSession("session_complete_1")).resolves.toEqual({
       sessionId: "session_complete_1",
+      personality: {
+        code: "steady-pragmatist",
+        name: "务实省心型",
+        subtitle: "你更在意确定性、成本压力和长期省心。",
+        summary:
+          "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
+        decisionStyle: expect.any(String),
+        lifeScenes: expect.any(Array),
+        usageHabits: expect.any(Array),
+        strengths: expect.any(Array),
+        cautions: expect.any(Array),
+        matchScore: expect.any(Number),
+        dimensionSnapshot: expect.any(Array),
+        imageUrl: null,
+      },
+      recommendationEntry: {
+        label: "查看适合你人格的车型方向",
+        href: "/result/session_complete_1/recommendations",
+      },
       personalityProfile: {
         code: "PSCV",
         archetypeCode: "STEADY_PRAGMATIST",
@@ -778,7 +797,7 @@ describe("AssessmentService", () => {
 
     const service = new AssessmentService(prisma as never, questionsService as never);
 
-    await expect(service.completeSession("session_constraints_1")).resolves.toEqual({
+    await expect(service.completeSession("session_constraints_1")).resolves.toMatchObject({
       sessionId: "session_constraints_1",
       personalityProfile: {
         code: "PSCV",
@@ -899,7 +918,7 @@ describe("AssessmentService", () => {
       getNextQuestion: vi.fn(),
     } as never);
 
-    await expect(service.completeSession("session_type_split_1")).resolves.toEqual({
+    await expect(service.completeSession("session_type_split_1")).resolves.toMatchObject({
       sessionId: "session_type_split_1",
       personalityProfile: {
         code: "PSCV",
@@ -1117,7 +1136,7 @@ describe("AssessmentService", () => {
       getNextQuestion: vi.fn(),
     } as never);
 
-    await expect(service.completeSession("session_constraint_type_split_1")).resolves.toEqual({
+    await expect(service.completeSession("session_constraint_type_split_1")).resolves.toMatchObject({
       sessionId: "session_constraint_type_split_1",
       personalityProfile: {
         code: "PSCV",
@@ -1230,7 +1249,7 @@ describe("AssessmentService", () => {
       getNextQuestion: vi.fn(),
     } as never);
 
-    await expect(service.completeSession("session_priority_penalty_1")).resolves.toEqual({
+    await expect(service.completeSession("session_priority_penalty_1")).resolves.toMatchObject({
       sessionId: "session_priority_penalty_1",
       personalityProfile: {
         code: "PSDV",
@@ -1759,7 +1778,7 @@ describe("AssessmentService", () => {
         questionId: "question_5",
         optionId: "option_5",
       }),
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       accepted: true,
       completed: true,
       lockedQuestionId: "question_5",
@@ -2307,7 +2326,7 @@ describe("AssessmentService", () => {
 
     const service = new AssessmentService(prisma as never, questionsService as never);
 
-    await expect(service.getSessionResult("session_result_1")).resolves.toEqual({
+    await expect(service.getSessionResult("session_result_1")).resolves.toMatchObject({
       sessionId: "session_result_1",
       personalityProfile: {
         code: "PSCV",

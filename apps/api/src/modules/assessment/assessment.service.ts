@@ -32,6 +32,12 @@ type CorePreferenceKey =
   | "family";
 
 type CorePreferenceVector = Record<CorePreferenceKey, number>;
+type PersonalityDimension = {
+  key: string;
+  label: string;
+  value: number;
+  directionLabel: string;
+};
 
 type VehicleScoreSource = {
   energyType?: string | null;
@@ -141,6 +147,43 @@ const DISPLAY_PERSONALITY_PROFILES: Record<
   EQDB: {
     name: "旗舰表达型",
     summary: "你追求品牌、科技、驾控和辨识度，买车同时也在买表达和气场。",
+  },
+};
+
+const PERSONALITY_ARCHETYPE_CONTENT: Record<
+  string,
+  {
+    code: string;
+    name: string;
+    subtitle: string;
+    decisionStyle: string;
+    lifeScenes: string[];
+    usageHabits: string[];
+    strengths: string[];
+    cautions: string[];
+  }
+> = {
+  STEADY_PRAGMATIST: {
+    code: "steady-pragmatist",
+    name: "务实省心型",
+    subtitle: "你更在意确定性、成本压力和长期省心。",
+    decisionStyle:
+      "你通常会先排除后续可能带来负担的选项，再去判断一台车是否真正适合你的日常生活。",
+    lifeScenes: ["更常见于稳定通勤与家庭协商场景", "会把长期持有和后续成本放在前面"],
+    usageHabits: ["更重视空间、舒适和省心", "倾向选择长期使用压力更小的方案"],
+    strengths: ["判断稳，不容易被短期噱头带偏", "更擅长控制预算和长期风险"],
+    cautions: ["可能低估驾驶情绪价值", "容易因为过度保守错过更适合自己的新方案"],
+  },
+  EXPRESSIVE_EXPLORER: {
+    code: "expressive-explorer",
+    name: "科技驾趣型",
+    subtitle: "你更容易被体验、表达欲和新鲜感驱动。",
+    decisionStyle:
+      "你会先看一台车是否足够有感觉、够新鲜、够好玩，再判断它是否值得长期投入。",
+    lifeScenes: ["更常见于个人表达欲较强的生活节奏", "会主动关注科技和设计变化"],
+    usageHabits: ["更在意智能体验和驾驶反馈", "愿意为辨识度和新鲜感支付溢价"],
+    strengths: ["对体验差异更敏感", "更容易找到真正让自己满意的车"],
+    cautions: ["可能低估长期成本和维护复杂度", "容易被短期兴奋感放大影响判断"],
   },
 };
 
@@ -515,6 +558,11 @@ export class AssessmentService {
 
     return {
       sessionId: result.sessionId,
+      personality: this.buildPersonalityPresentation(result.sessionId, aggregatedTraits, selectedProfile),
+      recommendationEntry: {
+        label: "查看适合你人格的车型方向",
+        href: `/result/${result.sessionId}/recommendations`,
+      },
       personalityProfile: {
         ...this.buildDisplayPersonalityProfile(aggregatedTraits),
         archetypeCode: selectedProfile.code,
@@ -663,6 +711,15 @@ export class AssessmentService {
 
     return {
       sessionId: session.result.sessionId,
+      personality: this.buildPersonalityPresentation(
+        session.result.sessionId,
+        aggregatedTraits,
+        session.result.personalityProfile,
+      ),
+      recommendationEntry: {
+        label: "查看适合你人格的车型方向",
+        href: `/result/${session.result.sessionId}/recommendations`,
+      },
       personalityProfile: {
         ...this.buildDisplayPersonalityProfile(aggregatedTraits),
         archetypeCode: session.result.personalityProfile.code,
@@ -675,6 +732,45 @@ export class AssessmentService {
         score: Number(item.score),
         reason: item.reason,
       })),
+    };
+  }
+
+  private buildPersonalityPresentation(
+    sessionId: string,
+    aggregatedTraits: AggregatedTraits,
+    selectedProfile: {
+      code: string;
+      name: string;
+      summary: string;
+    },
+  ) {
+    const dimensionSnapshot = this.buildDimensionSnapshot(aggregatedTraits);
+    const archetype =
+      PERSONALITY_ARCHETYPE_CONTENT[selectedProfile.code] ??
+      {
+        code: selectedProfile.code.toLowerCase().replace(/_/g, "-"),
+        name: selectedProfile.name,
+        subtitle: "你有一套相对稳定的购车判断方式。",
+        decisionStyle: "你会围绕自己最在意的生活场景和体验重点做取舍。",
+        lifeScenes: ["偏好会受到通勤、家庭和预算结构影响", "更看重适合自己，而不是绝对参数最强"],
+        usageHabits: ["会围绕自己的核心偏好来选车", "更容易在少数关键维度上形成明显倾向"],
+        strengths: ["有清晰偏好", "做决定时有稳定依据"],
+        cautions: ["可能忽略次级需求", "在少数维度上容易判断过重"],
+      };
+
+    return {
+      code: archetype.code,
+      name: archetype.name,
+      subtitle: archetype.subtitle,
+      summary: selectedProfile.summary,
+      decisionStyle: archetype.decisionStyle,
+      lifeScenes: archetype.lifeScenes,
+      usageHabits: archetype.usageHabits,
+      strengths: archetype.strengths,
+      cautions: archetype.cautions,
+      matchScore: this.calculateMatchScore(dimensionSnapshot),
+      dimensionSnapshot,
+      imageUrl: null,
     };
   }
 
@@ -1145,6 +1241,85 @@ export class AssessmentService {
       .sort((left, right) => right[1] - left[1])
       .slice(0, limit)
       .map(([key, value]) => ({ key, value }));
+  }
+
+  private buildDimensionSnapshot(aggregatedTraits: AggregatedTraits): PersonalityDimension[] {
+    const practicalScore =
+      this.getTraitValue(aggregatedTraits, "stability_preference") +
+      this.getTraitValue(aggregatedTraits, "planning_bias") +
+      this.getTraitValue(aggregatedTraits, "cost_control");
+    const expressiveScore =
+      this.getTraitValue(aggregatedTraits, "expression_drive") +
+      this.getTraitValue(aggregatedTraits, "social_confidence") +
+      this.getTraitValue(aggregatedTraits, "novelty_seeking");
+    const costScore =
+      this.getTraitValue(aggregatedTraits, "running_cost", "VEHICLE_PREFERENCE") +
+      this.getTraitValue(aggregatedTraits, "monthly_payment_sensitivity", "HARD_CONSTRAINT");
+    const qualityScore =
+      this.getTraitValue(aggregatedTraits, "smart_features", "VEHICLE_PREFERENCE") +
+      this.getTraitValue(aggregatedTraits, "design_presence", "VEHICLE_PREFERENCE") +
+      this.getTraitValue(aggregatedTraits, "brand_expression", "VEHICLE_PREFERENCE");
+    const comfortScore =
+      this.getTraitValue(aggregatedTraits, "family_fit", "VEHICLE_PREFERENCE") +
+      this.getTraitValue(aggregatedTraits, "comfort_space", "VEHICLE_PREFERENCE") +
+      this.getTraitValue(aggregatedTraits, "family_size", "HARD_CONSTRAINT");
+    const drivingScore =
+      this.getTraitValue(aggregatedTraits, "driving_engagement", "VEHICLE_PREFERENCE") +
+      this.getTraitValue(aggregatedTraits, "control_preference") +
+      this.getTraitValue(aggregatedTraits, "expression_drive");
+    const steadyScore =
+      this.getTraitValue(aggregatedTraits, "stability_preference") +
+      this.getTraitValue(aggregatedTraits, "planning_bias") +
+      this.getTraitValue(aggregatedTraits, "ownership_horizon", "HARD_CONSTRAINT");
+    const techScore =
+      this.getTraitValue(aggregatedTraits, "novelty_seeking") +
+      this.getTraitValue(aggregatedTraits, "smart_features", "VEHICLE_PREFERENCE") +
+      this.getTraitValue(aggregatedTraits, "charging_access", "HARD_CONSTRAINT");
+
+    return [
+      this.createDimension("practicality", "务实 vs 表达", practicalScore, expressiveScore, "更偏务实", "更偏表达"),
+      this.createDimension("ownership", "成本 vs 品质", costScore, qualityScore, "更偏成本敏感", "更偏品质体验"),
+      this.createDimension("comfort", "舒适 vs 驾控", comfortScore, drivingScore, "更偏舒适家庭", "更偏驾驶掌控"),
+      this.createDimension("innovation", "稳定 vs 科技", steadyScore, techScore, "更偏稳定保守", "更偏尝鲜科技"),
+    ];
+  }
+
+  private createDimension(
+    key: string,
+    label: string,
+    leftScore: number,
+    rightScore: number,
+    leftLabel: string,
+    rightLabel: string,
+  ): PersonalityDimension {
+    const total = leftScore + rightScore;
+    if (total <= 0) {
+      return {
+        key,
+        label,
+        value: 50,
+        directionLabel: leftLabel,
+      };
+    }
+
+    const isLeftDominant = leftScore >= rightScore;
+    const dominantScore = isLeftDominant ? leftScore : rightScore;
+
+    return {
+      key,
+      label,
+      value: Math.max(8, Math.min(100, Math.round((dominantScore / total) * 100))),
+      directionLabel: isLeftDominant ? leftLabel : rightLabel,
+    };
+  }
+
+  private calculateMatchScore(dimensionSnapshot: PersonalityDimension[]) {
+    if (dimensionSnapshot.length === 0) {
+      return 72;
+    }
+
+    const average = dimensionSnapshot.reduce((total, item) => total + item.value, 0) / dimensionSnapshot.length;
+    return Math.max(60, Math.min(96, Math.round(average)));
   }
 
   private getVehicleCoreScores(vehicle: VehicleScoreSource): CorePreferenceVector {

@@ -5,9 +5,10 @@ test("homepage CTA leads to the quiz landing page", async ({ page }) => {
 
   await expect(
     page.getByRole("heading", {
-      name: "找到最适合你的汽车人格与选车方案",
+      name: "识别你的汽车人格",
     }),
   ).toBeVisible();
+  await expect(page.getByText("比亚迪 宋 PLUS DM-i")).toHaveCount(0);
 
   await page.getByRole("link", { name: "开始测试" }).click();
 
