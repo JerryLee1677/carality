@@ -150,40 +150,80 @@ const DISPLAY_PERSONALITY_PROFILES: Record<
   },
 };
 
-const PERSONALITY_ARCHETYPE_CONTENT: Record<
+const PERSONALITY_DIRECTION_CONTENT: Record<
   string,
   {
-    code: string;
-    name: string;
     subtitle: string;
-    decisionStyle: string;
-    lifeScenes: string[];
-    usageHabits: string[];
-    strengths: string[];
-    cautions: string[];
+    decision: string;
+    scene: string;
+    habit: string;
+    strength: string;
+    caution: string;
   }
 > = {
-  STEADY_PRAGMATIST: {
-    code: "steady-pragmatist",
-    name: "务实省心型",
-    subtitle: "你更在意确定性、成本压力和长期省心。",
-    decisionStyle:
-      "你通常会先排除后续可能带来负担的选项，再去判断一台车是否真正适合你的日常生活。",
-    lifeScenes: ["更常见于稳定通勤与家庭协商场景", "会把长期持有和后续成本放在前面"],
-    usageHabits: ["更重视空间、舒适和省心", "倾向选择长期使用压力更小的方案"],
-    strengths: ["判断稳，不容易被短期噱头带偏", "更擅长控制预算和长期风险"],
-    cautions: ["可能低估驾驶情绪价值", "容易因为过度保守错过更适合自己的新方案"],
+  "更偏务实": {
+    subtitle: "会优先确认长期是否省心、划算、可持续。",
+    decision: "决策时会先看风险和长期负担，再考虑体验是否足够满意。",
+    scene: "更常见于预算需要兼顾现实压力的生活节奏。",
+    habit: "选车时会优先排除后续容易带来麻烦的方案。",
+    strength: "判断稳，不容易被短期情绪带偏。",
+    caution: "可能低估纯粹的情绪价值和驾驶兴奋感。",
   },
-  EXPRESSIVE_EXPLORER: {
-    code: "expressive-explorer",
-    name: "科技驾趣型",
-    subtitle: "你更容易被体验、表达欲和新鲜感驱动。",
-    decisionStyle:
-      "你会先看一台车是否足够有感觉、够新鲜、够好玩，再判断它是否值得长期投入。",
-    lifeScenes: ["更常见于个人表达欲较强的生活节奏", "会主动关注科技和设计变化"],
-    usageHabits: ["更在意智能体验和驾驶反馈", "愿意为辨识度和新鲜感支付溢价"],
-    strengths: ["对体验差异更敏感", "更容易找到真正让自己满意的车"],
-    cautions: ["可能低估长期成本和维护复杂度", "容易被短期兴奋感放大影响判断"],
+  "更偏表达": {
+    subtitle: "更容易被体验、辨识度和情绪价值驱动。",
+    decision: "决策时会先判断一台车有没有感觉，再考虑长期是否值得投入。",
+    scene: "更常见于个人表达欲和新鲜感需求更强的生活状态。",
+    habit: "选车时会主动关注设计、品牌感受和驾驶反馈。",
+    strength: "更容易识别真正让自己满意的体验差异。",
+    caution: "可能在兴奋感较强时低估长期使用成本。",
+  },
+  "更偏成本敏感": {
+    subtitle: "对预算效率、月供压力和长期成本更敏感。",
+    decision: "会反复确认花出去的钱是否真正换回了长期价值。",
+    scene: "更常见于需要综合平衡预算、家庭和长期用车支出的阶段。",
+    habit: "更看重保值、维护成本和持续使用的经济性。",
+    strength: "擅长控制投入产出比，不容易冲动超预算。",
+    caution: "可能因为过度关注成本而压缩体验上限。",
+  },
+  "更偏品质体验": {
+    subtitle: "更在意质感、完整体验和长期使用满意度。",
+    decision: "会愿意为更顺手、更高级、更完整的体验支付额外成本。",
+    scene: "更常见于对生活完成度和使用感受有明确要求的阶段。",
+    habit: "会优先看座舱体验、配置完成度和整体高级感。",
+    strength: "能更准确识别哪些体验差异值得付费。",
+    caution: "可能为体验溢价支付过多预算。",
+  },
+  "更偏舒适家庭": {
+    subtitle: "更重视空间、舒适和家庭成员共同体验。",
+    decision: "会优先考虑一台车能否稳定服务通勤、家用和多人出行。",
+    scene: "更常见于需要兼顾家庭成员和日常通勤的用车场景。",
+    habit: "会把乘坐感受、空间效率和使用便利性放在前面。",
+    strength: "更能筛出真正适合长期家用的车型。",
+    caution: "可能把驾控和个性表达压得过低。",
+  },
+  "更偏驾驶掌控": {
+    subtitle: "更在意车辆反馈、操控感和驾驶参与度。",
+    decision: "会优先判断这台车开起来是否足够顺手、够有掌控感。",
+    scene: "更常见于把驾驶本身也当成使用体验一部分的场景。",
+    habit: "会主动关注动力响应、底盘反馈和整体驾驶乐趣。",
+    strength: "更能识别哪些车真正适合自己驾驶。",
+    caution: "可能忽略家人乘坐舒适和空间容忍度。",
+  },
+  "更偏稳定保守": {
+    subtitle: "更偏好成熟、稳定、可预期的方案。",
+    decision: "会优先信任经过验证、长期风险更低的选择。",
+    scene: "更常见于不希望把时间和精力耗在试错上的阶段。",
+    habit: "会更看重可靠性、成熟方案和低维护压力。",
+    strength: "不容易被短期趋势或噱头带偏判断。",
+    caution: "可能对新技术和新品牌保持过度谨慎。",
+  },
+  "更偏尝鲜科技": {
+    subtitle: "更愿意拥抱新技术和新的使用体验。",
+    decision: "会主动关注一台车是否代表更新的技术方向和体验方式。",
+    scene: "更常见于愿意尝试新技术、接受新使用习惯的阶段。",
+    habit: "会优先关注智能能力、补能方式和科技完成度。",
+    strength: "更容易抓住体验升级带来的真实变化。",
+    caution: "可能低估新方案在稳定性上的不确定性。",
   },
 };
 
@@ -558,7 +598,7 @@ export class AssessmentService {
 
     return {
       sessionId: result.sessionId,
-      personality: this.buildPersonalityPresentation(result.sessionId, aggregatedTraits, selectedProfile),
+      personality: this.buildPersonalityPresentation(aggregatedTraits),
       recommendationEntry: {
         label: "查看适合你人格的车型方向",
         href: `/result/${result.sessionId}/recommendations`,
@@ -711,11 +751,7 @@ export class AssessmentService {
 
     return {
       sessionId: session.result.sessionId,
-      personality: this.buildPersonalityPresentation(
-        session.result.sessionId,
-        aggregatedTraits,
-        session.result.personalityProfile,
-      ),
+      personality: this.buildPersonalityPresentation(aggregatedTraits),
       recommendationEntry: {
         label: "查看适合你人格的车型方向",
         href: `/result/${session.result.sessionId}/recommendations`,
@@ -735,39 +771,33 @@ export class AssessmentService {
     };
   }
 
-  private buildPersonalityPresentation(
-    sessionId: string,
-    aggregatedTraits: AggregatedTraits,
-    selectedProfile: {
-      code: string;
-      name: string;
-      summary: string;
-    },
-  ) {
+  private buildPersonalityPresentation(aggregatedTraits: AggregatedTraits) {
     const dimensionSnapshot = this.buildDimensionSnapshot(aggregatedTraits);
-    const archetype =
-      PERSONALITY_ARCHETYPE_CONTENT[selectedProfile.code] ??
-      {
-        code: selectedProfile.code.toLowerCase().replace(/_/g, "-"),
-        name: selectedProfile.name,
-        subtitle: "你有一套相对稳定的购车判断方式。",
-        decisionStyle: "你会围绕自己最在意的生活场景和体验重点做取舍。",
-        lifeScenes: ["偏好会受到通勤、家庭和预算结构影响", "更看重适合自己，而不是绝对参数最强"],
-        usageHabits: ["会围绕自己的核心偏好来选车", "更容易在少数关键维度上形成明显倾向"],
-        strengths: ["有清晰偏好", "做决定时有稳定依据"],
-        cautions: ["可能忽略次级需求", "在少数维度上容易判断过重"],
-      };
+    const displayProfile = this.buildDisplayPersonalityProfile(aggregatedTraits);
+    const strongestDimensions = [...dimensionSnapshot]
+      .sort((left, right) => right.value - left.value)
+      .slice(0, 2);
+    const primary =
+      PERSONALITY_DIRECTION_CONTENT[strongestDimensions[0]?.directionLabel] ?? null;
+    const secondary =
+      PERSONALITY_DIRECTION_CONTENT[strongestDimensions[1]?.directionLabel] ?? primary;
+    const subtitleSegments = strongestDimensions
+      .map((dimension) => dimension.directionLabel.replace(/^更偏/, ""))
+      .filter(Boolean);
 
     return {
-      code: archetype.code,
-      name: archetype.name,
-      subtitle: archetype.subtitle,
-      summary: selectedProfile.summary,
-      decisionStyle: archetype.decisionStyle,
-      lifeScenes: archetype.lifeScenes,
-      usageHabits: archetype.usageHabits,
-      strengths: archetype.strengths,
-      cautions: archetype.cautions,
+      code: displayProfile.code.toLowerCase(),
+      name: displayProfile.name,
+      subtitle:
+        subtitleSegments.length >= 2
+          ? `你当前更偏${subtitleSegments[0]}，同时也明显偏向${subtitleSegments[1]}。`
+          : "你已经形成了相对稳定的汽车人格倾向。",
+      summary: displayProfile.summary,
+      decisionStyle: [primary?.decision, secondary?.decision].filter(Boolean).join(" "),
+      lifeScenes: [primary?.scene, secondary?.scene].filter(Boolean),
+      usageHabits: [primary?.habit, secondary?.habit].filter(Boolean),
+      strengths: [primary?.strength, secondary?.strength].filter(Boolean),
+      cautions: [primary?.caution, secondary?.caution].filter(Boolean),
       matchScore: this.calculateMatchScore(dimensionSnapshot),
       dimensionSnapshot,
       imageUrl: null,

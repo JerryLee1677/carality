@@ -569,9 +569,9 @@ describe("AssessmentService", () => {
     await expect(service.completeSession("session_complete_1")).resolves.toEqual({
       sessionId: "session_complete_1",
       personality: {
-        code: "steady-pragmatist",
+        code: "pscv",
         name: "务实省心型",
-        subtitle: "你更在意确定性、成本压力和长期省心。",
+        subtitle: "你当前更偏务实，同时也明显偏向成本敏感。",
         summary:
           "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
         decisionStyle: expect.any(String),
@@ -2258,6 +2258,9 @@ describe("AssessmentService", () => {
 
     await expect(service.completeSession("session_rule_profile")).resolves.toMatchObject({
       sessionId: "session_rule_profile",
+      personality: {
+        name: "高配舒享型",
+      },
       recommendations: [],
     });
   });
