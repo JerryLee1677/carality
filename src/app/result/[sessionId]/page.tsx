@@ -23,7 +23,7 @@ export default async function ResultPage({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={personality.imageUrl}
-              alt={personality.name}
+              alt={`${personality.word} ${personality.name}`}
               className="personality-result__image"
             />
           ) : (
@@ -41,7 +41,13 @@ export default async function ResultPage({
           <p className="display-font text-sm uppercase tracking-[0.28em] text-[var(--color-accent-2)]">
             你的汽车人格
           </p>
-          <h1 className="personality-result__title">{personality.name}</h1>
+          <h1 className="personality-result__title">{personality.word}</h1>
+          <p className="display-font text-lg tracking-[0.12em] text-[var(--color-text)] sm:text-xl">
+            {personality.name}
+          </p>
+          <p className="text-sm tracking-[0.12em] text-[var(--color-accent-2)]">
+            {personality.epithet} · 人格代号 {personality.code.toUpperCase()}
+          </p>
           <p className="personality-result__subtitle">{personality.subtitle}</p>
           <p className="personality-result__summary">{personality.summary}</p>
 

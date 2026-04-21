@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { QuestionsService } from "../questions/questions.service";
@@ -80,72 +82,106 @@ const CORE_PREFERENCE_LABELS: Record<CorePreferenceKey, string> = {
 const DISPLAY_PERSONALITY_PROFILES: Record<
   string,
   {
+    word: string;
     name: string;
+    epithet: string;
     summary: string;
   }
 > = {
   PSCV: {
+    word: "Guardian",
     name: "务实省心型",
+    epithet: "守序顾家者",
     summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
   },
   PSCB: {
+    word: "Steward",
     name: "体面务实型",
+    epithet: "稳妥掌舵者",
     summary: "你希望一台车既省心舒适，也有成熟品牌带来的体面感和安心感。",
   },
   PSDV: {
+    word: "Driver",
     name: "理性驾趣型",
+    epithet: "克制驾驶者",
     summary: "你在意驾驶乐趣和车辆反应，但前提仍是成本可控、选择划算，不会为情绪感完全失去理性。",
   },
   PSDB: {
+    word: "Commander",
     name: "克制性能型",
+    epithet: "分寸掌控者",
     summary: "你想要驾控和品牌带来的满足感，但依然会把理性和实际价值放在前面。",
   },
   PQCV: {
+    word: "Keeper",
     name: "品质实用型",
+    epithet: "品质守护者",
     summary: "你愿意为更完整的品质体验付费，但核心仍是舒适、稳定和长期使用价值。",
   },
   PQCB: {
+    word: "Curator",
     name: "成熟品质型",
+    epithet: "品位经营者",
     summary: "你看重舒适、质感和品牌成熟度，希望整台车在体验和体面感上都比较均衡。",
   },
   PQDV: {
+    word: "Performer",
     name: "精致驾控型",
+    epithet: "质感驾驭者",
     summary: "你追求更完整的驾驶质感和配置体验，同时仍会认真衡量一台车是否值得入手。",
   },
   PQDB: {
+    word: "Signature",
     name: "格调性能型",
+    epithet: "格调表达者",
     summary: "你偏爱更高级的驾控体验和品牌质感，买车时很看重整体格调和完成度。",
   },
   ESCV: {
+    word: "Companion",
     name: "感受家用型",
+    epithet: "温和陪伴者",
     summary: "你容易被顺手、舒服和整体感受打动，但最终仍偏向舒适、省心和高性价比。",
   },
   ESCB: {
+    word: "Charmer",
     name: "感性体面型",
+    epithet: "氛围魅力者",
     summary: "你喜欢顺眼、舒服、有面子的车，不一定追求极致参数，但很重视感受是否到位。",
   },
   ESDV: {
+    word: "Explorer",
     name: "玩乐超值型",
+    epithet: "乐趣探索者",
     summary: "你重视驾驶乐趣和新鲜感，但不想为品牌溢价多花钱，更希望把钱花在体验本身上。",
   },
   ESDB: {
+    word: "Maverick",
     name: "外放驾趣型",
+    epithet: "个性冒险者",
     summary: "你希望车有个性、有乐趣、有存在感，最好还能兼顾足够鲜明的品牌表达。",
   },
   EQCV: {
+    word: "Planner",
     name: "高配舒享型",
+    epithet: "舒享规划者",
     summary: "你更在意座舱体验、配置完整度和舒适感，偏好长期使用中持续让人满意的车。",
   },
   EQCB: {
+    word: "Executive",
     name: "豪华舒享型",
+    epithet: "从容主理者",
     summary: "你注重品牌、品质、舒适和体面，买车时会优先考虑整体体验是否足够高级。",
   },
   EQDV: {
+    word: "Visionary",
     name: "科技驾趣型",
+    epithet: "先锋驾控者",
     summary: "你看重科技、性能和品质完成度，希望一台车本身就能持续提供兴奋感和新鲜感。",
   },
   EQDB: {
+    word: "Iconic",
     name: "旗舰表达型",
+    epithet: "旗舰风格者",
     summary: "你追求品牌、科技、驾控和辨识度，买车同时也在买表达和气场。",
   },
 };
@@ -209,21 +245,21 @@ const PERSONALITY_DIRECTION_CONTENT: Record<
     strength: "更能识别哪些车真正适合自己驾驶。",
     caution: "可能忽略家人乘坐舒适和空间容忍度。",
   },
-  "更偏稳定保守": {
-    subtitle: "更偏好成熟、稳定、可预期的方案。",
-    decision: "会优先信任经过验证、长期风险更低的选择。",
-    scene: "更常见于不希望把时间和精力耗在试错上的阶段。",
-    habit: "会更看重可靠性、成熟方案和低维护压力。",
-    strength: "不容易被短期趋势或噱头带偏判断。",
-    caution: "可能对新技术和新品牌保持过度谨慎。",
+  "更偏品牌体面": {
+    subtitle: "更在意品牌认知、设计表达和外界感受到的完成度。",
+    decision: "会优先判断一台车是否足够体面、有辨识度，并能代表自己的审美取向。",
+    scene: "更常见于需要兼顾个人表达、社交观感和品牌感受的用车阶段。",
+    habit: "选车时会主动关注品牌气质、设计细节和整体形象呈现。",
+    strength: "更容易识别哪些车型真正能带来体面感和表达价值。",
+    caution: "可能为品牌和设计溢价支付过多预算。",
   },
-  "更偏尝鲜科技": {
-    subtitle: "更愿意拥抱新技术和新的使用体验。",
-    decision: "会主动关注一台车是否代表更新的技术方向和体验方式。",
-    scene: "更常见于愿意尝试新技术、接受新使用习惯的阶段。",
-    habit: "会优先关注智能能力、补能方式和科技完成度。",
-    strength: "更容易抓住体验升级带来的真实变化。",
-    caution: "可能低估新方案在稳定性上的不确定性。",
+  "更偏价值优先": {
+    subtitle: "更在意预算效率、长期回报和花出去的钱值不值。",
+    decision: "会优先确认一台车是否真正划算、耐用，并能持续带来稳定回报。",
+    scene: "更常见于预算需要精打细算、同时又重视长期持有成本的阶段。",
+    habit: "选车时会优先比较价格、保养、可靠性和长期使用账本。",
+    strength: "更擅长识别真正值得长期持有的高性价比方案。",
+    caution: "可能因为过于强调划算而压低品牌和设计带来的满足感。",
   },
 };
 
@@ -244,6 +280,11 @@ type AssessmentDbClient = Pick<
 
 @Injectable()
 export class AssessmentService {
+  private readonly personalityImageRoots = [
+    resolve(process.cwd(), "public", "images", "personalities"),
+    resolve(process.cwd(), "..", "..", "public", "images", "personalities"),
+  ];
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly questionsService: QuestionsService,
@@ -774,6 +815,7 @@ export class AssessmentService {
   private buildPersonalityPresentation(aggregatedTraits: AggregatedTraits) {
     const dimensionSnapshot = this.buildDimensionSnapshot(aggregatedTraits);
     const displayProfile = this.buildDisplayPersonalityProfile(aggregatedTraits);
+    const personalityCode = displayProfile.code.toLowerCase();
     const strongestDimensions = [...dimensionSnapshot]
       .sort((left, right) => right.value - left.value)
       .slice(0, 2);
@@ -786,8 +828,10 @@ export class AssessmentService {
       .filter(Boolean);
 
     return {
-      code: displayProfile.code.toLowerCase(),
+      code: personalityCode,
+      word: displayProfile.word,
       name: displayProfile.name,
+      epithet: displayProfile.epithet,
       subtitle:
         subtitleSegments.length >= 2
           ? `你当前更偏${subtitleSegments[0]}，同时也明显偏向${subtitleSegments[1]}。`
@@ -800,8 +844,18 @@ export class AssessmentService {
       cautions: [primary?.caution, secondary?.caution].filter(Boolean),
       matchScore: this.calculateMatchScore(dimensionSnapshot),
       dimensionSnapshot,
-      imageUrl: null,
+      imageUrl: this.resolvePersonalityImageUrl(personalityCode),
     };
+  }
+
+  private resolvePersonalityImageUrl(personalityCode: string) {
+    const imageFileName = [".png", ".jpeg", ".jpg"]
+      .map((extension) => `${personalityCode}${extension}`)
+      .find((candidate) =>
+        this.personalityImageRoots.some((rootPath) => existsSync(resolve(rootPath, candidate))),
+      );
+
+    return imageFileName ? `/images/personalities/${imageFileName}` : null;
   }
 
   private shouldAutoComplete(
@@ -1297,20 +1351,19 @@ export class AssessmentService {
       this.getTraitValue(aggregatedTraits, "driving_engagement", "VEHICLE_PREFERENCE") +
       this.getTraitValue(aggregatedTraits, "control_preference") +
       this.getTraitValue(aggregatedTraits, "expression_drive");
-    const steadyScore =
-      this.getTraitValue(aggregatedTraits, "stability_preference") +
-      this.getTraitValue(aggregatedTraits, "planning_bias") +
-      this.getTraitValue(aggregatedTraits, "ownership_horizon", "HARD_CONSTRAINT");
-    const techScore =
-      this.getTraitValue(aggregatedTraits, "novelty_seeking") +
-      this.getTraitValue(aggregatedTraits, "smart_features", "VEHICLE_PREFERENCE") +
-      this.getTraitValue(aggregatedTraits, "charging_access", "HARD_CONSTRAINT");
+    const valueScore =
+      this.getTraitValue(aggregatedTraits, "running_cost", "VEHICLE_PREFERENCE") +
+      this.getTraitValue(aggregatedTraits, "daily_reliability", "VEHICLE_PREFERENCE") +
+      this.getTraitValue(aggregatedTraits, "monthly_payment_sensitivity", "HARD_CONSTRAINT");
+    const brandScore =
+      this.getTraitValue(aggregatedTraits, "brand_expression", "VEHICLE_PREFERENCE") +
+      this.getTraitValue(aggregatedTraits, "design_presence", "VEHICLE_PREFERENCE");
 
     return [
       this.createDimension("practicality", "务实 vs 表达", practicalScore, expressiveScore, "更偏务实", "更偏表达"),
       this.createDimension("ownership", "成本 vs 品质", costScore, qualityScore, "更偏成本敏感", "更偏品质体验"),
       this.createDimension("comfort", "舒适 vs 驾控", comfortScore, drivingScore, "更偏舒适家庭", "更偏驾驶掌控"),
-      this.createDimension("innovation", "稳定 vs 科技", steadyScore, techScore, "更偏稳定保守", "更偏尝鲜科技"),
+      this.createDimension("brandValue", "品牌 vs 价值", brandScore, valueScore, "更偏品牌体面", "更偏价值优先"),
     ];
   }
 
@@ -1460,13 +1513,17 @@ export class AssessmentService {
   private buildDisplayPersonalityProfile(aggregatedTraits: AggregatedTraits) {
     const code = this.buildDisplayPersonalityCode(aggregatedTraits);
     const profile = DISPLAY_PERSONALITY_PROFILES[code] ?? {
+      word: "Persona",
       name: "购车人格",
+      epithet: "风格观察者",
       summary: "你的购车选择有稳定偏好，建议结合预算、场景和体验重点继续细看车型。",
     };
 
     return {
       code,
+      word: profile.word,
       name: profile.name,
+      epithet: profile.epithet,
       summary: profile.summary,
     };
   }

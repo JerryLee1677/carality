@@ -2,7 +2,9 @@ export type CompleteSessionResponseDto = {
   sessionId: string;
   personality: {
     code: string;
+    word: string;
     name: string;
+    epithet: string;
     subtitle: string;
     summary: string;
     decisionStyle: string;
@@ -26,7 +28,9 @@ export type CompleteSessionResponseDto = {
   personalityProfile: {
     code: string;
     archetypeCode: string;
+    word: string;
     name: string;
+    epithet: string;
     summary: string;
   } | null;
   recommendations: Array<{

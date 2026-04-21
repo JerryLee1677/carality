@@ -2,6 +2,17 @@ import { describe, expect, it, vi } from "vitest";
 import { AssessmentService } from "./assessment.service";
 
 describe("AssessmentService", () => {
+  it("resolves personality images across supported file extensions", () => {
+    const service = new AssessmentService({} as never, {} as never);
+
+    expect((service as any).resolvePersonalityImageUrl("pscv")).toBe(
+      "/images/personalities/pscv.png",
+    );
+    expect((service as any).resolvePersonalityImageUrl("eqdv")).toBe(
+      "/images/personalities/eqdv.jpeg",
+    );
+  });
+
   it("creates a quick session, stores the first question pointer, and returns that question", async () => {
     const create = vi.fn().mockResolvedValue({
       id: "session_1",
@@ -566,11 +577,15 @@ describe("AssessmentService", () => {
 
     const service = new AssessmentService(prisma as never, questionsService as never);
 
-    await expect(service.completeSession("session_complete_1")).resolves.toEqual({
+    const result = await service.completeSession("session_complete_1");
+
+    expect(result).toEqual({
       sessionId: "session_complete_1",
       personality: {
         code: "pscv",
+        word: "Guardian",
         name: "务实省心型",
+        epithet: "守序顾家者",
         subtitle: "你当前更偏务实，同时也明显偏向成本敏感。",
         summary:
           "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
@@ -581,7 +596,7 @@ describe("AssessmentService", () => {
         cautions: expect.any(Array),
         matchScore: expect.any(Number),
         dimensionSnapshot: expect.any(Array),
-        imageUrl: null,
+        imageUrl: "/images/personalities/pscv.png",
       },
       recommendationEntry: {
         label: "查看适合你人格的车型方向",
@@ -590,7 +605,9 @@ describe("AssessmentService", () => {
       personalityProfile: {
         code: "PSCV",
         archetypeCode: "STEADY_PRAGMATIST",
+        word: "Guardian",
         name: "务实省心型",
+        epithet: "守序顾家者",
         summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
       },
       recommendations: [
@@ -611,6 +628,11 @@ describe("AssessmentService", () => {
           reason: "你当前更看重空间实用性、家庭适配、使用成本，但这台车在这些维度上的匹配度偏低。",
         },
       ],
+    });
+    expect(result.personality.dimensionSnapshot[3]).toMatchObject({
+      key: "brandValue",
+      label: "品牌 vs 价值",
+      directionLabel: "更偏价值优先",
     });
 
     expect(profileFindMany).toHaveBeenCalledWith({
@@ -802,7 +824,9 @@ describe("AssessmentService", () => {
       personalityProfile: {
         code: "PSCV",
         archetypeCode: "STEADY_PRAGMATIST",
+        word: "Guardian",
         name: "务实省心型",
+        epithet: "守序顾家者",
         summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
       },
       recommendations: [
@@ -2259,7 +2283,9 @@ describe("AssessmentService", () => {
     await expect(service.completeSession("session_rule_profile")).resolves.toMatchObject({
       sessionId: "session_rule_profile",
       personality: {
+        word: "Planner",
         name: "高配舒享型",
+        epithet: "舒享规划者",
       },
       recommendations: [],
     });
@@ -2330,6 +2356,11 @@ describe("AssessmentService", () => {
     const service = new AssessmentService(prisma as never, questionsService as never);
 
     await expect(service.getSessionResult("session_result_1")).resolves.toMatchObject({
+      personality: {
+        word: "Guardian",
+        name: "务实省心型",
+        epithet: "守序顾家者",
+      },
       sessionId: "session_result_1",
       personalityProfile: {
         code: "PSCV",
