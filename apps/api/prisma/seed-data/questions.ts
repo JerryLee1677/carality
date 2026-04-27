@@ -184,19 +184,19 @@ export const questions = [
     priority: 136,
     discrimination: 93,
     left: {
-      label: "有固定车位或公司/家附近补能方便",
-      effects: [
-        { targetType: "HARD_CONSTRAINT", targetKey: "charging_access", weightDelta: 4 },
-        { targetType: "HARD_CONSTRAINT", targetKey: "energy_acceptance_ev", weightDelta: 3 },
-        { targetType: "HARD_CONSTRAINT", targetKey: "energy_acceptance_phev", weightDelta: 3 },
-      ],
-    },
-    right: {
       label: "没有稳定充电条件，更想省事",
       effects: [
         { targetType: "HARD_CONSTRAINT", targetKey: "charging_access", weightDelta: 1 },
         { targetType: "HARD_CONSTRAINT", targetKey: "energy_acceptance_ice", weightDelta: 4 },
         { targetType: "VEHICLE_PREFERENCE", targetKey: "simplicity_reliability", weightDelta: 1 },
+      ],
+    },
+    right: {
+      label: "有固定车位或公司/家附近补能方便",
+      effects: [
+        { targetType: "HARD_CONSTRAINT", targetKey: "charging_access", weightDelta: 4 },
+        { targetType: "HARD_CONSTRAINT", targetKey: "energy_acceptance_ev", weightDelta: 3 },
+        { targetType: "HARD_CONSTRAINT", targetKey: "energy_acceptance_phev", weightDelta: 3 },
       ],
     },
   }),

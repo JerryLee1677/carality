@@ -32,6 +32,28 @@ describe("assessment seed data", () => {
     expect(branchRuleCount).toBeGreaterThanOrEqual(8);
   });
 
+  it("maps no charging access answers away from EV recommendations", () => {
+    const chargingQuestion = questions.find((question) => question.slug === "charging-access");
+    const stronglyDisagree = chargingQuestion?.options.find((option) => option.order === 1);
+    const stronglyAgree = chargingQuestion?.options.find((option) => option.order === 5);
+    const effectValue = (
+      option: NonNullable<typeof stronglyDisagree>,
+      targetKey: string,
+    ) =>
+      option.effects.find(
+        (effect) =>
+          effect.targetType === "HARD_CONSTRAINT" && effect.targetKey === targetKey,
+      )?.weightDelta ?? 0;
+
+    expect(chargingQuestion).toBeDefined();
+    expect(effectValue(stronglyDisagree!, "charging_access")).toBeLessThanOrEqual(1);
+    expect(effectValue(stronglyDisagree!, "energy_acceptance_ice")).toBeGreaterThanOrEqual(4);
+    expect(effectValue(stronglyDisagree!, "energy_acceptance_ev")).toBe(0);
+
+    expect(effectValue(stronglyAgree!, "charging_access")).toBeGreaterThanOrEqual(4);
+    expect(effectValue(stronglyAgree!, "energy_acceptance_ev")).toBeGreaterThanOrEqual(3);
+  });
+
   it("contains at least 50 vehicles with trait weights and constraint rules", () => {
     expect(vehicles.length).toBeGreaterThanOrEqual(50);
     expect(vehicles.every((vehicle) => vehicle.traitWeights.length >= 3)).toBe(true);
