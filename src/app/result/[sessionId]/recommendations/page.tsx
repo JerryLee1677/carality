@@ -17,59 +17,52 @@ export default async function RecommendationsPage({
 
   return (
     <main className="shell py-8 sm:py-10">
-      <section className="dashboard-panel-strong flex flex-col gap-4">
-        <p className="display-font text-sm uppercase tracking-[0.28em] text-[var(--color-accent-2)]">
+      <section className="recommendations-hero">
+        <p className="recommendations-hero__eyebrow">
           Vehicle Match
         </p>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-semibold tracking-tight text-[var(--color-text)] sm:text-4xl">
-              适合你人格的车型方向
-            </h1>
-            <p className="max-w-3xl text-sm leading-7 text-[var(--color-muted)] sm:text-base">
+        <div className="recommendations-hero__row">
+          <div className="recommendations-hero__content">
+            <h1 className="recommendations-hero__title">适合你人格的车型方向</h1>
+            <p className="recommendations-hero__body">
               基于你的人格画像
-              <span className="font-medium text-[var(--color-text)]"> {headline} </span>
+              <span className="recommendations-hero__highlight"> {headline} </span>
               ，这里是当前更匹配的车型建议，你可以继续查看每台车的匹配理由与详情。
             </p>
           </div>
           <Link
             href={`/result/${sessionId}`}
-            className="race-button race-button-ghost w-full justify-center px-6 py-3 sm:w-auto"
+            className="race-button race-button-ghost recommendations-hero__action"
           >
             返回人格结果
           </Link>
         </div>
       </section>
 
-      <section className="mt-6 grid gap-4">
+      <section className="recommendations-list">
         {result.recommendations.length > 0 ? (
           result.recommendations.map((vehicle) => (
             <article
               key={vehicle.slug}
-              className="dashboard-panel flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+              className="recommendation-card"
             >
-              <div className="space-y-2">
-                <p className="text-xs font-medium uppercase tracking-[0.24em] text-[var(--color-accent-2)]">
-                  Top {vehicle.rank}
-                </p>
-                <h2 className="text-2xl font-semibold tracking-tight text-[var(--color-text)]">
+              <div className="recommendation-card__meta">
+                <p className="recommendation-card__rank">Top {vehicle.rank}</p>
+                <h2 className="recommendation-card__title">
                   {vehicle.brand} {vehicle.series}
                 </h2>
-                <p className="max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
-                  {vehicle.reason}
-                </p>
               </div>
 
-              <div className="flex flex-col items-start gap-3 sm:items-end">
-                <p className="text-sm text-[var(--color-muted)]">
-                  匹配分
-                  <span className="ml-2 text-2xl font-semibold text-[var(--color-text)]">
-                    {vehicle.score}
-                  </span>
-                </p>
+              <p className="recommendation-card__reason">{vehicle.reason}</p>
+
+              <div className="recommendation-card__aside">
+                <div className="recommendation-card__score-block">
+                  <p className="recommendation-card__score-label">匹配分</p>
+                  <p className="recommendation-card__score">{vehicle.score}</p>
+                </div>
                 <Link
                   href={`/cars/${vehicle.slug}`}
-                  className="race-button race-button-primary w-full justify-center px-6 py-3 sm:w-auto"
+                  className="race-button race-button-primary recommendation-card__button"
                 >
                   查看车型详情
                 </Link>
@@ -77,11 +70,9 @@ export default async function RecommendationsPage({
             </article>
           ))
         ) : (
-          <div className="dashboard-panel">
-            <h2 className="text-xl font-semibold tracking-tight text-[var(--color-text)]">
-              推荐结果生成中
-            </h2>
-            <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
+          <div className="recommendations-empty">
+            <h2 className="recommendations-empty__title">推荐结果生成中</h2>
+            <p className="recommendations-empty__body">
               当前还没有可展示的车型推荐，你可以先返回人格结果页，稍后再次查看。
             </p>
           </div>
