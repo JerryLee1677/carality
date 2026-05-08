@@ -55,9 +55,57 @@ describe("assessment seed data", () => {
   });
 
   it("contains at least 50 vehicles with trait weights and constraint rules", () => {
-    expect(vehicles.length).toBeGreaterThanOrEqual(50);
+    expect(vehicles.length).toBeGreaterThanOrEqual(120);
     expect(vehicles.every((vehicle) => vehicle.traitWeights.length >= 3)).toBe(true);
     expect(vehicles.every((vehicle) => vehicle.constraintRules.length >= 2)).toBe(true);
+  });
+
+  it("broadens mainstream China-market coverage without over-concentrating one brand", () => {
+    const brandCounts = vehicles.reduce<Record<string, number>>((counts, vehicle) => {
+      counts[vehicle.brand] = (counts[vehicle.brand] ?? 0) + 1;
+      return counts;
+    }, {});
+    const largestBrandCount = Math.max(...Object.values(brandCounts));
+
+    expect(Object.keys(brandCounts)).toEqual(
+      expect.arrayContaining([
+        "比亚迪",
+        "吉利银河",
+        "深蓝",
+        "零跑",
+        "小鹏",
+        "埃安",
+        "奇瑞",
+        "哈弗",
+        "理想",
+        "问界",
+        "腾势",
+      ]),
+    );
+    expect(largestBrandCount / vehicles.length).toBeLessThanOrEqual(0.15);
+  });
+
+  it("keeps vehicle energy constraints aligned with each vehicle energy type", () => {
+    const expectedEnergyConstraintByType = {
+      EV: "energy_acceptance_ev",
+      PHEV: "energy_acceptance_phev",
+      EREV: "energy_acceptance_phev",
+      HEV: "energy_acceptance_ice",
+      ICE: "energy_acceptance_ice",
+    } as const;
+
+    const mismatchedVehicles = vehicles
+      .filter((vehicle) => {
+        const expectedConstraint =
+          expectedEnergyConstraintByType[
+            vehicle.energyType as keyof typeof expectedEnergyConstraintByType
+          ];
+
+        return !vehicle.constraintRules.some((rule) => rule.targetKey === expectedConstraint);
+      })
+      .map((vehicle) => vehicle.slug);
+
+    expect(mismatchedVehicles).toEqual([]);
   });
 
   it("stores explicit core scores for every vehicle seed entry", () => {

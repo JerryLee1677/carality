@@ -854,6 +854,253 @@ describe("AssessmentService", () => {
     });
   });
 
+  it("does not fall back to EV or plug-in recommendations when charging and plug-in acceptance are rejected", async () => {
+    const prisma = {
+      assessmentSession: {
+        create: vi.fn(),
+        findUnique: vi.fn().mockResolvedValue({
+          id: "session_reject_plugin_1",
+          status: "IN_PROGRESS",
+        }),
+        update: vi.fn().mockResolvedValue(undefined),
+      },
+      sessionTraitSnapshot: {
+        createMany: vi.fn(),
+        findMany: vi.fn().mockResolvedValue([
+          { targetType: "HARD_CONSTRAINT", traitKey: "charging_access", traitValue: 0 },
+          { targetType: "HARD_CONSTRAINT", traitKey: "energy_acceptance_ev", traitValue: 0 },
+          { targetType: "HARD_CONSTRAINT", traitKey: "energy_acceptance_phev", traitValue: 0 },
+          { targetType: "VEHICLE_PREFERENCE", traitKey: "smart_features", traitValue: 5 },
+          { targetType: "VEHICLE_PREFERENCE", traitKey: "driving_engagement", traitValue: 5 },
+        ]),
+      },
+      personalityProfile: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "profile_tech",
+            code: "TECH_EXPLORER",
+            name: "科技探索型",
+            summary: "summary",
+            detail: "detail",
+            rules: [],
+          },
+        ]),
+      },
+      vehicle: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "vehicle_ev",
+            slug: "tesla-model-3",
+            brand: "特斯拉",
+            series: "Model 3",
+            modelName: "后轮驱动版",
+            energyType: "EV",
+            constraintRules: [
+              {
+                targetType: "HARD_CONSTRAINT",
+                targetKey: "charging_access",
+                traitOperator: "GTE",
+                traitThreshold: 3,
+              },
+              {
+                targetType: "HARD_CONSTRAINT",
+                targetKey: "energy_acceptance_ev",
+                traitOperator: "GTE",
+                traitThreshold: 3,
+              },
+            ],
+            traitWeights: [
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 10 },
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 8 },
+            ],
+          },
+          {
+            id: "vehicle_phev",
+            slug: "byd-song-plus-dmi",
+            brand: "比亚迪",
+            series: "宋 PLUS",
+            modelName: "DM-i",
+            energyType: "PHEV",
+            constraintRules: [
+              {
+                targetType: "HARD_CONSTRAINT",
+                targetKey: "energy_acceptance_phev",
+                traitOperator: "GTE",
+                traitThreshold: 2,
+              },
+            ],
+            traitWeights: [
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 8 },
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 7 },
+            ],
+          },
+        ]),
+      },
+      sessionResult: {
+        create: vi.fn().mockResolvedValue({
+          id: "result_reject_plugin_1",
+          sessionId: "session_reject_plugin_1",
+        }),
+      },
+      sessionVehicleRecommendation: {
+        createMany: vi.fn(),
+      },
+    };
+    const service = new AssessmentService(prisma as never, {
+      getInitialQuestion: vi.fn(),
+      getNextQuestion: vi.fn(),
+    } as never);
+
+    await expect(service.completeSession("session_reject_plugin_1")).resolves.toMatchObject({
+      sessionId: "session_reject_plugin_1",
+      recommendations: [],
+    });
+
+    expect(prisma.sessionVehicleRecommendation.createMany).not.toHaveBeenCalled();
+  });
+
+  it("blocks plug-in vehicles when any charging or replenishment answer is negative even if later answers raise totals", async () => {
+    const prisma = {
+      assessmentSession: {
+        create: vi.fn(),
+        findUnique: vi.fn().mockResolvedValue({
+          id: "session_negative_plugin_once_1",
+          status: "IN_PROGRESS",
+        }),
+        update: vi.fn().mockResolvedValue(undefined),
+      },
+      sessionTraitSnapshot: {
+        createMany: vi.fn(),
+        findMany: vi.fn().mockResolvedValue([
+          { targetType: "HARD_CONSTRAINT", traitKey: "charging_access", traitValue: 1 },
+          { targetType: "HARD_CONSTRAINT", traitKey: "charging_access", traitValue: 4 },
+          { targetType: "HARD_CONSTRAINT", traitKey: "energy_acceptance_ev", traitValue: 1 },
+          { targetType: "HARD_CONSTRAINT", traitKey: "energy_acceptance_ev", traitValue: 4 },
+          { targetType: "HARD_CONSTRAINT", traitKey: "energy_acceptance_phev", traitValue: 2 },
+          { targetType: "HARD_CONSTRAINT", traitKey: "energy_acceptance_phev", traitValue: 4 },
+          { targetType: "HARD_CONSTRAINT", traitKey: "energy_acceptance_ice", traitValue: 5 },
+          { targetType: "VEHICLE_PREFERENCE", traitKey: "smart_features", traitValue: 5 },
+          { targetType: "VEHICLE_PREFERENCE", traitKey: "driving_engagement", traitValue: 5 },
+        ]),
+      },
+      personalityProfile: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "profile_tech",
+            code: "TECH_EXPLORER",
+            name: "科技探索型",
+            summary: "summary",
+            detail: "detail",
+            rules: [],
+          },
+        ]),
+      },
+      vehicle: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "vehicle_ev",
+            slug: "tesla-model-3",
+            brand: "特斯拉",
+            series: "Model 3",
+            modelName: "后轮驱动版",
+            energyType: "EV",
+            constraintRules: [
+              {
+                targetType: "HARD_CONSTRAINT",
+                targetKey: "charging_access",
+                traitOperator: "GTE",
+                traitThreshold: 3,
+              },
+              {
+                targetType: "HARD_CONSTRAINT",
+                targetKey: "energy_acceptance_ev",
+                traitOperator: "GTE",
+                traitThreshold: 3,
+              },
+            ],
+            traitWeights: [
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 10 },
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 8 },
+            ],
+          },
+          {
+            id: "vehicle_phev",
+            slug: "byd-song-plus-dmi",
+            brand: "比亚迪",
+            series: "宋 PLUS",
+            modelName: "DM-i",
+            energyType: "PHEV",
+            constraintRules: [
+              {
+                targetType: "HARD_CONSTRAINT",
+                targetKey: "energy_acceptance_phev",
+                traitOperator: "GTE",
+                traitThreshold: 2,
+              },
+            ],
+            traitWeights: [
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 8 },
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 7 },
+            ],
+          },
+          {
+            id: "vehicle_ice",
+            slug: "lynkco-03-plus",
+            brand: "领克",
+            series: "03+",
+            modelName: "驭风版",
+            energyType: "ICE",
+            constraintRules: [
+              {
+                targetType: "HARD_CONSTRAINT",
+                targetKey: "energy_acceptance_ice",
+                traitOperator: "GTE",
+                traitThreshold: 3,
+              },
+            ],
+            traitWeights: [
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 9 },
+            ],
+          },
+        ]),
+      },
+      sessionResult: {
+        create: vi.fn().mockResolvedValue({
+          id: "result_negative_plugin_once_1",
+          sessionId: "session_negative_plugin_once_1",
+        }),
+      },
+      sessionVehicleRecommendation: {
+        createMany: vi.fn().mockResolvedValue(undefined),
+      },
+    };
+    const service = new AssessmentService(prisma as never, {
+      getInitialQuestion: vi.fn(),
+      getNextQuestion: vi.fn(),
+    } as never);
+
+    await expect(service.completeSession("session_negative_plugin_once_1")).resolves.toMatchObject({
+      sessionId: "session_negative_plugin_once_1",
+      recommendations: [
+        {
+          slug: "lynkco-03-plus",
+          brand: "领克",
+          series: "03+",
+          rank: 1,
+        },
+      ],
+    });
+
+    expect(prisma.sessionVehicleRecommendation.createMany).toHaveBeenCalledWith({
+      data: [
+        expect.objectContaining({
+          vehicleId: "vehicle_ice",
+          rank: 1,
+        }),
+      ],
+    });
+  });
+
   it("scores vehicle traits against matching target types when keys overlap", async () => {
     const prisma = {
       assessmentSession: {
@@ -971,7 +1218,7 @@ describe("AssessmentService", () => {
     });
   });
 
-  it("fails completion when hard constraints exclude every active vehicle", async () => {
+  it("returns no recommendations when hard constraints exclude every active vehicle", async () => {
     const prisma = {
       assessmentSession: {
         create: vi.fn(),
@@ -1047,15 +1294,10 @@ describe("AssessmentService", () => {
 
     await expect(service.completeSession("session_no_vehicle_1")).resolves.toMatchObject({
       sessionId: "session_no_vehicle_1",
-      recommendations: [
-        {
-          slug: "future-ev-x",
-          brand: "未来",
-          series: "EV",
-          rank: 1,
-        },
-      ],
+      recommendations: [],
     });
+
+    expect(prisma.sessionVehicleRecommendation.createMany).not.toHaveBeenCalled();
   });
 
   it("matches hard constraints against the rule target type when keys overlap", async () => {
