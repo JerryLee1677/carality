@@ -498,6 +498,129 @@
     color: var(--color-muted);
   }
 
+  .recommendation-diagnostics {
+    display: grid;
+    gap: 1rem;
+    border: 1px solid rgba(28, 33, 38, 0.12);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.54);
+    padding: 1rem;
+  }
+
+  .recommendation-diagnostics__header {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .recommendation-diagnostics__eyebrow,
+  .recommendation-diagnostics__title {
+    font-family: "Arial Narrow", "Aptos Narrow", "Franklin Gothic Medium", sans-serif;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .recommendation-diagnostics__eyebrow {
+    font-size: 0.75rem;
+    color: var(--color-accent-2);
+  }
+
+  .recommendation-diagnostics__note {
+    max-width: 42rem;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--color-muted);
+  }
+
+  .recommendation-diagnostics__grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .recommendation-diagnostics__panel {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .recommendation-diagnostics__title {
+    font-size: 0.72rem;
+    color: var(--color-text);
+  }
+
+  .recommendation-diagnostics__rows {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .diagnostic-row {
+    display: grid;
+    grid-template-columns: minmax(4.8rem, 7rem) minmax(5rem, 1fr) 2.4rem;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.78rem;
+    color: var(--color-muted);
+  }
+
+  .diagnostic-row__track {
+    height: 0.45rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(28, 33, 38, 0.08);
+  }
+
+  .diagnostic-row__fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+  }
+
+  .diagnostic-row__fill--user {
+    background: var(--color-accent);
+  }
+
+  .diagnostic-row__fill--vehicle {
+    background: var(--color-accent-2);
+  }
+
+  .diagnostic-row__value {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text);
+  }
+
+  .recommendation-diagnostics__breakdown {
+    display: grid;
+    gap: 0.7rem;
+    border-top: 1px solid rgba(28, 33, 38, 0.1);
+    padding-top: 0.9rem;
+  }
+
+  .score-breakdown {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+    margin: 0;
+  }
+
+  .score-breakdown__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    border-left: 2px solid rgba(28, 33, 38, 0.12);
+    padding-left: 0.65rem;
+    font-size: 0.78rem;
+  }
+
+  .score-breakdown__item dt {
+    color: var(--color-muted);
+  }
+
+  .score-breakdown__item dd {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text);
+  }
+
   .recommendation-card__aside {
     display: flex;
     flex-direction: column;
@@ -637,6 +760,14 @@
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) auto;
     align-items: center;
     gap: 1.5rem;
+  }
+
+  .recommendation-diagnostics {
+    grid-column: 1 / -1;
+  }
+
+  .recommendation-diagnostics__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .recommendation-card__aside {

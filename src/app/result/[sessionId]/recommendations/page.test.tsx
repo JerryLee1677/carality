@@ -56,6 +56,26 @@ describe("RecommendationsPage", () => {
             rank: 1,
             score: 92,
             reason: "空间与智能化体验均衡，适合稳定通勤与家庭出行。",
+            diagnostics: {
+              userPreferenceVector: [
+                { key: "smart", label: "科技配置", value: 84 },
+                { key: "family", label: "家庭适配", value: 76 },
+                { key: "energy", label: "能源类型", value: 100 },
+              ],
+              vehicleScores: [
+                { key: "smart", label: "科技配置", value: 92 },
+                { key: "family", label: "家庭适配", value: 70 },
+                { key: "energy", label: "能源类型", value: 100 },
+              ],
+              scoreBreakdown: {
+                vectorFit: 88,
+                energyFit: 91,
+                constraintFit: 100,
+                preferenceAlignment: 86,
+                personalityAlignment: 72,
+                corePenalty: 0,
+              },
+            },
           },
           {
             slug: "toyota-rav4",
@@ -64,6 +84,26 @@ describe("RecommendationsPage", () => {
             rank: 2,
             score: 88,
             reason: "可靠性高，长期使用成本可控。",
+            diagnostics: {
+              userPreferenceVector: [
+                { key: "smart", label: "科技配置", value: 84 },
+                { key: "family", label: "家庭适配", value: 76 },
+                { key: "energy", label: "能源类型", value: 0 },
+              ],
+              vehicleScores: [
+                { key: "smart", label: "科技配置", value: 45 },
+                { key: "family", label: "家庭适配", value: 82 },
+                { key: "energy", label: "能源类型", value: 0 },
+              ],
+              scoreBreakdown: {
+                vectorFit: 82,
+                energyFit: 76,
+                constraintFit: 100,
+                preferenceAlignment: 80,
+                personalityAlignment: 78,
+                corePenalty: 2,
+              },
+            },
           },
         ],
       }),
@@ -79,6 +119,14 @@ describe("RecommendationsPage", () => {
     expect(screen.getByText("务实省心型")).toBeInTheDocument();
     expect(screen.getByText("Tesla Model Y")).toBeInTheDocument();
     expect(screen.getByText("Toyota RAV4")).toBeInTheDocument();
+    expect(screen.getAllByText("本地测试得分")).toHaveLength(2);
+    expect(screen.getAllByText("用户偏好向量")[0]).toBeInTheDocument();
+    expect(screen.getAllByText("科技配置")[0]).toBeInTheDocument();
+    expect(screen.getAllByText("能源类型")[0]).toBeInTheDocument();
+    expect(screen.getAllByText("84")[0]).toBeInTheDocument();
+    expect(screen.getAllByText("车型各项分值")[0]).toBeInTheDocument();
+    expect(screen.getAllByText("评分拆解")[0]).toBeInTheDocument();
+    expect(screen.getAllByText("vectorFit")[0]).toBeInTheDocument();
     const detailLinks = screen.getAllByRole("link", { name: /查看车型详情/i });
     expect(detailLinks[0]).toHaveAttribute("href", "/cars/tesla-model-y");
     expect(detailLinks[1]).toHaveAttribute("href", "/cars/toyota-rav4");

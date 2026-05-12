@@ -55,6 +55,67 @@ export default async function RecommendationsPage({
 
               <p className="recommendation-card__reason">{vehicle.reason}</p>
 
+              {vehicle.diagnostics ? (
+                <section className="recommendation-diagnostics" aria-label={`${vehicle.brand} ${vehicle.series} 本地测试得分`}>
+                  <div className="recommendation-diagnostics__header">
+                    <p className="recommendation-diagnostics__eyebrow">本地测试得分</p>
+                    <p className="recommendation-diagnostics__note">
+                      用户偏好与车型分值越接近，说明该维度越支撑当前推荐。
+                    </p>
+                  </div>
+
+                  <div className="recommendation-diagnostics__grid">
+                    <div className="recommendation-diagnostics__panel">
+                      <h3 className="recommendation-diagnostics__title">用户偏好向量</h3>
+                      <div className="recommendation-diagnostics__rows">
+                        {vehicle.diagnostics.userPreferenceVector.map((dimension) => (
+                          <div key={dimension.key} className="diagnostic-row">
+                            <span className="diagnostic-row__label">{dimension.label}</span>
+                            <span className="diagnostic-row__track">
+                              <span
+                                className="diagnostic-row__fill diagnostic-row__fill--user"
+                                style={{ width: `${dimension.value}%` }}
+                              />
+                            </span>
+                            <span className="diagnostic-row__value">{dimension.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="recommendation-diagnostics__panel">
+                      <h3 className="recommendation-diagnostics__title">车型各项分值</h3>
+                      <div className="recommendation-diagnostics__rows">
+                        {vehicle.diagnostics.vehicleScores.map((dimension) => (
+                          <div key={dimension.key} className="diagnostic-row">
+                            <span className="diagnostic-row__label">{dimension.label}</span>
+                            <span className="diagnostic-row__track">
+                              <span
+                                className="diagnostic-row__fill diagnostic-row__fill--vehicle"
+                                style={{ width: `${dimension.value}%` }}
+                              />
+                            </span>
+                            <span className="diagnostic-row__value">{dimension.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="recommendation-diagnostics__breakdown">
+                    <h3 className="recommendation-diagnostics__title">评分拆解</h3>
+                    <dl className="score-breakdown">
+                      {Object.entries(vehicle.diagnostics.scoreBreakdown).map(([key, value]) => (
+                        <div key={key} className="score-breakdown__item">
+                          <dt>{key}</dt>
+                          <dd>{value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                </section>
+              ) : null}
+
               <div className="recommendation-card__aside">
                 <div className="recommendation-card__score-block">
                   <p className="recommendation-card__score-label">匹配分</p>

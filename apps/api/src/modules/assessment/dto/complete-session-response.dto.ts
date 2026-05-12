@@ -40,5 +40,25 @@ export type CompleteSessionResponseDto = {
     rank: number;
     score: number;
     reason: string;
+    diagnostics: {
+      userPreferenceVector: Array<{
+        key: string;
+        label: string;
+        value: number;
+      }>;
+      vehicleScores: Array<{
+        key: string;
+        label: string;
+        value: number;
+      }>;
+      scoreBreakdown: {
+        vectorFit: number;
+        energyFit: number;
+        constraintFit: number;
+        preferenceAlignment: number;
+        personalityAlignment: number;
+        corePenalty: number;
+      };
+    };
   }>;
 };

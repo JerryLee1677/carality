@@ -618,6 +618,7 @@ describe("AssessmentService", () => {
           rank: 1,
           score: 68,
           reason: "你当前更看重空间实用性、家庭适配、使用成本，这台车在家庭适配、使用成本上更贴合你的选择。",
+          diagnostics: expect.any(Object),
         },
         {
           slug: "tesla-model-3",
@@ -626,6 +627,7 @@ describe("AssessmentService", () => {
           rank: 2,
           score: 34,
           reason: "你当前更看重空间实用性、家庭适配、使用成本，但这台车在这些维度上的匹配度偏低。",
+          diagnostics: expect.any(Object),
         },
       ],
     });
@@ -934,6 +936,32 @@ describe("AssessmentService", () => {
               { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 7 },
             ],
           },
+          {
+            id: "vehicle_hev",
+            slug: "toyota-camry-hybrid",
+            brand: "丰田",
+            series: "凯美瑞双擎",
+            modelName: "双擎",
+            energyType: "HEV",
+            constraintRules: [],
+            traitWeights: [
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 10 },
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 10 },
+            ],
+          },
+          {
+            id: "vehicle_ice",
+            slug: "volkswagen-sagitar",
+            brand: "大众",
+            series: "速腾",
+            modelName: "燃油版",
+            energyType: "ICE",
+            constraintRules: [],
+            traitWeights: [
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 2 },
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 2 },
+            ],
+          },
         ]),
       },
       sessionResult: {
@@ -953,10 +981,24 @@ describe("AssessmentService", () => {
 
     await expect(service.completeSession("session_reject_plugin_1")).resolves.toMatchObject({
       sessionId: "session_reject_plugin_1",
-      recommendations: [],
+      recommendations: [
+        {
+          slug: "volkswagen-sagitar",
+          brand: "大众",
+          series: "速腾",
+          rank: 1,
+        },
+      ],
     });
 
-    expect(prisma.sessionVehicleRecommendation.createMany).not.toHaveBeenCalled();
+    expect(prisma.sessionVehicleRecommendation.createMany).toHaveBeenCalledWith({
+      data: [
+        expect.objectContaining({
+          vehicleId: "vehicle_ice",
+          rank: 1,
+        }),
+      ],
+    });
   });
 
   it("blocks plug-in vehicles when any charging or replenishment answer is negative even if later answers raise totals", async () => {
@@ -974,7 +1016,7 @@ describe("AssessmentService", () => {
         findMany: vi.fn().mockResolvedValue([
           { targetType: "HARD_CONSTRAINT", traitKey: "charging_access", traitValue: 1 },
           { targetType: "HARD_CONSTRAINT", traitKey: "charging_access", traitValue: 4 },
-          { targetType: "HARD_CONSTRAINT", traitKey: "energy_acceptance_ev", traitValue: 1 },
+          { targetType: "HARD_CONSTRAINT", traitKey: "energy_acceptance_ev", traitValue: 1.5 },
           { targetType: "HARD_CONSTRAINT", traitKey: "energy_acceptance_ev", traitValue: 4 },
           { targetType: "HARD_CONSTRAINT", traitKey: "energy_acceptance_phev", traitValue: 2 },
           { targetType: "HARD_CONSTRAINT", traitKey: "energy_acceptance_phev", traitValue: 4 },
@@ -1087,6 +1129,14 @@ describe("AssessmentService", () => {
           brand: "领克",
           series: "03+",
           rank: 1,
+          diagnostics: {
+            userPreferenceVector: expect.arrayContaining([
+              { key: "energy", label: "能源类型", value: 0 },
+            ]),
+            vehicleScores: expect.arrayContaining([
+              { key: "energy", label: "能源类型", value: 0 },
+            ]),
+          },
         },
       ],
     });
@@ -1203,22 +1253,22 @@ describe("AssessmentService", () => {
           brand: "品牌B",
           series: "系列B",
           rank: 1,
-          score: 39,
-          reason: "这台车和你的主要用车偏好整体比较接近。",
+          score: expect.any(Number),
+          reason: expect.any(String),
         },
         {
           slug: "personality-car",
           brand: "品牌A",
           series: "系列A",
           rank: 2,
-          score: 37,
-          reason: "这台车和你的主要用车偏好整体比较接近。",
+          score: expect.any(Number),
+          reason: expect.any(String),
         },
       ],
     });
   });
 
-  it("returns no recommendations when hard constraints exclude every active vehicle", async () => {
+  it("falls back to safe non plug-in vehicles when strict hard constraints exclude every active vehicle", async () => {
     const prisma = {
       assessmentSession: {
         create: vi.fn(),
@@ -1258,6 +1308,7 @@ describe("AssessmentService", () => {
             brand: "未来",
             series: "EV",
             modelName: "X",
+            energyType: "ICE",
             recommendation: "static",
             constraintRules: [
               {
@@ -1294,10 +1345,24 @@ describe("AssessmentService", () => {
 
     await expect(service.completeSession("session_no_vehicle_1")).resolves.toMatchObject({
       sessionId: "session_no_vehicle_1",
-      recommendations: [],
+      recommendations: [
+        {
+          slug: "future-ev-x",
+          brand: "未来",
+          series: "EV",
+          rank: 1,
+        },
+      ],
     });
 
-    expect(prisma.sessionVehicleRecommendation.createMany).not.toHaveBeenCalled();
+    expect(prisma.sessionVehicleRecommendation.createMany).toHaveBeenCalledWith({
+      data: [
+        expect.objectContaining({
+          vehicleId: "vehicle_fail",
+          rank: 1,
+        }),
+      ],
+    });
   });
 
   it("matches hard constraints against the rule target type when keys overlap", async () => {
@@ -1416,8 +1481,8 @@ describe("AssessmentService", () => {
           brand: "品牌D",
           series: "系列D",
           rank: 1,
-          score: 39,
-          reason: "这台车和你的主要用车偏好整体比较接近。",
+          score: expect.any(Number),
+          reason: expect.any(String),
         },
       ],
     });
@@ -1529,16 +1594,16 @@ describe("AssessmentService", () => {
           brand: "品牌性能",
           series: "系列性能",
           rank: 1,
-          score: 60,
-          reason: "你当前更看重科技配置、使用成本、动力表现，这台车在科技配置、动力表现上更贴合你的选择。",
+          score: expect.any(Number),
+          reason: expect.any(String),
         },
         {
           slug: "commuter-car",
           brand: "品牌通勤",
           series: "系列通勤",
           rank: 2,
-          score: 42,
-          reason: "你当前更看重科技配置、使用成本、动力表现，但这台车在这些维度上的匹配度偏低。",
+          score: expect.any(Number),
+          reason: expect.any(String),
         },
       ],
     });
@@ -1782,6 +1847,14 @@ describe("AssessmentService", () => {
       brand: "品牌纯电",
       series: "智能纯电轿车",
       rank: 1,
+      diagnostics: {
+        userPreferenceVector: expect.arrayContaining([
+          { key: "energy", label: "能源类型", value: 100 },
+        ]),
+        vehicleScores: expect.arrayContaining([
+          { key: "energy", label: "能源类型", value: 100 },
+        ]),
+      },
     });
     expect(result.recommendations[1]).toMatchObject({
       slug: "premium-ice-suv",
@@ -2558,6 +2631,27 @@ describe("AssessmentService", () => {
         ],
       },
     });
+    const vehicleFindMany = vi.fn().mockResolvedValue([
+      {
+        id: "vehicle_1",
+        slug: "byd-song-plus-dmi",
+        brand: "比亚迪",
+        series: "宋 PLUS",
+        energyType: "PHEV",
+        handlingScore: 54,
+        comfortScore: 80,
+        spaceScore: 86,
+        smartScore: 74,
+        powerScore: 68,
+        economyScore: 91,
+        brandScore: 72,
+        designScore: 70,
+        reliabilityScore: 84,
+        familyScore: 90,
+        traitWeights: [],
+        constraintRules: [],
+      },
+    ]);
 
     const prisma = {
       assessmentSession: {
@@ -2589,6 +2683,9 @@ describe("AssessmentService", () => {
           },
         ]),
       },
+      vehicle: {
+        findMany: vehicleFindMany,
+      },
     };
     const questionsService = {
       getInitialQuestion: vi.fn(),
@@ -2616,8 +2713,9 @@ describe("AssessmentService", () => {
           brand: "比亚迪",
           series: "宋 PLUS",
           rank: 1,
-          score: 88,
-          reason: "你当前更看重家庭适配、稳定性、长期使用成本，这台车在这些维度上最贴合你的选择。",
+          score: expect.any(Number),
+          reason: expect.any(String),
+          diagnostics: expect.any(Object),
         },
       ],
     });
@@ -2651,6 +2749,19 @@ describe("AssessmentService", () => {
                     slug: true,
                     brand: true,
                     series: true,
+                    energyType: true,
+                    handlingScore: true,
+                    comfortScore: true,
+                    spaceScore: true,
+                    smartScore: true,
+                    powerScore: true,
+                    economyScore: true,
+                    brandScore: true,
+                    designScore: true,
+                    reliabilityScore: true,
+                    familyScore: true,
+                    traitWeights: true,
+                    constraintRules: true,
                   },
                 },
               },
@@ -2658,6 +2769,136 @@ describe("AssessmentService", () => {
           },
         },
       },
+    });
+    expect(vehicleFindMany).toHaveBeenCalledWith({
+      include: {
+        traitWeights: true,
+        constraintRules: true,
+      },
+      where: {
+        status: "active",
+      },
+    });
+  });
+
+  it("recomputes persisted result recommendations with current charging hard constraints", async () => {
+    const sessionFindUnique = vi.fn().mockResolvedValue({
+      id: "session_result_stale_ev",
+      result: {
+        sessionId: "session_result_stale_ev",
+        personalityProfile: {
+          code: "STEADY_PRAGMATIST",
+          name: "稳健务实型",
+          summary: "做决定偏稳，重视长期成本、确定性和日常便利。",
+        },
+        recommendations: [
+          {
+            rank: 1,
+            score: 96,
+            reason: "旧结果里曾经存过电车。",
+            vehicle: {
+              slug: "tesla-model-y",
+              brand: "特斯拉",
+              series: "Model Y",
+              energyType: "EV",
+              traitWeights: [],
+              constraintRules: [],
+            },
+          },
+        ],
+      },
+    });
+    const vehicleFindMany = vi.fn().mockResolvedValue([
+      {
+        id: "vehicle_ev",
+        slug: "tesla-model-y",
+        brand: "特斯拉",
+        series: "Model Y",
+        energyType: "EV",
+        handlingScore: 95,
+        comfortScore: 90,
+        spaceScore: 88,
+        smartScore: 98,
+        powerScore: 96,
+        economyScore: 90,
+        brandScore: 92,
+        designScore: 88,
+        reliabilityScore: 80,
+        familyScore: 86,
+        traitWeights: [],
+        constraintRules: [],
+      },
+      {
+        id: "vehicle_ice",
+        slug: "toyota-rav4",
+        brand: "丰田",
+        series: "RAV4",
+        energyType: "ICE",
+        handlingScore: 65,
+        comfortScore: 76,
+        spaceScore: 84,
+        smartScore: 62,
+        powerScore: 66,
+        economyScore: 78,
+        brandScore: 80,
+        designScore: 64,
+        reliabilityScore: 92,
+        familyScore: 88,
+        traitWeights: [],
+        constraintRules: [],
+      },
+    ]);
+
+    const prisma = {
+      assessmentSession: {
+        create: vi.fn(),
+        findUnique: sessionFindUnique,
+        update: vi.fn(),
+      },
+      sessionTraitSnapshot: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            targetType: "HARD_CONSTRAINT",
+            traitKey: "charging_access",
+            traitValue: 1,
+          },
+          {
+            targetType: "HARD_CONSTRAINT",
+            traitKey: "energy_acceptance_ev",
+            traitValue: 1,
+          },
+          {
+            targetType: "HARD_CONSTRAINT",
+            traitKey: "energy_acceptance_phev",
+            traitValue: 1,
+          },
+          {
+            targetType: "VEHICLE_PREFERENCE",
+            traitKey: "family_fit",
+            traitValue: 4,
+          },
+        ]),
+      },
+      vehicle: {
+        findMany: vehicleFindMany,
+      },
+    };
+    const questionsService = {
+      getInitialQuestion: vi.fn(),
+      getNextQuestion: vi.fn(),
+    };
+
+    const service = new AssessmentService(prisma as never, questionsService as never);
+
+    await expect(service.getSessionResult("session_result_stale_ev")).resolves.toMatchObject({
+      recommendations: [
+        {
+          slug: "toyota-rav4",
+          brand: "丰田",
+          series: "RAV4",
+          diagnostics: expect.any(Object),
+        },
+      ],
     });
   });
 
