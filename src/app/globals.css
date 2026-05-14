@@ -455,13 +455,61 @@
   .recommendations-list {
     margin-top: 1.75rem;
     display: grid;
+    gap: 1.75rem;
+  }
+
+  .recommendations-groups {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .recommendation-group {
+    display: grid;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(28, 33, 38, 0.1);
+  }
+
+  .recommendation-group__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+  }
+
+  .recommendation-group__eyebrow {
+    font-family: "Arial Narrow", "Aptos Narrow", "Franklin Gothic Medium", sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-accent-2);
+  }
+
+  .recommendation-group__title {
+    margin-top: 0.45rem;
+    max-width: 38rem;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--color-muted);
+  }
+
+  .recommendation-group__count {
+    font-family: "Arial Narrow", "Aptos Narrow", "Franklin Gothic Medium", sans-serif;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--color-text);
+  }
+
+  .recommendation-group__list {
+    display: grid;
     gap: 0;
   }
 
   .recommendation-card {
     display: grid;
     gap: 1rem;
-    padding: 1.5rem 0;
+    padding: 1.35rem 0;
     border-top: 1px solid rgba(28, 33, 38, 0.1);
   }
 
@@ -498,158 +546,11 @@
     color: var(--color-muted);
   }
 
-  .recommendation-diagnostics {
-    display: grid;
-    gap: 1rem;
-    border: 1px solid rgba(28, 33, 38, 0.12);
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.54);
-    padding: 1rem;
-  }
-
-  .recommendation-diagnostics__header {
-    display: grid;
-    gap: 0.35rem;
-  }
-
-  .recommendation-diagnostics__eyebrow,
-  .recommendation-diagnostics__title {
-    font-family: "Arial Narrow", "Aptos Narrow", "Franklin Gothic Medium", sans-serif;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-  }
-
-  .recommendation-diagnostics__eyebrow {
-    font-size: 0.75rem;
-    color: var(--color-accent-2);
-  }
-
-  .recommendation-diagnostics__note {
-    max-width: 42rem;
-    font-size: 0.85rem;
-    line-height: 1.7;
-    color: var(--color-muted);
-  }
-
-  .recommendation-diagnostics__grid {
-    display: grid;
-    gap: 1rem;
-  }
-
-  .recommendation-diagnostics__panel {
-    display: grid;
-    gap: 0.8rem;
-  }
-
-  .recommendation-diagnostics__title {
-    font-size: 0.72rem;
-    color: var(--color-text);
-  }
-
-  .recommendation-diagnostics__rows {
-    display: grid;
-    gap: 0.5rem;
-  }
-
-  .diagnostic-row {
-    display: grid;
-    grid-template-columns: minmax(4.8rem, 7rem) minmax(5rem, 1fr) 2.4rem;
-    align-items: center;
-    gap: 0.55rem;
-    font-size: 0.78rem;
-    color: var(--color-muted);
-  }
-
-  .diagnostic-row__track {
-    height: 0.45rem;
-    overflow: hidden;
-    border-radius: 999px;
-    background: rgba(28, 33, 38, 0.08);
-  }
-
-  .diagnostic-row__fill {
-    display: block;
-    height: 100%;
-    border-radius: inherit;
-  }
-
-  .diagnostic-row__fill--user {
-    background: var(--color-accent);
-  }
-
-  .diagnostic-row__fill--vehicle {
-    background: var(--color-accent-2);
-  }
-
-  .diagnostic-row__value {
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-    color: var(--color-text);
-  }
-
-  .recommendation-diagnostics__breakdown {
-    display: grid;
-    gap: 0.7rem;
-    border-top: 1px solid rgba(28, 33, 38, 0.1);
-    padding-top: 0.9rem;
-  }
-
-  .score-breakdown {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.55rem;
-    margin: 0;
-  }
-
-  .score-breakdown__item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.6rem;
-    border-left: 2px solid rgba(28, 33, 38, 0.12);
-    padding-left: 0.65rem;
-    font-size: 0.78rem;
-  }
-
-  .score-breakdown__item dt {
-    color: var(--color-muted);
-  }
-
-  .score-breakdown__item dd {
-    margin: 0;
-    font-variant-numeric: tabular-nums;
-    color: var(--color-text);
-  }
-
   .recommendation-card__aside {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 0.9rem;
-  }
-
-  .recommendation-card__score-block {
-    display: inline-flex;
-    min-width: 8.5rem;
-    flex-direction: column;
-    gap: 0.25rem;
-    border-left: 2px solid rgba(200, 98, 39, 0.3);
-    padding-left: 0.9rem;
-  }
-
-  .recommendation-card__score-label {
-    font-family: "Arial Narrow", "Aptos Narrow", "Franklin Gothic Medium", sans-serif;
-    font-size: 0.75rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-muted);
-  }
-
-  .recommendation-card__score {
-    font-family: "Arial Narrow", "Aptos Narrow", "Franklin Gothic Medium", sans-serif;
-    font-size: clamp(2.1rem, 6vw, 3.2rem);
-    line-height: 1;
-    color: var(--color-accent);
   }
 
   .recommendation-card__button {
@@ -660,6 +561,11 @@
   .recommendations-empty {
     border-top: 1px solid rgba(28, 33, 38, 0.1);
     padding-top: 1.75rem;
+  }
+
+  .recommendations-empty--compact {
+    border-top: none;
+    padding-top: 0.25rem;
   }
 
   .recommendations-empty__title {
@@ -760,14 +666,6 @@
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) auto;
     align-items: center;
     gap: 1.5rem;
-  }
-
-  .recommendation-diagnostics {
-    grid-column: 1 / -1;
-  }
-
-  .recommendation-diagnostics__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .recommendation-card__aside {

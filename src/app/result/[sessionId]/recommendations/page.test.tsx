@@ -53,19 +53,17 @@ describe("RecommendationsPage", () => {
             slug: "tesla-model-y",
             brand: "Tesla",
             series: "Model Y",
+            energyType: "EV",
             rank: 1,
-            score: 92,
             reason: "空间与智能化体验均衡，适合稳定通勤与家庭出行。",
             diagnostics: {
               userPreferenceVector: [
                 { key: "smart", label: "科技配置", value: 84 },
                 { key: "family", label: "家庭适配", value: 76 },
-                { key: "energy", label: "能源类型", value: 100 },
               ],
               vehicleScores: [
                 { key: "smart", label: "科技配置", value: 92 },
                 { key: "family", label: "家庭适配", value: 70 },
-                { key: "energy", label: "能源类型", value: 100 },
               ],
               scoreBreakdown: {
                 vectorFit: 88,
@@ -78,22 +76,20 @@ describe("RecommendationsPage", () => {
             },
           },
           {
-            slug: "toyota-rav4",
-            brand: "Toyota",
-            series: "RAV4",
+            slug: "byd-song-plus-dmi",
+            brand: "BYD",
+            series: "Song Plus",
+            energyType: "PHEV",
             rank: 2,
-            score: 88,
-            reason: "可靠性高，长期使用成本可控。",
+            reason: "空间与成本兼顾，适合家庭出行。",
             diagnostics: {
               userPreferenceVector: [
                 { key: "smart", label: "科技配置", value: 84 },
                 { key: "family", label: "家庭适配", value: 76 },
-                { key: "energy", label: "能源类型", value: 0 },
               ],
               vehicleScores: [
                 { key: "smart", label: "科技配置", value: 45 },
                 { key: "family", label: "家庭适配", value: 82 },
-                { key: "energy", label: "能源类型", value: 0 },
               ],
               scoreBreakdown: {
                 vectorFit: 82,
@@ -102,6 +98,110 @@ describe("RecommendationsPage", () => {
                 preferenceAlignment: 80,
                 personalityAlignment: 78,
                 corePenalty: 2,
+              },
+            },
+          },
+          {
+            slug: "toyota-rav4",
+            brand: "Toyota",
+            series: "RAV4",
+            energyType: "ICE",
+            rank: 3,
+            reason: "可靠性高，长期使用成本可控。",
+            diagnostics: {
+              userPreferenceVector: [
+                { key: "smart", label: "科技配置", value: 84 },
+                { key: "family", label: "家庭适配", value: 76 },
+              ],
+              vehicleScores: [
+                { key: "smart", label: "科技配置", value: 45 },
+                { key: "family", label: "家庭适配", value: 82 },
+              ],
+              scoreBreakdown: {
+                vectorFit: 82,
+                energyFit: 76,
+                constraintFit: 100,
+                preferenceAlignment: 80,
+                personalityAlignment: 78,
+                corePenalty: 2,
+              },
+            },
+          },
+          {
+            slug: "li-auto-l6",
+            brand: "Li Auto",
+            series: "L6",
+            energyType: "EREV",
+            rank: 3,
+            reason: "空间和家庭舒适性更强，适合多人出行。",
+            diagnostics: {
+              userPreferenceVector: [
+                { key: "smart", label: "科技配置", value: 84 },
+                { key: "family", label: "家庭适配", value: 76 },
+              ],
+              vehicleScores: [
+                { key: "smart", label: "科技配置", value: 80 },
+                { key: "family", label: "家庭适配", value: 92 },
+              ],
+              scoreBreakdown: {
+                vectorFit: 84,
+                energyFit: 78,
+                constraintFit: 100,
+                preferenceAlignment: 82,
+                personalityAlignment: 80,
+                corePenalty: 1,
+              },
+            },
+          },
+          {
+            slug: "honda-crv",
+            brand: "Honda",
+            series: "CR-V",
+            energyType: "HEV",
+            rank: 5,
+            reason: "舒适均衡，适合家用通勤。",
+            diagnostics: {
+              userPreferenceVector: [
+                { key: "smart", label: "科技配置", value: 84 },
+                { key: "family", label: "家庭适配", value: 76 },
+              ],
+              vehicleScores: [
+                { key: "smart", label: "科技配置", value: 45 },
+                { key: "family", label: "家庭适配", value: 82 },
+              ],
+              scoreBreakdown: {
+                vectorFit: 82,
+                energyFit: 76,
+                constraintFit: 100,
+                preferenceAlignment: 80,
+                personalityAlignment: 78,
+                corePenalty: 2,
+              },
+            },
+          },
+          {
+            slug: "mazda-cx-5",
+            brand: "Mazda",
+            series: "CX-5",
+            energyType: "ICE",
+            rank: 6,
+            reason: "更偏驾驶反馈，适合想兼顾家用和操控的人。",
+            diagnostics: {
+              userPreferenceVector: [
+                { key: "smart", label: "科技配置", value: 84 },
+                { key: "family", label: "家庭适配", value: 76 },
+              ],
+              vehicleScores: [
+                { key: "smart", label: "科技配置", value: 40 },
+                { key: "family", label: "家庭适配", value: 68 },
+              ],
+              scoreBreakdown: {
+                vectorFit: 76,
+                energyFit: 74,
+                constraintFit: 100,
+                preferenceAlignment: 70,
+                personalityAlignment: 72,
+                corePenalty: 3,
               },
             },
           },
@@ -119,16 +219,13 @@ describe("RecommendationsPage", () => {
     expect(screen.getByText("务实省心型")).toBeInTheDocument();
     expect(screen.getByText("Tesla Model Y")).toBeInTheDocument();
     expect(screen.getByText("Toyota RAV4")).toBeInTheDocument();
-    expect(screen.getAllByText("本地测试得分")).toHaveLength(2);
-    expect(screen.getAllByText("用户偏好向量")[0]).toBeInTheDocument();
-    expect(screen.getAllByText("科技配置")[0]).toBeInTheDocument();
-    expect(screen.getAllByText("能源类型")[0]).toBeInTheDocument();
-    expect(screen.getAllByText("84")[0]).toBeInTheDocument();
-    expect(screen.getAllByText("车型各项分值")[0]).toBeInTheDocument();
-    expect(screen.getAllByText("评分拆解")[0]).toBeInTheDocument();
-    expect(screen.getAllByText("vectorFit")[0]).toBeInTheDocument();
+    expect(screen.getByText("电车推荐")).toBeInTheDocument();
+    expect(screen.getByText("油车推荐")).toBeInTheDocument();
+    expect(screen.getAllByText("3 辆")).toHaveLength(2);
+    expect(screen.queryByText("本地测试得分")).not.toBeInTheDocument();
+    expect(screen.queryByText("匹配分")).not.toBeInTheDocument();
     const detailLinks = screen.getAllByRole("link", { name: /查看车型详情/i });
     expect(detailLinks[0]).toHaveAttribute("href", "/cars/tesla-model-y");
-    expect(detailLinks[1]).toHaveAttribute("href", "/cars/toyota-rav4");
+    expect(detailLinks[1]).toHaveAttribute("href", "/cars/byd-song-plus-dmi");
   });
 });

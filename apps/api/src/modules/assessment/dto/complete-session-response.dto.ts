@@ -37,6 +37,7 @@ export type CompleteSessionResponseDto = {
     slug: string;
     brand: string;
     series: string;
+    energyType: string;
     rank: number;
     score: number;
     reason: string;

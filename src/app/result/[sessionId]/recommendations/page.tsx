@@ -3,6 +3,28 @@ import Link from "next/link";
 import { assessmentApiFetch } from "@/lib/assessment-api";
 import type { AssessmentResult } from "@/lib/assessment-session";
 
+type RecommendationBucket = "electric" | "fuel";
+
+function getRecommendationBucket(energyType: string): RecommendationBucket {
+  const normalizedEnergyType = energyType.toUpperCase();
+
+  if (normalizedEnergyType === "EV" || normalizedEnergyType === "PHEV" || normalizedEnergyType === "EREV") {
+    return "electric";
+  }
+
+  return "fuel";
+}
+
+function getBucketLabel(bucket: RecommendationBucket) {
+  return bucket === "electric" ? "电车推荐" : "油车推荐";
+}
+
+function getBucketDescription(bucket: RecommendationBucket) {
+  return bucket === "electric"
+    ? "纯电、插混和增程都归在这里，优先看使用感受和补能便利性。"
+    : "燃油和混动都归在这里，优先看省心、稳定和传统驾驶习惯。";
+}
+
 export default async function RecommendationsPage({
   params,
 }: {
@@ -14,6 +36,16 @@ export default async function RecommendationsPage({
   });
   const result = (await response.json()) as AssessmentResult;
   const headline = result.personalityProfile?.name ?? result.personality.name;
+  const electricRecommendations = result.recommendations.filter(
+    (vehicle) => getRecommendationBucket(vehicle.energyType) === "electric",
+  );
+  const fuelRecommendations = result.recommendations.filter(
+    (vehicle) => getRecommendationBucket(vehicle.energyType) === "fuel",
+  );
+  const recommendationSections = [
+    { key: "electric", title: getBucketLabel("electric"), description: getBucketDescription("electric"), items: electricRecommendations },
+    { key: "fuel", title: getBucketLabel("fuel"), description: getBucketDescription("fuel"), items: fuelRecommendations },
+  ] as const;
 
   return (
     <main className="shell py-8 sm:py-10">
@@ -41,95 +73,52 @@ export default async function RecommendationsPage({
 
       <section className="recommendations-list">
         {result.recommendations.length > 0 ? (
-          result.recommendations.map((vehicle) => (
-            <article
-              key={vehicle.slug}
-              className="recommendation-card"
-            >
-              <div className="recommendation-card__meta">
-                <p className="recommendation-card__rank">Top {vehicle.rank}</p>
-                <h2 className="recommendation-card__title">
-                  {vehicle.brand} {vehicle.series}
-                </h2>
-              </div>
+          <div className="recommendations-groups">
+            {recommendationSections.map((section) => (
+              <section key={section.key} className="recommendation-group">
+                <div className="recommendation-group__header">
+                  <div>
+                    <p className="recommendation-group__eyebrow">{section.title}</p>
+                    <h2 className="recommendation-group__title">{section.description}</h2>
+                  </div>
+                  <p className="recommendation-group__count">{section.items.length} 辆</p>
+                </div>
 
-              <p className="recommendation-card__reason">{vehicle.reason}</p>
+                {section.items.length > 0 ? (
+                  <div className="recommendation-group__list">
+                    {section.items.slice(0, 3).map((vehicle) => (
+                      <article key={vehicle.slug} className="recommendation-card">
+                        <div className="recommendation-card__meta">
+                          <p className="recommendation-card__rank">Top {vehicle.rank}</p>
+                          <h3 className="recommendation-card__title">
+                            {vehicle.brand} {vehicle.series}
+                          </h3>
+                        </div>
 
-              {vehicle.diagnostics ? (
-                <section className="recommendation-diagnostics" aria-label={`${vehicle.brand} ${vehicle.series} 本地测试得分`}>
-                  <div className="recommendation-diagnostics__header">
-                    <p className="recommendation-diagnostics__eyebrow">本地测试得分</p>
-                    <p className="recommendation-diagnostics__note">
-                      用户偏好与车型分值越接近，说明该维度越支撑当前推荐。
+                        <p className="recommendation-card__reason">{vehicle.reason}</p>
+
+                        <div className="recommendation-card__aside">
+                          <Link
+                            href={`/cars/${vehicle.slug}`}
+                            className="race-button race-button-primary recommendation-card__button"
+                          >
+                            查看车型详情
+                          </Link>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="recommendations-empty recommendations-empty--compact">
+                    <h3 className="recommendations-empty__title">暂无可展示车型</h3>
+                    <p className="recommendations-empty__body">
+                      当前这一类没有足够的推荐结果，系统会继续保留另一类车型供你参考。
                     </p>
                   </div>
-
-                  <div className="recommendation-diagnostics__grid">
-                    <div className="recommendation-diagnostics__panel">
-                      <h3 className="recommendation-diagnostics__title">用户偏好向量</h3>
-                      <div className="recommendation-diagnostics__rows">
-                        {vehicle.diagnostics.userPreferenceVector.map((dimension) => (
-                          <div key={dimension.key} className="diagnostic-row">
-                            <span className="diagnostic-row__label">{dimension.label}</span>
-                            <span className="diagnostic-row__track">
-                              <span
-                                className="diagnostic-row__fill diagnostic-row__fill--user"
-                                style={{ width: `${dimension.value}%` }}
-                              />
-                            </span>
-                            <span className="diagnostic-row__value">{dimension.value}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="recommendation-diagnostics__panel">
-                      <h3 className="recommendation-diagnostics__title">车型各项分值</h3>
-                      <div className="recommendation-diagnostics__rows">
-                        {vehicle.diagnostics.vehicleScores.map((dimension) => (
-                          <div key={dimension.key} className="diagnostic-row">
-                            <span className="diagnostic-row__label">{dimension.label}</span>
-                            <span className="diagnostic-row__track">
-                              <span
-                                className="diagnostic-row__fill diagnostic-row__fill--vehicle"
-                                style={{ width: `${dimension.value}%` }}
-                              />
-                            </span>
-                            <span className="diagnostic-row__value">{dimension.value}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="recommendation-diagnostics__breakdown">
-                    <h3 className="recommendation-diagnostics__title">评分拆解</h3>
-                    <dl className="score-breakdown">
-                      {Object.entries(vehicle.diagnostics.scoreBreakdown).map(([key, value]) => (
-                        <div key={key} className="score-breakdown__item">
-                          <dt>{key}</dt>
-                          <dd>{value}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  </div>
-                </section>
-              ) : null}
-
-              <div className="recommendation-card__aside">
-                <div className="recommendation-card__score-block">
-                  <p className="recommendation-card__score-label">匹配分</p>
-                  <p className="recommendation-card__score">{vehicle.score}</p>
-                </div>
-                <Link
-                  href={`/cars/${vehicle.slug}`}
-                  className="race-button race-button-primary recommendation-card__button"
-                >
-                  查看车型详情
-                </Link>
-              </div>
-            </article>
-          ))
+                )}
+              </section>
+            ))}
+          </div>
         ) : (
           <div className="recommendations-empty">
             <h2 className="recommendations-empty__title">推荐结果生成中</h2>

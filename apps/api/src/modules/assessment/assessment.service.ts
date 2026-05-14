@@ -73,7 +73,10 @@ type VehicleRecommendationSource = VehicleScoreSource & {
   slug: string;
   brand: string;
   series: string;
+  energyType?: string | null;
 };
+
+type VehicleRecommendationDiagnostics = ReturnType<AssessmentService["buildRecommendationDiagnostics"]>;
 
 const CORE_PREFERENCE_LABELS: Record<CorePreferenceKey, string> = {
   handling: "操控响应",
@@ -583,7 +586,7 @@ export class AssessmentService {
       },
     });
 
-    const rankedRecommendations = this.buildRankedVehicleRecommendations(
+    const rankedRecommendations = this.buildDualBucketRankedVehicleRecommendations(
       vehicles,
       aggregatedTraits,
     );
@@ -640,6 +643,7 @@ export class AssessmentService {
         slug: vehicle.slug,
         brand: vehicle.brand,
         series: vehicle.series,
+        energyType: vehicle.energyType ?? "ICE",
         rank: vehicle.rank,
         score: vehicle.score,
         reason: vehicle.reason,
@@ -801,7 +805,7 @@ export class AssessmentService {
         status: "active",
       },
     });
-    const rankedRecommendations = this.buildRankedVehicleRecommendations(
+    const rankedRecommendations = this.buildDualBucketRankedVehicleRecommendations(
       vehicles,
       aggregatedTraits,
     );
@@ -821,6 +825,7 @@ export class AssessmentService {
         slug: item.slug,
         brand: item.brand,
         series: item.series,
+        energyType: item.energyType ?? "ICE",
         rank: item.rank,
         score: item.score,
         reason: item.reason,
@@ -1015,19 +1020,30 @@ export class AssessmentService {
     };
   }
 
+  private buildDualBucketRankedVehicleRecommendations(
+    vehicles: VehicleRecommendationSource[],
+    aggregatedTraits: AggregatedTraits,
+  ) {
+    const electricRecommendations = this.buildRankedVehicleRecommendations(
+      vehicles.filter((vehicle) => this.isElectricVehicle(vehicle.energyType)),
+      aggregatedTraits,
+    );
+    const fuelRecommendations = this.buildRankedVehicleRecommendations(
+      vehicles.filter((vehicle) => !this.isElectricVehicle(vehicle.energyType)),
+      aggregatedTraits,
+    );
+
+    return [...electricRecommendations, ...fuelRecommendations].map((vehicle, index) => ({
+      ...vehicle,
+      rank: index + 1,
+    }));
+  }
+
   private buildRankedVehicleRecommendations(
     vehicles: VehicleRecommendationSource[],
     aggregatedTraits: AggregatedTraits,
   ) {
-    const strictlyMatchedVehicles = vehicles.filter((vehicle) =>
-      this.matchesVehicleConstraints(vehicle, aggregatedTraits),
-    );
-    const candidateVehicles =
-      strictlyMatchedVehicles.length > 0
-        ? strictlyMatchedVehicles
-        : vehicles.filter((vehicle) => !this.isPlugInVehicleDisqualified(vehicle, aggregatedTraits));
-
-    return candidateVehicles
+    const scoredVehicles = vehicles
       .map((vehicle) => {
         const score = this.scoreVehicle(vehicle, aggregatedTraits);
         const reason = this.buildRecommendationReason(aggregatedTraits, vehicle);
@@ -1038,18 +1054,42 @@ export class AssessmentService {
           slug: vehicle.slug,
           brand: vehicle.brand,
           series: vehicle.series,
+          energyType: vehicle.energyType,
           rank: 0,
           score,
           reason,
           diagnostics,
         };
       })
-      .sort((left, right) => right.score - left.score)
+      .sort((left, right) => right.score - left.score);
+
+    const strictlyMatchedVehicleIds = new Set(
+      vehicles
+        .filter((vehicle) => this.matchesVehicleConstraints(vehicle, aggregatedTraits))
+        .map((vehicle) => vehicle.id),
+    );
+
+    const prioritizedVehicles = [
+      ...scoredVehicles.filter((vehicle) => strictlyMatchedVehicleIds.has(vehicle.vehicleId)),
+      ...scoredVehicles.filter((vehicle) => !strictlyMatchedVehicleIds.has(vehicle.vehicleId)),
+    ];
+
+    return prioritizedVehicles
       .map((vehicle, index) => ({
         ...vehicle,
         rank: index + 1,
       }))
       .slice(0, 3);
+  }
+
+  private isElectricVehicle(energyType?: string | null) {
+    const normalizedEnergyType = (energyType ?? "").toUpperCase();
+
+    return (
+      normalizedEnergyType === "EV" ||
+      normalizedEnergyType === "PHEV" ||
+      normalizedEnergyType === "EREV"
+    );
   }
 
   private toDiagnosticDimensions(vector: CorePreferenceVector) {

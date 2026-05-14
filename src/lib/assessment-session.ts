@@ -62,6 +62,7 @@ export type AssessmentResult = {
     slug: string;
     brand: string;
     series: string;
+    energyType: string;
     rank: number;
     score: number;
     reason: string;

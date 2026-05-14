@@ -460,35 +460,10 @@ export const questions = [
     },
   }),
   question({
-    slug: "energy-choice-openness",
-    title: "我愿意优先考虑纯电或插混等新能源动力形式。",
-    type: "CAR_USAGE",
-    priority: 110,
-    discrimination: 89,
-    left: {
-      label: "愿意优先考虑纯电或插混，只要体验合理",
-      effects: [
-        { targetType: "HARD_CONSTRAINT", targetKey: "energy_acceptance_ev", weightDelta: 4 },
-        { targetType: "HARD_CONSTRAINT", targetKey: "energy_acceptance_phev", weightDelta: 4 },
-        { targetType: "HARD_CONSTRAINT", targetKey: "energy_acceptance_ice", weightDelta: 1 },
-        { targetType: "PERSONALITY_TRAIT", targetKey: "novelty_seeking", weightDelta: 1 },
-      ],
-    },
-    right: {
-      label: "还是更偏向传统动力，省心更重要",
-      effects: [
-        { targetType: "HARD_CONSTRAINT", targetKey: "energy_acceptance_ev", weightDelta: 1 },
-        { targetType: "HARD_CONSTRAINT", targetKey: "energy_acceptance_phev", weightDelta: 2 },
-        { targetType: "HARD_CONSTRAINT", targetKey: "energy_acceptance_ice", weightDelta: 5 },
-        { targetType: "PERSONALITY_TRAIT", targetKey: "stability_preference", weightDelta: 1 },
-      ],
-    },
-  }),
-  question({
     slug: "recharge-patience",
     title: "我可以接受车辆补能时花费一些等待时间。",
     type: "CAR_USAGE",
-    priority: 108,
+    priority: 110,
     discrimination: 77,
     left: {
       label: "可以接受一些等待，前提是平时成本和体验不错",
@@ -510,7 +485,7 @@ export const questions = [
     slug: "winter-range-anxiety",
     title: "我会明显担心冬天或极端天气下的续航与能耗波动。",
     type: "CAR_USAGE",
-    priority: 106,
+    priority: 108,
     discrimination: 75,
     left: {
       label: "还好，只要整体方案成熟可接受",
@@ -531,7 +506,7 @@ export const questions = [
     slug: "fixed-parking",
     title: "我有固定停车位或相对稳定的停车习惯。",
     type: "LIFE_STYLE",
-    priority: 104,
+    priority: 106,
     discrimination: 74,
     left: {
       label: "有，日常停车安排比较固定",
@@ -553,7 +528,7 @@ export const questions = [
     title: "我的驾驶风格更偏向稳妥、省心和少折腾。",
     type: "CAR_USAGE",
     branchKey: null,
-    priority: 102,
+    priority: 104,
     discrimination: 86,
     left: {
       label: "更偏稳妥、省心、少折腾",

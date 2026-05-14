@@ -3,8 +3,8 @@ import { questions } from "@/data/quiz/questions";
 import { vehicles } from "@/data/vehicles/vehicles";
 
 describe("seed data", () => {
-  it("contains 12 questions with at least 2 options each", () => {
-    expect(questions).toHaveLength(12);
+  it("contains 11 questions with at least 2 options each", () => {
+    expect(questions).toHaveLength(11);
     expect(questions.every((question) => question.options.length >= 2)).toBe(true);
   });
 
