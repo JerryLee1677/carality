@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AuthActions } from "./auth-actions";
 
 export function SiteHeader() {
   return (
@@ -27,6 +28,7 @@ export function SiteHeader() {
             购车指南
           </Link>
         </nav>
+        <AuthActions />
       </div>
     </header>
   );

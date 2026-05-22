@@ -70,6 +70,7 @@ describe("AssessmentService", () => {
 
     expect(create).toHaveBeenCalledWith({
       data: {
+        userId: null,
         status: "IN_PROGRESS",
         stepIndex: 0,
         mode: "QUICK",

@@ -7,6 +7,8 @@ import { EngineModule } from "./modules/engine/engine.module";
 import { PersonalityModule } from "./modules/personality/personality.module";
 import { RecommendationModule } from "./modules/recommendation/recommendation.module";
 import { VehiclesModule } from "./modules/vehicles/vehicles.module";
+import { AuthModule } from "./modules/auth/auth.module";
+import { HistoryModule } from "./modules/history/history.module";
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { VehiclesModule } from "./modules/vehicles/vehicles.module";
     PersonalityModule,
     RecommendationModule,
     VehiclesModule,
+    AuthModule,
+    HistoryModule,
   ],
   controllers: [HealthController],
 })

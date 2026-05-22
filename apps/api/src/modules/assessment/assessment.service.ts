@@ -303,12 +303,16 @@ export class AssessmentService {
     private readonly questionsService: QuestionsService,
   ) {}
 
-  async createSession(payload?: CreateSessionDto): Promise<CreateSessionResponseDto> {
+  async createSession(
+    payload?: CreateSessionDto,
+    userId?: string,
+  ): Promise<CreateSessionResponseDto> {
     const initialQuestion = await this.questionsService.getInitialQuestion();
     const mode = payload?.mode === "quick" ? "quick" : "standard";
     const targetQuestionCount = mode === "quick" ? 24 : 56;
     const session = await this.prisma.assessmentSession.create({
       data: {
+        userId: userId ?? null,
         status: "IN_PROGRESS",
         stepIndex: 0,
         mode: mode === "quick" ? "QUICK" : "STANDARD",

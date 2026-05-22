@@ -1,15 +1,23 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Headers, Param, Post } from "@nestjs/common";
 import { AssessmentService } from "./assessment.service";
 import { CreateSessionDto } from "./dto/create-session.dto";
 import { SubmitAnswerDto } from "./dto/submit-answer.dto";
+import { SessionAuthService } from "../../common/auth/session-auth.service";
 
 @Controller("assessment/sessions")
 export class AssessmentController {
-  constructor(private readonly assessmentService: AssessmentService) {}
+  constructor(
+    private readonly assessmentService: AssessmentService,
+    private readonly sessionAuth: SessionAuthService,
+  ) {}
 
   @Post()
-  createSession(@Body() payload: CreateSessionDto) {
-    return this.assessmentService.createSession(payload);
+  async createSession(
+    @Body() payload: CreateSessionDto,
+    @Headers("x-session-token") sessionToken: string | undefined,
+  ) {
+    const auth = await this.sessionAuth.lookupSession(sessionToken);
+    return this.assessmentService.createSession(payload, auth?.user.id);
   }
 
   @Post(":sessionId/answers")

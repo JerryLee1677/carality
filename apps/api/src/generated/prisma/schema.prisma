@@ -110,6 +110,7 @@ model QuestionBranchRule {
 
 model AssessmentSession {
   id                  String                     @id @default(cuid())
+  userId              String?
   status              SessionStatus              @default(DRAFT)
   mode                AssessmentMode             @default(STANDARD)
   targetQuestionCount Int                        @default(56)
@@ -120,10 +121,13 @@ model AssessmentSession {
   carQuestionCount    Int                        @default(0)
   startedAt           DateTime                   @default(now())
   completedAt         DateTime?
+  user                User?                      @relation(fields: [userId], references: [id], onDelete: SetNull)
   answers             AssessmentAnswer[]
   traitSnapshots      SessionTraitSnapshot[]
   result              SessionResult?
   questionCandidates  SessionQuestionCandidate[]
+
+  @@index([userId, startedAt])
 }
 
 model AssessmentAnswer {
@@ -287,4 +291,28 @@ model SessionVehicleRecommendation {
   vehicle   Vehicle       @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 
   @@unique([resultId, rank])
+}
+
+model User {
+  id            String              @id @default(cuid())
+  email         String              @unique
+  passwordHash  String
+  emailVerified Boolean             @default(false)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  sessions      AuthSession[]
+  assessments   AssessmentSession[]
+}
+
+model AuthSession {
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String    @unique
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  lastSeenAt DateTime?
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }

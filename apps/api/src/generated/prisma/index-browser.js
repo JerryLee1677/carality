@@ -169,6 +169,7 @@ exports.Prisma.QuestionBranchRuleScalarFieldEnum = {
 
 exports.Prisma.AssessmentSessionScalarFieldEnum = {
   id: 'id',
+  userId: 'userId',
   status: 'status',
   mode: 'mode',
   targetQuestionCount: 'targetQuestionCount',
@@ -304,6 +305,25 @@ exports.Prisma.SessionVehicleRecommendationScalarFieldEnum = {
   reason: 'reason'
 };
 
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  passwordHash: 'passwordHash',
+  emailVerified: 'emailVerified',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AuthSessionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  revokedAt: 'revokedAt',
+  lastSeenAt: 'lastSeenAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -374,7 +394,9 @@ exports.Prisma.ModelName = {
   VehicleTag: 'VehicleTag',
   VehicleTagMapping: 'VehicleTagMapping',
   SessionResult: 'SessionResult',
-  SessionVehicleRecommendation: 'SessionVehicleRecommendation'
+  SessionVehicleRecommendation: 'SessionVehicleRecommendation',
+  User: 'User',
+  AuthSession: 'AuthSession'
 };
 
 /**
