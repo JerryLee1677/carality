@@ -7,7 +7,7 @@ export default async function CarDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const vehicle = vehicleRepository.getBySlug(slug);
+  const vehicle = await vehicleRepository.getBySlug(slug);
 
   if (!vehicle) {
     notFound();

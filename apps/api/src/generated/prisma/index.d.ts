@@ -89,6 +89,11 @@ export type VehicleTag = $Result.DefaultSelection<Prisma.$VehicleTagPayload>
  */
 export type VehicleTagMapping = $Result.DefaultSelection<Prisma.$VehicleTagMappingPayload>
 /**
+ * Model ExternalVehicleSeries
+ * 
+ */
+export type ExternalVehicleSeries = $Result.DefaultSelection<Prisma.$ExternalVehicleSeriesPayload>
+/**
  * Model SessionResult
  * 
  */
@@ -462,6 +467,16 @@ export class PrismaClient<
     * ```
     */
   get vehicleTagMapping(): Prisma.VehicleTagMappingDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.externalVehicleSeries`: Exposes CRUD operations for the **ExternalVehicleSeries** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ExternalVehicleSeries
+    * const externalVehicleSeries = await prisma.externalVehicleSeries.findMany()
+    * ```
+    */
+  get externalVehicleSeries(): Prisma.ExternalVehicleSeriesDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.sessionResult`: Exposes CRUD operations for the **SessionResult** model.
@@ -958,6 +973,7 @@ export namespace Prisma {
     VehicleConstraintRule: 'VehicleConstraintRule',
     VehicleTag: 'VehicleTag',
     VehicleTagMapping: 'VehicleTagMapping',
+    ExternalVehicleSeries: 'ExternalVehicleSeries',
     SessionResult: 'SessionResult',
     SessionVehicleRecommendation: 'SessionVehicleRecommendation',
     User: 'User',
@@ -980,7 +996,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "question" | "questionOption" | "optionEffect" | "questionBranchRule" | "assessmentSession" | "assessmentAnswer" | "sessionTraitSnapshot" | "sessionQuestionCandidate" | "personalityProfile" | "personalityProfileRule" | "vehicle" | "vehicleTraitWeight" | "vehicleConstraintRule" | "vehicleTag" | "vehicleTagMapping" | "sessionResult" | "sessionVehicleRecommendation" | "user" | "authSession"
+      modelProps: "question" | "questionOption" | "optionEffect" | "questionBranchRule" | "assessmentSession" | "assessmentAnswer" | "sessionTraitSnapshot" | "sessionQuestionCandidate" | "personalityProfile" | "personalityProfileRule" | "vehicle" | "vehicleTraitWeight" | "vehicleConstraintRule" | "vehicleTag" | "vehicleTagMapping" | "externalVehicleSeries" | "sessionResult" | "sessionVehicleRecommendation" | "user" | "authSession"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2094,6 +2110,80 @@ export namespace Prisma {
           }
         }
       }
+      ExternalVehicleSeries: {
+        payload: Prisma.$ExternalVehicleSeriesPayload<ExtArgs>
+        fields: Prisma.ExternalVehicleSeriesFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ExternalVehicleSeriesFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleSeriesPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ExternalVehicleSeriesFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleSeriesPayload>
+          }
+          findFirst: {
+            args: Prisma.ExternalVehicleSeriesFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleSeriesPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ExternalVehicleSeriesFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleSeriesPayload>
+          }
+          findMany: {
+            args: Prisma.ExternalVehicleSeriesFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleSeriesPayload>[]
+          }
+          create: {
+            args: Prisma.ExternalVehicleSeriesCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleSeriesPayload>
+          }
+          createMany: {
+            args: Prisma.ExternalVehicleSeriesCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ExternalVehicleSeriesCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleSeriesPayload>[]
+          }
+          delete: {
+            args: Prisma.ExternalVehicleSeriesDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleSeriesPayload>
+          }
+          update: {
+            args: Prisma.ExternalVehicleSeriesUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleSeriesPayload>
+          }
+          deleteMany: {
+            args: Prisma.ExternalVehicleSeriesDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ExternalVehicleSeriesUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ExternalVehicleSeriesUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleSeriesPayload>[]
+          }
+          upsert: {
+            args: Prisma.ExternalVehicleSeriesUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleSeriesPayload>
+          }
+          aggregate: {
+            args: Prisma.ExternalVehicleSeriesAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateExternalVehicleSeries>
+          }
+          groupBy: {
+            args: Prisma.ExternalVehicleSeriesGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ExternalVehicleSeriesGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ExternalVehicleSeriesCountArgs<ExtArgs>
+            result: $Utils.Optional<ExternalVehicleSeriesCountAggregateOutputType> | number
+          }
+        }
+      }
       SessionResult: {
         payload: Prisma.$SessionResultPayload<ExtArgs>
         fields: Prisma.SessionResultFieldRefs
@@ -2501,6 +2591,7 @@ export namespace Prisma {
     vehicleConstraintRule?: VehicleConstraintRuleOmit
     vehicleTag?: VehicleTagOmit
     vehicleTagMapping?: VehicleTagMappingOmit
+    externalVehicleSeries?: ExternalVehicleSeriesOmit
     sessionResult?: SessionResultOmit
     sessionVehicleRecommendation?: SessionVehicleRecommendationOmit
     user?: UserOmit
@@ -20477,6 +20568,1338 @@ export namespace Prisma {
 
 
   /**
+   * Model ExternalVehicleSeries
+   */
+
+  export type AggregateExternalVehicleSeries = {
+    _count: ExternalVehicleSeriesCountAggregateOutputType | null
+    _avg: ExternalVehicleSeriesAvgAggregateOutputType | null
+    _sum: ExternalVehicleSeriesSumAggregateOutputType | null
+    _min: ExternalVehicleSeriesMinAggregateOutputType | null
+    _max: ExternalVehicleSeriesMaxAggregateOutputType | null
+  }
+
+  export type ExternalVehicleSeriesAvgAggregateOutputType = {
+    sourceSeriesId: number | null
+    sourceBrandId: number | null
+    businessStatus: number | null
+    concernId: number | null
+    dcarScore: Decimal | null
+    newCarTag: number | null
+    seriesPicCount: number | null
+  }
+
+  export type ExternalVehicleSeriesSumAggregateOutputType = {
+    sourceSeriesId: number | null
+    sourceBrandId: number | null
+    businessStatus: number | null
+    concernId: number | null
+    dcarScore: Decimal | null
+    newCarTag: number | null
+    seriesPicCount: number | null
+  }
+
+  export type ExternalVehicleSeriesMinAggregateOutputType = {
+    id: string | null
+    source: string | null
+    sourceSeriesId: number | null
+    sourceBrandId: number | null
+    brandName: string | null
+    seriesName: string | null
+    coverUrl: string | null
+    businessStatus: number | null
+    concernId: number | null
+    dcarScore: Decimal | null
+    newCarTag: number | null
+    dealerPriceText: string | null
+    hasDealerPrice: boolean | null
+    officialPriceText: string | null
+    hasOfficialPrice: boolean | null
+    prePriceText: string | null
+    hasPrePrice: boolean | null
+    subsidyPriceText: string | null
+    hasSubsidyPrice: boolean | null
+    seriesPicCount: number | null
+    lastSyncedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ExternalVehicleSeriesMaxAggregateOutputType = {
+    id: string | null
+    source: string | null
+    sourceSeriesId: number | null
+    sourceBrandId: number | null
+    brandName: string | null
+    seriesName: string | null
+    coverUrl: string | null
+    businessStatus: number | null
+    concernId: number | null
+    dcarScore: Decimal | null
+    newCarTag: number | null
+    dealerPriceText: string | null
+    hasDealerPrice: boolean | null
+    officialPriceText: string | null
+    hasOfficialPrice: boolean | null
+    prePriceText: string | null
+    hasPrePrice: boolean | null
+    subsidyPriceText: string | null
+    hasSubsidyPrice: boolean | null
+    seriesPicCount: number | null
+    lastSyncedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ExternalVehicleSeriesCountAggregateOutputType = {
+    id: number
+    source: number
+    sourceSeriesId: number
+    sourceBrandId: number
+    brandName: number
+    seriesName: number
+    coverUrl: number
+    carIds: number
+    businessStatus: number
+    concernId: number
+    dcarScore: number
+    newCarTag: number
+    dealerPriceText: number
+    hasDealerPrice: number
+    officialPriceText: number
+    hasOfficialPrice: number
+    prePriceText: number
+    hasPrePrice: number
+    subsidyPriceText: number
+    hasSubsidyPrice: number
+    rankInfo: number
+    topTag: number
+    categoryPic: number
+    seriesPicCount: number
+    rawPayload: number
+    lastSyncedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ExternalVehicleSeriesAvgAggregateInputType = {
+    sourceSeriesId?: true
+    sourceBrandId?: true
+    businessStatus?: true
+    concernId?: true
+    dcarScore?: true
+    newCarTag?: true
+    seriesPicCount?: true
+  }
+
+  export type ExternalVehicleSeriesSumAggregateInputType = {
+    sourceSeriesId?: true
+    sourceBrandId?: true
+    businessStatus?: true
+    concernId?: true
+    dcarScore?: true
+    newCarTag?: true
+    seriesPicCount?: true
+  }
+
+  export type ExternalVehicleSeriesMinAggregateInputType = {
+    id?: true
+    source?: true
+    sourceSeriesId?: true
+    sourceBrandId?: true
+    brandName?: true
+    seriesName?: true
+    coverUrl?: true
+    businessStatus?: true
+    concernId?: true
+    dcarScore?: true
+    newCarTag?: true
+    dealerPriceText?: true
+    hasDealerPrice?: true
+    officialPriceText?: true
+    hasOfficialPrice?: true
+    prePriceText?: true
+    hasPrePrice?: true
+    subsidyPriceText?: true
+    hasSubsidyPrice?: true
+    seriesPicCount?: true
+    lastSyncedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ExternalVehicleSeriesMaxAggregateInputType = {
+    id?: true
+    source?: true
+    sourceSeriesId?: true
+    sourceBrandId?: true
+    brandName?: true
+    seriesName?: true
+    coverUrl?: true
+    businessStatus?: true
+    concernId?: true
+    dcarScore?: true
+    newCarTag?: true
+    dealerPriceText?: true
+    hasDealerPrice?: true
+    officialPriceText?: true
+    hasOfficialPrice?: true
+    prePriceText?: true
+    hasPrePrice?: true
+    subsidyPriceText?: true
+    hasSubsidyPrice?: true
+    seriesPicCount?: true
+    lastSyncedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ExternalVehicleSeriesCountAggregateInputType = {
+    id?: true
+    source?: true
+    sourceSeriesId?: true
+    sourceBrandId?: true
+    brandName?: true
+    seriesName?: true
+    coverUrl?: true
+    carIds?: true
+    businessStatus?: true
+    concernId?: true
+    dcarScore?: true
+    newCarTag?: true
+    dealerPriceText?: true
+    hasDealerPrice?: true
+    officialPriceText?: true
+    hasOfficialPrice?: true
+    prePriceText?: true
+    hasPrePrice?: true
+    subsidyPriceText?: true
+    hasSubsidyPrice?: true
+    rankInfo?: true
+    topTag?: true
+    categoryPic?: true
+    seriesPicCount?: true
+    rawPayload?: true
+    lastSyncedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ExternalVehicleSeriesAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ExternalVehicleSeries to aggregate.
+     */
+    where?: ExternalVehicleSeriesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExternalVehicleSeries to fetch.
+     */
+    orderBy?: ExternalVehicleSeriesOrderByWithRelationInput | ExternalVehicleSeriesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ExternalVehicleSeriesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExternalVehicleSeries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExternalVehicleSeries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ExternalVehicleSeries
+    **/
+    _count?: true | ExternalVehicleSeriesCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ExternalVehicleSeriesAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ExternalVehicleSeriesSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ExternalVehicleSeriesMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ExternalVehicleSeriesMaxAggregateInputType
+  }
+
+  export type GetExternalVehicleSeriesAggregateType<T extends ExternalVehicleSeriesAggregateArgs> = {
+        [P in keyof T & keyof AggregateExternalVehicleSeries]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateExternalVehicleSeries[P]>
+      : GetScalarType<T[P], AggregateExternalVehicleSeries[P]>
+  }
+
+
+
+
+  export type ExternalVehicleSeriesGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ExternalVehicleSeriesWhereInput
+    orderBy?: ExternalVehicleSeriesOrderByWithAggregationInput | ExternalVehicleSeriesOrderByWithAggregationInput[]
+    by: ExternalVehicleSeriesScalarFieldEnum[] | ExternalVehicleSeriesScalarFieldEnum
+    having?: ExternalVehicleSeriesScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ExternalVehicleSeriesCountAggregateInputType | true
+    _avg?: ExternalVehicleSeriesAvgAggregateInputType
+    _sum?: ExternalVehicleSeriesSumAggregateInputType
+    _min?: ExternalVehicleSeriesMinAggregateInputType
+    _max?: ExternalVehicleSeriesMaxAggregateInputType
+  }
+
+  export type ExternalVehicleSeriesGroupByOutputType = {
+    id: string
+    source: string
+    sourceSeriesId: number
+    sourceBrandId: number | null
+    brandName: string
+    seriesName: string
+    coverUrl: string | null
+    carIds: JsonValue
+    businessStatus: number | null
+    concernId: number | null
+    dcarScore: Decimal | null
+    newCarTag: number | null
+    dealerPriceText: string | null
+    hasDealerPrice: boolean
+    officialPriceText: string | null
+    hasOfficialPrice: boolean
+    prePriceText: string | null
+    hasPrePrice: boolean
+    subsidyPriceText: string | null
+    hasSubsidyPrice: boolean
+    rankInfo: JsonValue | null
+    topTag: JsonValue | null
+    categoryPic: JsonValue | null
+    seriesPicCount: number | null
+    rawPayload: JsonValue
+    lastSyncedAt: Date
+    createdAt: Date
+    updatedAt: Date
+    _count: ExternalVehicleSeriesCountAggregateOutputType | null
+    _avg: ExternalVehicleSeriesAvgAggregateOutputType | null
+    _sum: ExternalVehicleSeriesSumAggregateOutputType | null
+    _min: ExternalVehicleSeriesMinAggregateOutputType | null
+    _max: ExternalVehicleSeriesMaxAggregateOutputType | null
+  }
+
+  type GetExternalVehicleSeriesGroupByPayload<T extends ExternalVehicleSeriesGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ExternalVehicleSeriesGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ExternalVehicleSeriesGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ExternalVehicleSeriesGroupByOutputType[P]>
+            : GetScalarType<T[P], ExternalVehicleSeriesGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ExternalVehicleSeriesSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    source?: boolean
+    sourceSeriesId?: boolean
+    sourceBrandId?: boolean
+    brandName?: boolean
+    seriesName?: boolean
+    coverUrl?: boolean
+    carIds?: boolean
+    businessStatus?: boolean
+    concernId?: boolean
+    dcarScore?: boolean
+    newCarTag?: boolean
+    dealerPriceText?: boolean
+    hasDealerPrice?: boolean
+    officialPriceText?: boolean
+    hasOfficialPrice?: boolean
+    prePriceText?: boolean
+    hasPrePrice?: boolean
+    subsidyPriceText?: boolean
+    hasSubsidyPrice?: boolean
+    rankInfo?: boolean
+    topTag?: boolean
+    categoryPic?: boolean
+    seriesPicCount?: boolean
+    rawPayload?: boolean
+    lastSyncedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["externalVehicleSeries"]>
+
+  export type ExternalVehicleSeriesSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    source?: boolean
+    sourceSeriesId?: boolean
+    sourceBrandId?: boolean
+    brandName?: boolean
+    seriesName?: boolean
+    coverUrl?: boolean
+    carIds?: boolean
+    businessStatus?: boolean
+    concernId?: boolean
+    dcarScore?: boolean
+    newCarTag?: boolean
+    dealerPriceText?: boolean
+    hasDealerPrice?: boolean
+    officialPriceText?: boolean
+    hasOfficialPrice?: boolean
+    prePriceText?: boolean
+    hasPrePrice?: boolean
+    subsidyPriceText?: boolean
+    hasSubsidyPrice?: boolean
+    rankInfo?: boolean
+    topTag?: boolean
+    categoryPic?: boolean
+    seriesPicCount?: boolean
+    rawPayload?: boolean
+    lastSyncedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["externalVehicleSeries"]>
+
+  export type ExternalVehicleSeriesSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    source?: boolean
+    sourceSeriesId?: boolean
+    sourceBrandId?: boolean
+    brandName?: boolean
+    seriesName?: boolean
+    coverUrl?: boolean
+    carIds?: boolean
+    businessStatus?: boolean
+    concernId?: boolean
+    dcarScore?: boolean
+    newCarTag?: boolean
+    dealerPriceText?: boolean
+    hasDealerPrice?: boolean
+    officialPriceText?: boolean
+    hasOfficialPrice?: boolean
+    prePriceText?: boolean
+    hasPrePrice?: boolean
+    subsidyPriceText?: boolean
+    hasSubsidyPrice?: boolean
+    rankInfo?: boolean
+    topTag?: boolean
+    categoryPic?: boolean
+    seriesPicCount?: boolean
+    rawPayload?: boolean
+    lastSyncedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["externalVehicleSeries"]>
+
+  export type ExternalVehicleSeriesSelectScalar = {
+    id?: boolean
+    source?: boolean
+    sourceSeriesId?: boolean
+    sourceBrandId?: boolean
+    brandName?: boolean
+    seriesName?: boolean
+    coverUrl?: boolean
+    carIds?: boolean
+    businessStatus?: boolean
+    concernId?: boolean
+    dcarScore?: boolean
+    newCarTag?: boolean
+    dealerPriceText?: boolean
+    hasDealerPrice?: boolean
+    officialPriceText?: boolean
+    hasOfficialPrice?: boolean
+    prePriceText?: boolean
+    hasPrePrice?: boolean
+    subsidyPriceText?: boolean
+    hasSubsidyPrice?: boolean
+    rankInfo?: boolean
+    topTag?: boolean
+    categoryPic?: boolean
+    seriesPicCount?: boolean
+    rawPayload?: boolean
+    lastSyncedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ExternalVehicleSeriesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "source" | "sourceSeriesId" | "sourceBrandId" | "brandName" | "seriesName" | "coverUrl" | "carIds" | "businessStatus" | "concernId" | "dcarScore" | "newCarTag" | "dealerPriceText" | "hasDealerPrice" | "officialPriceText" | "hasOfficialPrice" | "prePriceText" | "hasPrePrice" | "subsidyPriceText" | "hasSubsidyPrice" | "rankInfo" | "topTag" | "categoryPic" | "seriesPicCount" | "rawPayload" | "lastSyncedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["externalVehicleSeries"]>
+
+  export type $ExternalVehicleSeriesPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ExternalVehicleSeries"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      source: string
+      sourceSeriesId: number
+      sourceBrandId: number | null
+      brandName: string
+      seriesName: string
+      coverUrl: string | null
+      carIds: Prisma.JsonValue
+      businessStatus: number | null
+      concernId: number | null
+      dcarScore: Prisma.Decimal | null
+      newCarTag: number | null
+      dealerPriceText: string | null
+      hasDealerPrice: boolean
+      officialPriceText: string | null
+      hasOfficialPrice: boolean
+      prePriceText: string | null
+      hasPrePrice: boolean
+      subsidyPriceText: string | null
+      hasSubsidyPrice: boolean
+      rankInfo: Prisma.JsonValue | null
+      topTag: Prisma.JsonValue | null
+      categoryPic: Prisma.JsonValue | null
+      seriesPicCount: number | null
+      rawPayload: Prisma.JsonValue
+      lastSyncedAt: Date
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["externalVehicleSeries"]>
+    composites: {}
+  }
+
+  type ExternalVehicleSeriesGetPayload<S extends boolean | null | undefined | ExternalVehicleSeriesDefaultArgs> = $Result.GetResult<Prisma.$ExternalVehicleSeriesPayload, S>
+
+  type ExternalVehicleSeriesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ExternalVehicleSeriesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ExternalVehicleSeriesCountAggregateInputType | true
+    }
+
+  export interface ExternalVehicleSeriesDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ExternalVehicleSeries'], meta: { name: 'ExternalVehicleSeries' } }
+    /**
+     * Find zero or one ExternalVehicleSeries that matches the filter.
+     * @param {ExternalVehicleSeriesFindUniqueArgs} args - Arguments to find a ExternalVehicleSeries
+     * @example
+     * // Get one ExternalVehicleSeries
+     * const externalVehicleSeries = await prisma.externalVehicleSeries.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ExternalVehicleSeriesFindUniqueArgs>(args: SelectSubset<T, ExternalVehicleSeriesFindUniqueArgs<ExtArgs>>): Prisma__ExternalVehicleSeriesClient<$Result.GetResult<Prisma.$ExternalVehicleSeriesPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ExternalVehicleSeries that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ExternalVehicleSeriesFindUniqueOrThrowArgs} args - Arguments to find a ExternalVehicleSeries
+     * @example
+     * // Get one ExternalVehicleSeries
+     * const externalVehicleSeries = await prisma.externalVehicleSeries.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ExternalVehicleSeriesFindUniqueOrThrowArgs>(args: SelectSubset<T, ExternalVehicleSeriesFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ExternalVehicleSeriesClient<$Result.GetResult<Prisma.$ExternalVehicleSeriesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ExternalVehicleSeries that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalVehicleSeriesFindFirstArgs} args - Arguments to find a ExternalVehicleSeries
+     * @example
+     * // Get one ExternalVehicleSeries
+     * const externalVehicleSeries = await prisma.externalVehicleSeries.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ExternalVehicleSeriesFindFirstArgs>(args?: SelectSubset<T, ExternalVehicleSeriesFindFirstArgs<ExtArgs>>): Prisma__ExternalVehicleSeriesClient<$Result.GetResult<Prisma.$ExternalVehicleSeriesPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ExternalVehicleSeries that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalVehicleSeriesFindFirstOrThrowArgs} args - Arguments to find a ExternalVehicleSeries
+     * @example
+     * // Get one ExternalVehicleSeries
+     * const externalVehicleSeries = await prisma.externalVehicleSeries.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ExternalVehicleSeriesFindFirstOrThrowArgs>(args?: SelectSubset<T, ExternalVehicleSeriesFindFirstOrThrowArgs<ExtArgs>>): Prisma__ExternalVehicleSeriesClient<$Result.GetResult<Prisma.$ExternalVehicleSeriesPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ExternalVehicleSeries that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalVehicleSeriesFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ExternalVehicleSeries
+     * const externalVehicleSeries = await prisma.externalVehicleSeries.findMany()
+     * 
+     * // Get first 10 ExternalVehicleSeries
+     * const externalVehicleSeries = await prisma.externalVehicleSeries.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const externalVehicleSeriesWithIdOnly = await prisma.externalVehicleSeries.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ExternalVehicleSeriesFindManyArgs>(args?: SelectSubset<T, ExternalVehicleSeriesFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExternalVehicleSeriesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ExternalVehicleSeries.
+     * @param {ExternalVehicleSeriesCreateArgs} args - Arguments to create a ExternalVehicleSeries.
+     * @example
+     * // Create one ExternalVehicleSeries
+     * const ExternalVehicleSeries = await prisma.externalVehicleSeries.create({
+     *   data: {
+     *     // ... data to create a ExternalVehicleSeries
+     *   }
+     * })
+     * 
+     */
+    create<T extends ExternalVehicleSeriesCreateArgs>(args: SelectSubset<T, ExternalVehicleSeriesCreateArgs<ExtArgs>>): Prisma__ExternalVehicleSeriesClient<$Result.GetResult<Prisma.$ExternalVehicleSeriesPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ExternalVehicleSeries.
+     * @param {ExternalVehicleSeriesCreateManyArgs} args - Arguments to create many ExternalVehicleSeries.
+     * @example
+     * // Create many ExternalVehicleSeries
+     * const externalVehicleSeries = await prisma.externalVehicleSeries.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ExternalVehicleSeriesCreateManyArgs>(args?: SelectSubset<T, ExternalVehicleSeriesCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ExternalVehicleSeries and returns the data saved in the database.
+     * @param {ExternalVehicleSeriesCreateManyAndReturnArgs} args - Arguments to create many ExternalVehicleSeries.
+     * @example
+     * // Create many ExternalVehicleSeries
+     * const externalVehicleSeries = await prisma.externalVehicleSeries.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ExternalVehicleSeries and only return the `id`
+     * const externalVehicleSeriesWithIdOnly = await prisma.externalVehicleSeries.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ExternalVehicleSeriesCreateManyAndReturnArgs>(args?: SelectSubset<T, ExternalVehicleSeriesCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExternalVehicleSeriesPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ExternalVehicleSeries.
+     * @param {ExternalVehicleSeriesDeleteArgs} args - Arguments to delete one ExternalVehicleSeries.
+     * @example
+     * // Delete one ExternalVehicleSeries
+     * const ExternalVehicleSeries = await prisma.externalVehicleSeries.delete({
+     *   where: {
+     *     // ... filter to delete one ExternalVehicleSeries
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ExternalVehicleSeriesDeleteArgs>(args: SelectSubset<T, ExternalVehicleSeriesDeleteArgs<ExtArgs>>): Prisma__ExternalVehicleSeriesClient<$Result.GetResult<Prisma.$ExternalVehicleSeriesPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ExternalVehicleSeries.
+     * @param {ExternalVehicleSeriesUpdateArgs} args - Arguments to update one ExternalVehicleSeries.
+     * @example
+     * // Update one ExternalVehicleSeries
+     * const externalVehicleSeries = await prisma.externalVehicleSeries.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ExternalVehicleSeriesUpdateArgs>(args: SelectSubset<T, ExternalVehicleSeriesUpdateArgs<ExtArgs>>): Prisma__ExternalVehicleSeriesClient<$Result.GetResult<Prisma.$ExternalVehicleSeriesPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ExternalVehicleSeries.
+     * @param {ExternalVehicleSeriesDeleteManyArgs} args - Arguments to filter ExternalVehicleSeries to delete.
+     * @example
+     * // Delete a few ExternalVehicleSeries
+     * const { count } = await prisma.externalVehicleSeries.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ExternalVehicleSeriesDeleteManyArgs>(args?: SelectSubset<T, ExternalVehicleSeriesDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ExternalVehicleSeries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalVehicleSeriesUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ExternalVehicleSeries
+     * const externalVehicleSeries = await prisma.externalVehicleSeries.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ExternalVehicleSeriesUpdateManyArgs>(args: SelectSubset<T, ExternalVehicleSeriesUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ExternalVehicleSeries and returns the data updated in the database.
+     * @param {ExternalVehicleSeriesUpdateManyAndReturnArgs} args - Arguments to update many ExternalVehicleSeries.
+     * @example
+     * // Update many ExternalVehicleSeries
+     * const externalVehicleSeries = await prisma.externalVehicleSeries.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ExternalVehicleSeries and only return the `id`
+     * const externalVehicleSeriesWithIdOnly = await prisma.externalVehicleSeries.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ExternalVehicleSeriesUpdateManyAndReturnArgs>(args: SelectSubset<T, ExternalVehicleSeriesUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExternalVehicleSeriesPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ExternalVehicleSeries.
+     * @param {ExternalVehicleSeriesUpsertArgs} args - Arguments to update or create a ExternalVehicleSeries.
+     * @example
+     * // Update or create a ExternalVehicleSeries
+     * const externalVehicleSeries = await prisma.externalVehicleSeries.upsert({
+     *   create: {
+     *     // ... data to create a ExternalVehicleSeries
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ExternalVehicleSeries we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ExternalVehicleSeriesUpsertArgs>(args: SelectSubset<T, ExternalVehicleSeriesUpsertArgs<ExtArgs>>): Prisma__ExternalVehicleSeriesClient<$Result.GetResult<Prisma.$ExternalVehicleSeriesPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ExternalVehicleSeries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalVehicleSeriesCountArgs} args - Arguments to filter ExternalVehicleSeries to count.
+     * @example
+     * // Count the number of ExternalVehicleSeries
+     * const count = await prisma.externalVehicleSeries.count({
+     *   where: {
+     *     // ... the filter for the ExternalVehicleSeries we want to count
+     *   }
+     * })
+    **/
+    count<T extends ExternalVehicleSeriesCountArgs>(
+      args?: Subset<T, ExternalVehicleSeriesCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ExternalVehicleSeriesCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ExternalVehicleSeries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalVehicleSeriesAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ExternalVehicleSeriesAggregateArgs>(args: Subset<T, ExternalVehicleSeriesAggregateArgs>): Prisma.PrismaPromise<GetExternalVehicleSeriesAggregateType<T>>
+
+    /**
+     * Group by ExternalVehicleSeries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalVehicleSeriesGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ExternalVehicleSeriesGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ExternalVehicleSeriesGroupByArgs['orderBy'] }
+        : { orderBy?: ExternalVehicleSeriesGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ExternalVehicleSeriesGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetExternalVehicleSeriesGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ExternalVehicleSeries model
+   */
+  readonly fields: ExternalVehicleSeriesFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ExternalVehicleSeries.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ExternalVehicleSeriesClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ExternalVehicleSeries model
+   */
+  interface ExternalVehicleSeriesFieldRefs {
+    readonly id: FieldRef<"ExternalVehicleSeries", 'String'>
+    readonly source: FieldRef<"ExternalVehicleSeries", 'String'>
+    readonly sourceSeriesId: FieldRef<"ExternalVehicleSeries", 'Int'>
+    readonly sourceBrandId: FieldRef<"ExternalVehicleSeries", 'Int'>
+    readonly brandName: FieldRef<"ExternalVehicleSeries", 'String'>
+    readonly seriesName: FieldRef<"ExternalVehicleSeries", 'String'>
+    readonly coverUrl: FieldRef<"ExternalVehicleSeries", 'String'>
+    readonly carIds: FieldRef<"ExternalVehicleSeries", 'Json'>
+    readonly businessStatus: FieldRef<"ExternalVehicleSeries", 'Int'>
+    readonly concernId: FieldRef<"ExternalVehicleSeries", 'Int'>
+    readonly dcarScore: FieldRef<"ExternalVehicleSeries", 'Decimal'>
+    readonly newCarTag: FieldRef<"ExternalVehicleSeries", 'Int'>
+    readonly dealerPriceText: FieldRef<"ExternalVehicleSeries", 'String'>
+    readonly hasDealerPrice: FieldRef<"ExternalVehicleSeries", 'Boolean'>
+    readonly officialPriceText: FieldRef<"ExternalVehicleSeries", 'String'>
+    readonly hasOfficialPrice: FieldRef<"ExternalVehicleSeries", 'Boolean'>
+    readonly prePriceText: FieldRef<"ExternalVehicleSeries", 'String'>
+    readonly hasPrePrice: FieldRef<"ExternalVehicleSeries", 'Boolean'>
+    readonly subsidyPriceText: FieldRef<"ExternalVehicleSeries", 'String'>
+    readonly hasSubsidyPrice: FieldRef<"ExternalVehicleSeries", 'Boolean'>
+    readonly rankInfo: FieldRef<"ExternalVehicleSeries", 'Json'>
+    readonly topTag: FieldRef<"ExternalVehicleSeries", 'Json'>
+    readonly categoryPic: FieldRef<"ExternalVehicleSeries", 'Json'>
+    readonly seriesPicCount: FieldRef<"ExternalVehicleSeries", 'Int'>
+    readonly rawPayload: FieldRef<"ExternalVehicleSeries", 'Json'>
+    readonly lastSyncedAt: FieldRef<"ExternalVehicleSeries", 'DateTime'>
+    readonly createdAt: FieldRef<"ExternalVehicleSeries", 'DateTime'>
+    readonly updatedAt: FieldRef<"ExternalVehicleSeries", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ExternalVehicleSeries findUnique
+   */
+  export type ExternalVehicleSeriesFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleSeries
+     */
+    select?: ExternalVehicleSeriesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleSeries
+     */
+    omit?: ExternalVehicleSeriesOmit<ExtArgs> | null
+    /**
+     * Filter, which ExternalVehicleSeries to fetch.
+     */
+    where: ExternalVehicleSeriesWhereUniqueInput
+  }
+
+  /**
+   * ExternalVehicleSeries findUniqueOrThrow
+   */
+  export type ExternalVehicleSeriesFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleSeries
+     */
+    select?: ExternalVehicleSeriesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleSeries
+     */
+    omit?: ExternalVehicleSeriesOmit<ExtArgs> | null
+    /**
+     * Filter, which ExternalVehicleSeries to fetch.
+     */
+    where: ExternalVehicleSeriesWhereUniqueInput
+  }
+
+  /**
+   * ExternalVehicleSeries findFirst
+   */
+  export type ExternalVehicleSeriesFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleSeries
+     */
+    select?: ExternalVehicleSeriesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleSeries
+     */
+    omit?: ExternalVehicleSeriesOmit<ExtArgs> | null
+    /**
+     * Filter, which ExternalVehicleSeries to fetch.
+     */
+    where?: ExternalVehicleSeriesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExternalVehicleSeries to fetch.
+     */
+    orderBy?: ExternalVehicleSeriesOrderByWithRelationInput | ExternalVehicleSeriesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ExternalVehicleSeries.
+     */
+    cursor?: ExternalVehicleSeriesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExternalVehicleSeries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExternalVehicleSeries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ExternalVehicleSeries.
+     */
+    distinct?: ExternalVehicleSeriesScalarFieldEnum | ExternalVehicleSeriesScalarFieldEnum[]
+  }
+
+  /**
+   * ExternalVehicleSeries findFirstOrThrow
+   */
+  export type ExternalVehicleSeriesFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleSeries
+     */
+    select?: ExternalVehicleSeriesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleSeries
+     */
+    omit?: ExternalVehicleSeriesOmit<ExtArgs> | null
+    /**
+     * Filter, which ExternalVehicleSeries to fetch.
+     */
+    where?: ExternalVehicleSeriesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExternalVehicleSeries to fetch.
+     */
+    orderBy?: ExternalVehicleSeriesOrderByWithRelationInput | ExternalVehicleSeriesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ExternalVehicleSeries.
+     */
+    cursor?: ExternalVehicleSeriesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExternalVehicleSeries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExternalVehicleSeries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ExternalVehicleSeries.
+     */
+    distinct?: ExternalVehicleSeriesScalarFieldEnum | ExternalVehicleSeriesScalarFieldEnum[]
+  }
+
+  /**
+   * ExternalVehicleSeries findMany
+   */
+  export type ExternalVehicleSeriesFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleSeries
+     */
+    select?: ExternalVehicleSeriesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleSeries
+     */
+    omit?: ExternalVehicleSeriesOmit<ExtArgs> | null
+    /**
+     * Filter, which ExternalVehicleSeries to fetch.
+     */
+    where?: ExternalVehicleSeriesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExternalVehicleSeries to fetch.
+     */
+    orderBy?: ExternalVehicleSeriesOrderByWithRelationInput | ExternalVehicleSeriesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ExternalVehicleSeries.
+     */
+    cursor?: ExternalVehicleSeriesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExternalVehicleSeries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExternalVehicleSeries.
+     */
+    skip?: number
+    distinct?: ExternalVehicleSeriesScalarFieldEnum | ExternalVehicleSeriesScalarFieldEnum[]
+  }
+
+  /**
+   * ExternalVehicleSeries create
+   */
+  export type ExternalVehicleSeriesCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleSeries
+     */
+    select?: ExternalVehicleSeriesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleSeries
+     */
+    omit?: ExternalVehicleSeriesOmit<ExtArgs> | null
+    /**
+     * The data needed to create a ExternalVehicleSeries.
+     */
+    data: XOR<ExternalVehicleSeriesCreateInput, ExternalVehicleSeriesUncheckedCreateInput>
+  }
+
+  /**
+   * ExternalVehicleSeries createMany
+   */
+  export type ExternalVehicleSeriesCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ExternalVehicleSeries.
+     */
+    data: ExternalVehicleSeriesCreateManyInput | ExternalVehicleSeriesCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ExternalVehicleSeries createManyAndReturn
+   */
+  export type ExternalVehicleSeriesCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleSeries
+     */
+    select?: ExternalVehicleSeriesSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleSeries
+     */
+    omit?: ExternalVehicleSeriesOmit<ExtArgs> | null
+    /**
+     * The data used to create many ExternalVehicleSeries.
+     */
+    data: ExternalVehicleSeriesCreateManyInput | ExternalVehicleSeriesCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ExternalVehicleSeries update
+   */
+  export type ExternalVehicleSeriesUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleSeries
+     */
+    select?: ExternalVehicleSeriesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleSeries
+     */
+    omit?: ExternalVehicleSeriesOmit<ExtArgs> | null
+    /**
+     * The data needed to update a ExternalVehicleSeries.
+     */
+    data: XOR<ExternalVehicleSeriesUpdateInput, ExternalVehicleSeriesUncheckedUpdateInput>
+    /**
+     * Choose, which ExternalVehicleSeries to update.
+     */
+    where: ExternalVehicleSeriesWhereUniqueInput
+  }
+
+  /**
+   * ExternalVehicleSeries updateMany
+   */
+  export type ExternalVehicleSeriesUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ExternalVehicleSeries.
+     */
+    data: XOR<ExternalVehicleSeriesUpdateManyMutationInput, ExternalVehicleSeriesUncheckedUpdateManyInput>
+    /**
+     * Filter which ExternalVehicleSeries to update
+     */
+    where?: ExternalVehicleSeriesWhereInput
+    /**
+     * Limit how many ExternalVehicleSeries to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ExternalVehicleSeries updateManyAndReturn
+   */
+  export type ExternalVehicleSeriesUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleSeries
+     */
+    select?: ExternalVehicleSeriesSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleSeries
+     */
+    omit?: ExternalVehicleSeriesOmit<ExtArgs> | null
+    /**
+     * The data used to update ExternalVehicleSeries.
+     */
+    data: XOR<ExternalVehicleSeriesUpdateManyMutationInput, ExternalVehicleSeriesUncheckedUpdateManyInput>
+    /**
+     * Filter which ExternalVehicleSeries to update
+     */
+    where?: ExternalVehicleSeriesWhereInput
+    /**
+     * Limit how many ExternalVehicleSeries to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ExternalVehicleSeries upsert
+   */
+  export type ExternalVehicleSeriesUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleSeries
+     */
+    select?: ExternalVehicleSeriesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleSeries
+     */
+    omit?: ExternalVehicleSeriesOmit<ExtArgs> | null
+    /**
+     * The filter to search for the ExternalVehicleSeries to update in case it exists.
+     */
+    where: ExternalVehicleSeriesWhereUniqueInput
+    /**
+     * In case the ExternalVehicleSeries found by the `where` argument doesn't exist, create a new ExternalVehicleSeries with this data.
+     */
+    create: XOR<ExternalVehicleSeriesCreateInput, ExternalVehicleSeriesUncheckedCreateInput>
+    /**
+     * In case the ExternalVehicleSeries was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ExternalVehicleSeriesUpdateInput, ExternalVehicleSeriesUncheckedUpdateInput>
+  }
+
+  /**
+   * ExternalVehicleSeries delete
+   */
+  export type ExternalVehicleSeriesDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleSeries
+     */
+    select?: ExternalVehicleSeriesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleSeries
+     */
+    omit?: ExternalVehicleSeriesOmit<ExtArgs> | null
+    /**
+     * Filter which ExternalVehicleSeries to delete.
+     */
+    where: ExternalVehicleSeriesWhereUniqueInput
+  }
+
+  /**
+   * ExternalVehicleSeries deleteMany
+   */
+  export type ExternalVehicleSeriesDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ExternalVehicleSeries to delete
+     */
+    where?: ExternalVehicleSeriesWhereInput
+    /**
+     * Limit how many ExternalVehicleSeries to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ExternalVehicleSeries without action
+   */
+  export type ExternalVehicleSeriesDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleSeries
+     */
+    select?: ExternalVehicleSeriesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleSeries
+     */
+    omit?: ExternalVehicleSeriesOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model SessionResult
    */
 
@@ -25168,6 +26591,40 @@ export namespace Prisma {
   export type VehicleTagMappingScalarFieldEnum = (typeof VehicleTagMappingScalarFieldEnum)[keyof typeof VehicleTagMappingScalarFieldEnum]
 
 
+  export const ExternalVehicleSeriesScalarFieldEnum: {
+    id: 'id',
+    source: 'source',
+    sourceSeriesId: 'sourceSeriesId',
+    sourceBrandId: 'sourceBrandId',
+    brandName: 'brandName',
+    seriesName: 'seriesName',
+    coverUrl: 'coverUrl',
+    carIds: 'carIds',
+    businessStatus: 'businessStatus',
+    concernId: 'concernId',
+    dcarScore: 'dcarScore',
+    newCarTag: 'newCarTag',
+    dealerPriceText: 'dealerPriceText',
+    hasDealerPrice: 'hasDealerPrice',
+    officialPriceText: 'officialPriceText',
+    hasOfficialPrice: 'hasOfficialPrice',
+    prePriceText: 'prePriceText',
+    hasPrePrice: 'hasPrePrice',
+    subsidyPriceText: 'subsidyPriceText',
+    hasSubsidyPrice: 'hasSubsidyPrice',
+    rankInfo: 'rankInfo',
+    topTag: 'topTag',
+    categoryPic: 'categoryPic',
+    seriesPicCount: 'seriesPicCount',
+    rawPayload: 'rawPayload',
+    lastSyncedAt: 'lastSyncedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ExternalVehicleSeriesScalarFieldEnum = (typeof ExternalVehicleSeriesScalarFieldEnum)[keyof typeof ExternalVehicleSeriesScalarFieldEnum]
+
+
   export const SessionResultScalarFieldEnum: {
     id: 'id',
     sessionId: 'sessionId',
@@ -25226,6 +26683,21 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
   export const QueryMode: {
     default: 'default',
     insensitive: 'insensitive'
@@ -25240,6 +26712,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -25391,6 +26872,20 @@ export namespace Prisma {
    * Reference to a field of type 'AssessmentMode[]'
    */
   export type ListEnumAssessmentModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AssessmentMode[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -26551,6 +28046,176 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"VehicleTagMapping"> | string
     vehicleId?: StringWithAggregatesFilter<"VehicleTagMapping"> | string
     tagId?: StringWithAggregatesFilter<"VehicleTagMapping"> | string
+  }
+
+  export type ExternalVehicleSeriesWhereInput = {
+    AND?: ExternalVehicleSeriesWhereInput | ExternalVehicleSeriesWhereInput[]
+    OR?: ExternalVehicleSeriesWhereInput[]
+    NOT?: ExternalVehicleSeriesWhereInput | ExternalVehicleSeriesWhereInput[]
+    id?: StringFilter<"ExternalVehicleSeries"> | string
+    source?: StringFilter<"ExternalVehicleSeries"> | string
+    sourceSeriesId?: IntFilter<"ExternalVehicleSeries"> | number
+    sourceBrandId?: IntNullableFilter<"ExternalVehicleSeries"> | number | null
+    brandName?: StringFilter<"ExternalVehicleSeries"> | string
+    seriesName?: StringFilter<"ExternalVehicleSeries"> | string
+    coverUrl?: StringNullableFilter<"ExternalVehicleSeries"> | string | null
+    carIds?: JsonFilter<"ExternalVehicleSeries">
+    businessStatus?: IntNullableFilter<"ExternalVehicleSeries"> | number | null
+    concernId?: IntNullableFilter<"ExternalVehicleSeries"> | number | null
+    dcarScore?: DecimalNullableFilter<"ExternalVehicleSeries"> | Decimal | DecimalJsLike | number | string | null
+    newCarTag?: IntNullableFilter<"ExternalVehicleSeries"> | number | null
+    dealerPriceText?: StringNullableFilter<"ExternalVehicleSeries"> | string | null
+    hasDealerPrice?: BoolFilter<"ExternalVehicleSeries"> | boolean
+    officialPriceText?: StringNullableFilter<"ExternalVehicleSeries"> | string | null
+    hasOfficialPrice?: BoolFilter<"ExternalVehicleSeries"> | boolean
+    prePriceText?: StringNullableFilter<"ExternalVehicleSeries"> | string | null
+    hasPrePrice?: BoolFilter<"ExternalVehicleSeries"> | boolean
+    subsidyPriceText?: StringNullableFilter<"ExternalVehicleSeries"> | string | null
+    hasSubsidyPrice?: BoolFilter<"ExternalVehicleSeries"> | boolean
+    rankInfo?: JsonNullableFilter<"ExternalVehicleSeries">
+    topTag?: JsonNullableFilter<"ExternalVehicleSeries">
+    categoryPic?: JsonNullableFilter<"ExternalVehicleSeries">
+    seriesPicCount?: IntNullableFilter<"ExternalVehicleSeries"> | number | null
+    rawPayload?: JsonFilter<"ExternalVehicleSeries">
+    lastSyncedAt?: DateTimeFilter<"ExternalVehicleSeries"> | Date | string
+    createdAt?: DateTimeFilter<"ExternalVehicleSeries"> | Date | string
+    updatedAt?: DateTimeFilter<"ExternalVehicleSeries"> | Date | string
+  }
+
+  export type ExternalVehicleSeriesOrderByWithRelationInput = {
+    id?: SortOrder
+    source?: SortOrder
+    sourceSeriesId?: SortOrder
+    sourceBrandId?: SortOrderInput | SortOrder
+    brandName?: SortOrder
+    seriesName?: SortOrder
+    coverUrl?: SortOrderInput | SortOrder
+    carIds?: SortOrder
+    businessStatus?: SortOrderInput | SortOrder
+    concernId?: SortOrderInput | SortOrder
+    dcarScore?: SortOrderInput | SortOrder
+    newCarTag?: SortOrderInput | SortOrder
+    dealerPriceText?: SortOrderInput | SortOrder
+    hasDealerPrice?: SortOrder
+    officialPriceText?: SortOrderInput | SortOrder
+    hasOfficialPrice?: SortOrder
+    prePriceText?: SortOrderInput | SortOrder
+    hasPrePrice?: SortOrder
+    subsidyPriceText?: SortOrderInput | SortOrder
+    hasSubsidyPrice?: SortOrder
+    rankInfo?: SortOrderInput | SortOrder
+    topTag?: SortOrderInput | SortOrder
+    categoryPic?: SortOrderInput | SortOrder
+    seriesPicCount?: SortOrderInput | SortOrder
+    rawPayload?: SortOrder
+    lastSyncedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExternalVehicleSeriesWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    source_sourceSeriesId?: ExternalVehicleSeriesSourceSourceSeriesIdCompoundUniqueInput
+    AND?: ExternalVehicleSeriesWhereInput | ExternalVehicleSeriesWhereInput[]
+    OR?: ExternalVehicleSeriesWhereInput[]
+    NOT?: ExternalVehicleSeriesWhereInput | ExternalVehicleSeriesWhereInput[]
+    source?: StringFilter<"ExternalVehicleSeries"> | string
+    sourceSeriesId?: IntFilter<"ExternalVehicleSeries"> | number
+    sourceBrandId?: IntNullableFilter<"ExternalVehicleSeries"> | number | null
+    brandName?: StringFilter<"ExternalVehicleSeries"> | string
+    seriesName?: StringFilter<"ExternalVehicleSeries"> | string
+    coverUrl?: StringNullableFilter<"ExternalVehicleSeries"> | string | null
+    carIds?: JsonFilter<"ExternalVehicleSeries">
+    businessStatus?: IntNullableFilter<"ExternalVehicleSeries"> | number | null
+    concernId?: IntNullableFilter<"ExternalVehicleSeries"> | number | null
+    dcarScore?: DecimalNullableFilter<"ExternalVehicleSeries"> | Decimal | DecimalJsLike | number | string | null
+    newCarTag?: IntNullableFilter<"ExternalVehicleSeries"> | number | null
+    dealerPriceText?: StringNullableFilter<"ExternalVehicleSeries"> | string | null
+    hasDealerPrice?: BoolFilter<"ExternalVehicleSeries"> | boolean
+    officialPriceText?: StringNullableFilter<"ExternalVehicleSeries"> | string | null
+    hasOfficialPrice?: BoolFilter<"ExternalVehicleSeries"> | boolean
+    prePriceText?: StringNullableFilter<"ExternalVehicleSeries"> | string | null
+    hasPrePrice?: BoolFilter<"ExternalVehicleSeries"> | boolean
+    subsidyPriceText?: StringNullableFilter<"ExternalVehicleSeries"> | string | null
+    hasSubsidyPrice?: BoolFilter<"ExternalVehicleSeries"> | boolean
+    rankInfo?: JsonNullableFilter<"ExternalVehicleSeries">
+    topTag?: JsonNullableFilter<"ExternalVehicleSeries">
+    categoryPic?: JsonNullableFilter<"ExternalVehicleSeries">
+    seriesPicCount?: IntNullableFilter<"ExternalVehicleSeries"> | number | null
+    rawPayload?: JsonFilter<"ExternalVehicleSeries">
+    lastSyncedAt?: DateTimeFilter<"ExternalVehicleSeries"> | Date | string
+    createdAt?: DateTimeFilter<"ExternalVehicleSeries"> | Date | string
+    updatedAt?: DateTimeFilter<"ExternalVehicleSeries"> | Date | string
+  }, "id" | "source_sourceSeriesId">
+
+  export type ExternalVehicleSeriesOrderByWithAggregationInput = {
+    id?: SortOrder
+    source?: SortOrder
+    sourceSeriesId?: SortOrder
+    sourceBrandId?: SortOrderInput | SortOrder
+    brandName?: SortOrder
+    seriesName?: SortOrder
+    coverUrl?: SortOrderInput | SortOrder
+    carIds?: SortOrder
+    businessStatus?: SortOrderInput | SortOrder
+    concernId?: SortOrderInput | SortOrder
+    dcarScore?: SortOrderInput | SortOrder
+    newCarTag?: SortOrderInput | SortOrder
+    dealerPriceText?: SortOrderInput | SortOrder
+    hasDealerPrice?: SortOrder
+    officialPriceText?: SortOrderInput | SortOrder
+    hasOfficialPrice?: SortOrder
+    prePriceText?: SortOrderInput | SortOrder
+    hasPrePrice?: SortOrder
+    subsidyPriceText?: SortOrderInput | SortOrder
+    hasSubsidyPrice?: SortOrder
+    rankInfo?: SortOrderInput | SortOrder
+    topTag?: SortOrderInput | SortOrder
+    categoryPic?: SortOrderInput | SortOrder
+    seriesPicCount?: SortOrderInput | SortOrder
+    rawPayload?: SortOrder
+    lastSyncedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ExternalVehicleSeriesCountOrderByAggregateInput
+    _avg?: ExternalVehicleSeriesAvgOrderByAggregateInput
+    _max?: ExternalVehicleSeriesMaxOrderByAggregateInput
+    _min?: ExternalVehicleSeriesMinOrderByAggregateInput
+    _sum?: ExternalVehicleSeriesSumOrderByAggregateInput
+  }
+
+  export type ExternalVehicleSeriesScalarWhereWithAggregatesInput = {
+    AND?: ExternalVehicleSeriesScalarWhereWithAggregatesInput | ExternalVehicleSeriesScalarWhereWithAggregatesInput[]
+    OR?: ExternalVehicleSeriesScalarWhereWithAggregatesInput[]
+    NOT?: ExternalVehicleSeriesScalarWhereWithAggregatesInput | ExternalVehicleSeriesScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ExternalVehicleSeries"> | string
+    source?: StringWithAggregatesFilter<"ExternalVehicleSeries"> | string
+    sourceSeriesId?: IntWithAggregatesFilter<"ExternalVehicleSeries"> | number
+    sourceBrandId?: IntNullableWithAggregatesFilter<"ExternalVehicleSeries"> | number | null
+    brandName?: StringWithAggregatesFilter<"ExternalVehicleSeries"> | string
+    seriesName?: StringWithAggregatesFilter<"ExternalVehicleSeries"> | string
+    coverUrl?: StringNullableWithAggregatesFilter<"ExternalVehicleSeries"> | string | null
+    carIds?: JsonWithAggregatesFilter<"ExternalVehicleSeries">
+    businessStatus?: IntNullableWithAggregatesFilter<"ExternalVehicleSeries"> | number | null
+    concernId?: IntNullableWithAggregatesFilter<"ExternalVehicleSeries"> | number | null
+    dcarScore?: DecimalNullableWithAggregatesFilter<"ExternalVehicleSeries"> | Decimal | DecimalJsLike | number | string | null
+    newCarTag?: IntNullableWithAggregatesFilter<"ExternalVehicleSeries"> | number | null
+    dealerPriceText?: StringNullableWithAggregatesFilter<"ExternalVehicleSeries"> | string | null
+    hasDealerPrice?: BoolWithAggregatesFilter<"ExternalVehicleSeries"> | boolean
+    officialPriceText?: StringNullableWithAggregatesFilter<"ExternalVehicleSeries"> | string | null
+    hasOfficialPrice?: BoolWithAggregatesFilter<"ExternalVehicleSeries"> | boolean
+    prePriceText?: StringNullableWithAggregatesFilter<"ExternalVehicleSeries"> | string | null
+    hasPrePrice?: BoolWithAggregatesFilter<"ExternalVehicleSeries"> | boolean
+    subsidyPriceText?: StringNullableWithAggregatesFilter<"ExternalVehicleSeries"> | string | null
+    hasSubsidyPrice?: BoolWithAggregatesFilter<"ExternalVehicleSeries"> | boolean
+    rankInfo?: JsonNullableWithAggregatesFilter<"ExternalVehicleSeries">
+    topTag?: JsonNullableWithAggregatesFilter<"ExternalVehicleSeries">
+    categoryPic?: JsonNullableWithAggregatesFilter<"ExternalVehicleSeries">
+    seriesPicCount?: IntNullableWithAggregatesFilter<"ExternalVehicleSeries"> | number | null
+    rawPayload?: JsonWithAggregatesFilter<"ExternalVehicleSeries">
+    lastSyncedAt?: DateTimeWithAggregatesFilter<"ExternalVehicleSeries"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"ExternalVehicleSeries"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ExternalVehicleSeries"> | Date | string
   }
 
   export type SessionResultWhereInput = {
@@ -28034,6 +29699,223 @@ export namespace Prisma {
     tagId?: StringFieldUpdateOperationsInput | string
   }
 
+  export type ExternalVehicleSeriesCreateInput = {
+    id?: string
+    source: string
+    sourceSeriesId: number
+    sourceBrandId?: number | null
+    brandName: string
+    seriesName: string
+    coverUrl?: string | null
+    carIds: JsonNullValueInput | InputJsonValue
+    businessStatus?: number | null
+    concernId?: number | null
+    dcarScore?: Decimal | DecimalJsLike | number | string | null
+    newCarTag?: number | null
+    dealerPriceText?: string | null
+    hasDealerPrice?: boolean
+    officialPriceText?: string | null
+    hasOfficialPrice?: boolean
+    prePriceText?: string | null
+    hasPrePrice?: boolean
+    subsidyPriceText?: string | null
+    hasSubsidyPrice?: boolean
+    rankInfo?: NullableJsonNullValueInput | InputJsonValue
+    topTag?: NullableJsonNullValueInput | InputJsonValue
+    categoryPic?: NullableJsonNullValueInput | InputJsonValue
+    seriesPicCount?: number | null
+    rawPayload: JsonNullValueInput | InputJsonValue
+    lastSyncedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExternalVehicleSeriesUncheckedCreateInput = {
+    id?: string
+    source: string
+    sourceSeriesId: number
+    sourceBrandId?: number | null
+    brandName: string
+    seriesName: string
+    coverUrl?: string | null
+    carIds: JsonNullValueInput | InputJsonValue
+    businessStatus?: number | null
+    concernId?: number | null
+    dcarScore?: Decimal | DecimalJsLike | number | string | null
+    newCarTag?: number | null
+    dealerPriceText?: string | null
+    hasDealerPrice?: boolean
+    officialPriceText?: string | null
+    hasOfficialPrice?: boolean
+    prePriceText?: string | null
+    hasPrePrice?: boolean
+    subsidyPriceText?: string | null
+    hasSubsidyPrice?: boolean
+    rankInfo?: NullableJsonNullValueInput | InputJsonValue
+    topTag?: NullableJsonNullValueInput | InputJsonValue
+    categoryPic?: NullableJsonNullValueInput | InputJsonValue
+    seriesPicCount?: number | null
+    rawPayload: JsonNullValueInput | InputJsonValue
+    lastSyncedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExternalVehicleSeriesUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: IntFieldUpdateOperationsInput | number
+    sourceBrandId?: NullableIntFieldUpdateOperationsInput | number | null
+    brandName?: StringFieldUpdateOperationsInput | string
+    seriesName?: StringFieldUpdateOperationsInput | string
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    carIds?: JsonNullValueInput | InputJsonValue
+    businessStatus?: NullableIntFieldUpdateOperationsInput | number | null
+    concernId?: NullableIntFieldUpdateOperationsInput | number | null
+    dcarScore?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    newCarTag?: NullableIntFieldUpdateOperationsInput | number | null
+    dealerPriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasDealerPrice?: BoolFieldUpdateOperationsInput | boolean
+    officialPriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasOfficialPrice?: BoolFieldUpdateOperationsInput | boolean
+    prePriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasPrePrice?: BoolFieldUpdateOperationsInput | boolean
+    subsidyPriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasSubsidyPrice?: BoolFieldUpdateOperationsInput | boolean
+    rankInfo?: NullableJsonNullValueInput | InputJsonValue
+    topTag?: NullableJsonNullValueInput | InputJsonValue
+    categoryPic?: NullableJsonNullValueInput | InputJsonValue
+    seriesPicCount?: NullableIntFieldUpdateOperationsInput | number | null
+    rawPayload?: JsonNullValueInput | InputJsonValue
+    lastSyncedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExternalVehicleSeriesUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: IntFieldUpdateOperationsInput | number
+    sourceBrandId?: NullableIntFieldUpdateOperationsInput | number | null
+    brandName?: StringFieldUpdateOperationsInput | string
+    seriesName?: StringFieldUpdateOperationsInput | string
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    carIds?: JsonNullValueInput | InputJsonValue
+    businessStatus?: NullableIntFieldUpdateOperationsInput | number | null
+    concernId?: NullableIntFieldUpdateOperationsInput | number | null
+    dcarScore?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    newCarTag?: NullableIntFieldUpdateOperationsInput | number | null
+    dealerPriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasDealerPrice?: BoolFieldUpdateOperationsInput | boolean
+    officialPriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasOfficialPrice?: BoolFieldUpdateOperationsInput | boolean
+    prePriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasPrePrice?: BoolFieldUpdateOperationsInput | boolean
+    subsidyPriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasSubsidyPrice?: BoolFieldUpdateOperationsInput | boolean
+    rankInfo?: NullableJsonNullValueInput | InputJsonValue
+    topTag?: NullableJsonNullValueInput | InputJsonValue
+    categoryPic?: NullableJsonNullValueInput | InputJsonValue
+    seriesPicCount?: NullableIntFieldUpdateOperationsInput | number | null
+    rawPayload?: JsonNullValueInput | InputJsonValue
+    lastSyncedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExternalVehicleSeriesCreateManyInput = {
+    id?: string
+    source: string
+    sourceSeriesId: number
+    sourceBrandId?: number | null
+    brandName: string
+    seriesName: string
+    coverUrl?: string | null
+    carIds: JsonNullValueInput | InputJsonValue
+    businessStatus?: number | null
+    concernId?: number | null
+    dcarScore?: Decimal | DecimalJsLike | number | string | null
+    newCarTag?: number | null
+    dealerPriceText?: string | null
+    hasDealerPrice?: boolean
+    officialPriceText?: string | null
+    hasOfficialPrice?: boolean
+    prePriceText?: string | null
+    hasPrePrice?: boolean
+    subsidyPriceText?: string | null
+    hasSubsidyPrice?: boolean
+    rankInfo?: NullableJsonNullValueInput | InputJsonValue
+    topTag?: NullableJsonNullValueInput | InputJsonValue
+    categoryPic?: NullableJsonNullValueInput | InputJsonValue
+    seriesPicCount?: number | null
+    rawPayload: JsonNullValueInput | InputJsonValue
+    lastSyncedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExternalVehicleSeriesUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: IntFieldUpdateOperationsInput | number
+    sourceBrandId?: NullableIntFieldUpdateOperationsInput | number | null
+    brandName?: StringFieldUpdateOperationsInput | string
+    seriesName?: StringFieldUpdateOperationsInput | string
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    carIds?: JsonNullValueInput | InputJsonValue
+    businessStatus?: NullableIntFieldUpdateOperationsInput | number | null
+    concernId?: NullableIntFieldUpdateOperationsInput | number | null
+    dcarScore?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    newCarTag?: NullableIntFieldUpdateOperationsInput | number | null
+    dealerPriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasDealerPrice?: BoolFieldUpdateOperationsInput | boolean
+    officialPriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasOfficialPrice?: BoolFieldUpdateOperationsInput | boolean
+    prePriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasPrePrice?: BoolFieldUpdateOperationsInput | boolean
+    subsidyPriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasSubsidyPrice?: BoolFieldUpdateOperationsInput | boolean
+    rankInfo?: NullableJsonNullValueInput | InputJsonValue
+    topTag?: NullableJsonNullValueInput | InputJsonValue
+    categoryPic?: NullableJsonNullValueInput | InputJsonValue
+    seriesPicCount?: NullableIntFieldUpdateOperationsInput | number | null
+    rawPayload?: JsonNullValueInput | InputJsonValue
+    lastSyncedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExternalVehicleSeriesUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: IntFieldUpdateOperationsInput | number
+    sourceBrandId?: NullableIntFieldUpdateOperationsInput | number | null
+    brandName?: StringFieldUpdateOperationsInput | string
+    seriesName?: StringFieldUpdateOperationsInput | string
+    coverUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    carIds?: JsonNullValueInput | InputJsonValue
+    businessStatus?: NullableIntFieldUpdateOperationsInput | number | null
+    concernId?: NullableIntFieldUpdateOperationsInput | number | null
+    dcarScore?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    newCarTag?: NullableIntFieldUpdateOperationsInput | number | null
+    dealerPriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasDealerPrice?: BoolFieldUpdateOperationsInput | boolean
+    officialPriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasOfficialPrice?: BoolFieldUpdateOperationsInput | boolean
+    prePriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasPrePrice?: BoolFieldUpdateOperationsInput | boolean
+    subsidyPriceText?: NullableStringFieldUpdateOperationsInput | string | null
+    hasSubsidyPrice?: BoolFieldUpdateOperationsInput | boolean
+    rankInfo?: NullableJsonNullValueInput | InputJsonValue
+    topTag?: NullableJsonNullValueInput | InputJsonValue
+    categoryPic?: NullableJsonNullValueInput | InputJsonValue
+    seriesPicCount?: NullableIntFieldUpdateOperationsInput | number | null
+    rawPayload?: JsonNullValueInput | InputJsonValue
+    lastSyncedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SessionResultCreateInput = {
     id?: string
     confidenceScore?: Decimal | DecimalJsLike | number | string | null
@@ -29499,6 +31381,212 @@ export namespace Prisma {
     id?: SortOrder
     vehicleId?: SortOrder
     tagId?: SortOrder
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type ExternalVehicleSeriesSourceSourceSeriesIdCompoundUniqueInput = {
+    source: string
+    sourceSeriesId: number
+  }
+
+  export type ExternalVehicleSeriesCountOrderByAggregateInput = {
+    id?: SortOrder
+    source?: SortOrder
+    sourceSeriesId?: SortOrder
+    sourceBrandId?: SortOrder
+    brandName?: SortOrder
+    seriesName?: SortOrder
+    coverUrl?: SortOrder
+    carIds?: SortOrder
+    businessStatus?: SortOrder
+    concernId?: SortOrder
+    dcarScore?: SortOrder
+    newCarTag?: SortOrder
+    dealerPriceText?: SortOrder
+    hasDealerPrice?: SortOrder
+    officialPriceText?: SortOrder
+    hasOfficialPrice?: SortOrder
+    prePriceText?: SortOrder
+    hasPrePrice?: SortOrder
+    subsidyPriceText?: SortOrder
+    hasSubsidyPrice?: SortOrder
+    rankInfo?: SortOrder
+    topTag?: SortOrder
+    categoryPic?: SortOrder
+    seriesPicCount?: SortOrder
+    rawPayload?: SortOrder
+    lastSyncedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExternalVehicleSeriesAvgOrderByAggregateInput = {
+    sourceSeriesId?: SortOrder
+    sourceBrandId?: SortOrder
+    businessStatus?: SortOrder
+    concernId?: SortOrder
+    dcarScore?: SortOrder
+    newCarTag?: SortOrder
+    seriesPicCount?: SortOrder
+  }
+
+  export type ExternalVehicleSeriesMaxOrderByAggregateInput = {
+    id?: SortOrder
+    source?: SortOrder
+    sourceSeriesId?: SortOrder
+    sourceBrandId?: SortOrder
+    brandName?: SortOrder
+    seriesName?: SortOrder
+    coverUrl?: SortOrder
+    businessStatus?: SortOrder
+    concernId?: SortOrder
+    dcarScore?: SortOrder
+    newCarTag?: SortOrder
+    dealerPriceText?: SortOrder
+    hasDealerPrice?: SortOrder
+    officialPriceText?: SortOrder
+    hasOfficialPrice?: SortOrder
+    prePriceText?: SortOrder
+    hasPrePrice?: SortOrder
+    subsidyPriceText?: SortOrder
+    hasSubsidyPrice?: SortOrder
+    seriesPicCount?: SortOrder
+    lastSyncedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExternalVehicleSeriesMinOrderByAggregateInput = {
+    id?: SortOrder
+    source?: SortOrder
+    sourceSeriesId?: SortOrder
+    sourceBrandId?: SortOrder
+    brandName?: SortOrder
+    seriesName?: SortOrder
+    coverUrl?: SortOrder
+    businessStatus?: SortOrder
+    concernId?: SortOrder
+    dcarScore?: SortOrder
+    newCarTag?: SortOrder
+    dealerPriceText?: SortOrder
+    hasDealerPrice?: SortOrder
+    officialPriceText?: SortOrder
+    hasOfficialPrice?: SortOrder
+    prePriceText?: SortOrder
+    hasPrePrice?: SortOrder
+    subsidyPriceText?: SortOrder
+    hasSubsidyPrice?: SortOrder
+    seriesPicCount?: SortOrder
+    lastSyncedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExternalVehicleSeriesSumOrderByAggregateInput = {
+    sourceSeriesId?: SortOrder
+    sourceBrandId?: SortOrder
+    businessStatus?: SortOrder
+    concernId?: SortOrder
+    dcarScore?: SortOrder
+    newCarTag?: SortOrder
+    seriesPicCount?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type SessionResultCountOrderByAggregateInput = {
@@ -31348,6 +33436,52 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumRuleOperatorFilter<$PrismaModel>
     _max?: NestedEnumRuleOperatorFilter<$PrismaModel>
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type QuestionOptionCreateWithoutQuestionInput = {

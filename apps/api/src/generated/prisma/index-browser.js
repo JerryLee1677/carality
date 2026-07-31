@@ -286,6 +286,37 @@ exports.Prisma.VehicleTagMappingScalarFieldEnum = {
   tagId: 'tagId'
 };
 
+exports.Prisma.ExternalVehicleSeriesScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  sourceSeriesId: 'sourceSeriesId',
+  sourceBrandId: 'sourceBrandId',
+  brandName: 'brandName',
+  seriesName: 'seriesName',
+  coverUrl: 'coverUrl',
+  carIds: 'carIds',
+  businessStatus: 'businessStatus',
+  concernId: 'concernId',
+  dcarScore: 'dcarScore',
+  newCarTag: 'newCarTag',
+  dealerPriceText: 'dealerPriceText',
+  hasDealerPrice: 'hasDealerPrice',
+  officialPriceText: 'officialPriceText',
+  hasOfficialPrice: 'hasOfficialPrice',
+  prePriceText: 'prePriceText',
+  hasPrePrice: 'hasPrePrice',
+  subsidyPriceText: 'subsidyPriceText',
+  hasSubsidyPrice: 'hasSubsidyPrice',
+  rankInfo: 'rankInfo',
+  topTag: 'topTag',
+  categoryPic: 'categoryPic',
+  seriesPicCount: 'seriesPicCount',
+  rawPayload: 'rawPayload',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SessionResultScalarFieldEnum = {
   id: 'id',
   sessionId: 'sessionId',
@@ -329,6 +360,15 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -337,6 +377,12 @@ exports.Prisma.QueryMode = {
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
 };
 exports.QuestionType = exports.$Enums.QuestionType = {
   LIFE_STYLE: 'LIFE_STYLE',
@@ -393,6 +439,7 @@ exports.Prisma.ModelName = {
   VehicleConstraintRule: 'VehicleConstraintRule',
   VehicleTag: 'VehicleTag',
   VehicleTagMapping: 'VehicleTagMapping',
+  ExternalVehicleSeries: 'ExternalVehicleSeries',
   SessionResult: 'SessionResult',
   SessionVehicleRecommendation: 'SessionVehicleRecommendation',
   User: 'User',

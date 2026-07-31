@@ -21,8 +21,9 @@ Carality 是一个汽车人格测试与选车推荐网站。用户通过自适�
 
 **数据存储说明**
 
-- **PostgreSQL**（唯一数据库）：题目、车型目录、测评会话、用户账号、登录会话、推荐结果等。
-- **静态 TS 文件**：`/cars`、`/guides` 部分页面仍读取 `src/data/vehicles/vehicles.ts` 与 `src/data/content/buying-guides.ts`，不经过数据库。
+- **PostgreSQL**：题目、测评会话、用户账号、登录会话、人格结果等仍由后端数据库管理。
+- **飞书多维表格（可选车型数据源）**：配置 `FEISHU_*` 环境变量后，车型目录、推荐车型、标签、权重和约束规则从飞书 Base 读取。
+- **静态 TS 文件**：购车指南仍读取 `src/data/content/buying-guides.ts`，不经过数据库。
 
 ## 当前功能
 
@@ -61,6 +62,34 @@ cp apps/api/.env.example apps/api/.env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/carality_assessment"
 PORT="4010"
 ```
+
+可选：使用飞书多维表格管理车型数据：
+
+```env
+FEISHU_APP_ID="cli_xxx"
+FEISHU_APP_SECRET="xxx"
+FEISHU_BASE_TOKEN="Tmk6bKTBSaFJ1OspL4YcyLzEnod"
+FEISHU_VEHICLES_TABLE_ID="tbl1UIzGFpqfKbgm"
+FEISHU_VEHICLE_TAGS_TABLE_ID="tbl6nOMwNiwFj9en"
+FEISHU_VEHICLE_WEIGHTS_TABLE_ID="tblgWpb6Lsa1DQY8"
+FEISHU_VEHICLE_RULES_TABLE_ID="tbl21NFxHRRxfoD0"
+```
+
+真实 `FEISHU_APP_SECRET` 只放在本地或部署环境变量中，不要提交到 Git。
+
+可选：同步懂车帝车系原始数据到外部车型表：
+
+```env
+DONGCHEDI_SERIES_ENDPOINT="https://www.dongchedi.com/motor/pc/car/brand/select_series_v2"
+DONGCHEDI_QUERY_STRING="aid=1839&app_name=auto_web_pc&msToken=xxx&a_bogus=xxx"
+DONGCHEDI_COOKIE="ttwid=...; sessionid=..."
+DONGCHEDI_CITY_NAME="杭州"
+DONGCHEDI_USER_AGENT="Mozilla/5.0 ..."
+DONGCHEDI_REFERER="https://www.dongchedi.com/auto/library/x-0-x-x-x-x-x-x-x-x-x"
+DONGCHEDI_ORIGIN="https://www.dongchedi.com"
+```
+
+`DONGCHEDI_COOKIE`、`msToken`、`a_bogus` 等参数容易过期，也可能包含登录态信息，只放在本地或部署环境变量中，不要提交到 Git。
 
 前端可选覆盖 API 地址（默认 `http://127.0.0.1:4010`）：
 
@@ -115,6 +144,8 @@ pnpm dev
 | `pnpm db:migrate` | 开发环境数据库迁移 |
 | `pnpm db:seed` | 重置并导入种子数据 |
 | `pnpm db:studio` | Prisma Studio 浏览数据库 |
+| `pnpm --dir apps/api sync:dongchedi -- --start-page=1 --max-pages=1 --limit=30 --dry-run` | 试跑懂车帝车系同步，不写库 |
+| `pnpm --dir apps/api sync:dongchedi -- --start-page=1 --max-pages=10 --limit=30` | 同步懂车帝车系原始数据到外部表 |
 | `pnpm test` | 单元测试 |
 | `pnpm test:e2e` | Playwright E2E |
 

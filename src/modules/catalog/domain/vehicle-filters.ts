@@ -1,4 +1,4 @@
-import type { VehicleSeed } from "@/data/vehicles/vehicles";
+import type { CatalogVehicle } from "@/modules/catalog/repository/vehicle-repository";
 
 export type VehicleFilterInput = {
   budgetMin?: number;
@@ -8,7 +8,7 @@ export type VehicleFilterInput = {
 };
 
 export function filterVehicles(
-  vehicles: VehicleSeed[],
+  vehicles: CatalogVehicle[],
   filters: VehicleFilterInput,
 ) {
   return vehicles.filter((vehicle) => {

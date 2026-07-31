@@ -697,6 +697,107 @@ describe("AssessmentService", () => {
     });
   });
 
+  it("uses external vehicle data when a vehicle service is provided", async () => {
+    const sessionFindUnique = vi.fn().mockResolvedValue({
+      id: "session_external_vehicles",
+      status: "IN_PROGRESS",
+    });
+    const snapshotFindMany = vi.fn().mockResolvedValue([
+      {
+        targetType: "VEHICLE_PREFERENCE",
+        traitKey: "family_fit",
+        traitValue: 4,
+      },
+    ]);
+    const profileFindMany = vi.fn().mockResolvedValue([
+      {
+        id: "profile_steady",
+        code: "STEADY_PRAGMATIST",
+        name: "务实省心型",
+        summary: "稳定满足通勤和家庭需要。",
+        detail: "detail",
+        rules: [],
+      },
+    ]);
+    const vehicleFindMany = vi.fn().mockResolvedValue([]);
+    const recommendationCreateMany = vi.fn().mockResolvedValue(undefined);
+    const sessionUpdate = vi.fn().mockResolvedValue(undefined);
+    const resultCreate = vi.fn().mockResolvedValue({
+      id: "result_external",
+      sessionId: "session_external_vehicles",
+    });
+    const prisma = {
+      assessmentSession: {
+        findUnique: sessionFindUnique,
+        update: sessionUpdate,
+      },
+      sessionTraitSnapshot: {
+        findMany: snapshotFindMany,
+      },
+      personalityProfile: {
+        findMany: profileFindMany,
+      },
+      vehicle: {
+        findMany: vehicleFindMany,
+      },
+      sessionResult: {
+        create: resultCreate,
+      },
+      sessionVehicleRecommendation: {
+        createMany: recommendationCreateMany,
+      },
+    };
+    const vehiclesService = {
+      findActiveRecommendationVehicles: vi.fn().mockResolvedValue([
+        {
+          id: "byd-song-plus-dmi",
+          slug: "byd-song-plus-dmi",
+          brand: "比亚迪",
+          series: "宋 PLUS",
+          modelName: "DM-i",
+          energyType: "PHEV",
+          bodyType: "SUV",
+          recommendation: "适合家庭用户",
+          constraintRules: [],
+          traitWeights: [
+            { targetType: "VEHICLE_PREFERENCE", targetKey: "family_fit", weight: 10 },
+          ],
+          handlingScore: 20,
+          comfortScore: 92,
+          spaceScore: 94,
+          smartScore: 18,
+          powerScore: 18,
+          economyScore: 81,
+          brandScore: 18,
+          designScore: 18,
+          reliabilityScore: 18,
+          familyScore: 100,
+        },
+      ]),
+      usesExternalVehicleSource: vi.fn().mockReturnValue(true),
+    };
+    const service = new (AssessmentService as any)(
+      prisma,
+      {
+        getInitialQuestion: vi.fn(),
+        getNextQuestion: vi.fn(),
+      },
+      vehiclesService,
+    );
+
+    const result = await service.completeSession("session_external_vehicles");
+
+    expect(vehiclesService.findActiveRecommendationVehicles).toHaveBeenCalledWith(prisma);
+    expect(vehicleFindMany).not.toHaveBeenCalled();
+    expect(result.recommendations).toHaveLength(1);
+    expect(result.recommendations[0]).toMatchObject({
+      slug: "byd-song-plus-dmi",
+      brand: "比亚迪",
+      energyType: "PHEV",
+    });
+    expect(recommendationCreateMany).not.toHaveBeenCalled();
+  });
+
   it("prioritizes strict matches before same-bucket fallback when hard constraints fail", async () => {
     const sessionFindUnique = vi.fn().mockResolvedValue({
       id: "session_constraints_1",

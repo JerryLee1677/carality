@@ -267,6 +267,41 @@ model VehicleTagMapping {
   @@unique([vehicleId, tagId])
 }
 
+model ExternalVehicleSeries {
+  id                  String   @id @default(cuid())
+  source              String
+  sourceSeriesId      Int
+  sourceBrandId       Int?
+  brandName           String
+  seriesName          String
+  coverUrl            String?
+  carIds              Json
+  businessStatus      Int?
+  concernId           Int?
+  dcarScore           Decimal? @db.Decimal(6, 2)
+  newCarTag           Int?
+  dealerPriceText     String?
+  hasDealerPrice      Boolean  @default(false)
+  officialPriceText   String?
+  hasOfficialPrice    Boolean  @default(false)
+  prePriceText        String?
+  hasPrePrice         Boolean  @default(false)
+  subsidyPriceText    String?
+  hasSubsidyPrice     Boolean  @default(false)
+  rankInfo            Json?
+  topTag              Json?
+  categoryPic         Json?
+  seriesPicCount      Int?
+  rawPayload          Json
+  lastSyncedAt        DateTime @default(now())
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@unique([source, sourceSeriesId])
+  @@index([source, brandName])
+  @@index([source, lastSyncedAt])
+}
+
 model SessionResult {
   id                   String                         @id @default(cuid())
   sessionId            String                         @unique

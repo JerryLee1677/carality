@@ -1,8 +1,9 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException, Optional } from "@nestjs/common";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { QuestionsService } from "../questions/questions.service";
+import { VehiclesService } from "../vehicles/vehicles.service";
 import { CompleteSessionResponseDto } from "./dto/complete-session-response.dto";
 import type { RankedQuestionCandidate } from "../questions/next-question-result.type";
 import { CreateSessionResponseDto } from "./dto/create-session-response.dto";
@@ -301,6 +302,7 @@ export class AssessmentService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly questionsService: QuestionsService,
+    @Optional() private readonly vehiclesService?: VehiclesService,
   ) {}
 
   async createSession(
@@ -580,15 +582,7 @@ export class AssessmentService {
       throw new NotFoundException("No personality profile is configured");
     }
 
-    const vehicles = await db.vehicle.findMany({
-      include: {
-        traitWeights: true,
-        constraintRules: true,
-      },
-      where: {
-        status: "active",
-      },
-    });
+    const vehicles = await this.findActiveRecommendationVehicles(db);
 
     const rankedRecommendations = this.buildDualBucketRankedVehicleRecommendations(
       vehicles,
@@ -609,7 +603,7 @@ export class AssessmentService {
       },
     });
 
-    if (rankedRecommendations.length > 0) {
+    if (rankedRecommendations.length > 0 && !this.usesExternalVehicleSource()) {
       await db.sessionVehicleRecommendation.createMany({
         data: rankedRecommendations.map((vehicle) => ({
           resultId: result.id,
@@ -666,6 +660,26 @@ export class AssessmentService {
     }
 
     return operation(this.prisma);
+  }
+
+  private findActiveRecommendationVehicles(db: AssessmentDbClient) {
+    if (this.vehiclesService) {
+      return this.vehiclesService.findActiveRecommendationVehicles(db);
+    }
+
+    return db.vehicle.findMany({
+      include: {
+        traitWeights: true,
+        constraintRules: true,
+      },
+      where: {
+        status: "active",
+      },
+    });
+  }
+
+  private usesExternalVehicleSource() {
+    return this.vehiclesService?.usesExternalVehicleSource() ?? false;
   }
 
   async getCurrentSession(sessionId: string): Promise<{
@@ -800,15 +814,7 @@ export class AssessmentService {
       throw new NotFoundException("Completed assessment result not found");
     }
 
-    const vehicles = await this.prisma.vehicle.findMany({
-      include: {
-        traitWeights: true,
-        constraintRules: true,
-      },
-      where: {
-        status: "active",
-      },
-    });
+    const vehicles = await this.findActiveRecommendationVehicles(this.prisma);
     const rankedRecommendations = this.buildDualBucketRankedVehicleRecommendations(
       vehicles,
       aggregatedTraits,

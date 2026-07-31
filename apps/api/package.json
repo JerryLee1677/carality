@@ -10,7 +10,8 @@
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
     "prisma:migrate:dev": "prisma migrate dev --schema prisma/schema.prisma",
     "prisma:studio": "prisma studio --schema prisma/schema.prisma",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "sync:dongchedi": "tsx scripts/sync-dongchedi-series.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",

@@ -1,11 +1,31 @@
-import { vehicles } from "@/data/vehicles/vehicles";
+import { assessmentApiFetch } from "@/lib/assessment-api";
+
+export type CatalogVehicle = {
+  slug: string;
+  brand: string;
+  series: string;
+  modelName: string;
+  priceMin: number;
+  priceMax: number;
+  energyType: string;
+  bodyType: string;
+  summary: string;
+  recommendation: string;
+  heroImage?: string | null;
+};
 
 export const vehicleRepository = {
-  getAll() {
-    return vehicles;
+  async getAll() {
+    const response = await assessmentApiFetch("/vehicles");
+    const payload = (await response.json()) as { vehicles: CatalogVehicle[] };
+
+    return payload.vehicles;
   },
 
-  getBySlug(slug: string) {
-    return vehicles.find((vehicle) => vehicle.slug === slug) ?? null;
+  async getBySlug(slug: string) {
+    const response = await assessmentApiFetch(`/vehicles/${encodeURIComponent(slug)}`);
+    const payload = (await response.json()) as { vehicle: CatalogVehicle };
+
+    return payload.vehicle ?? null;
   },
 };
