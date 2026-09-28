@@ -3,13 +3,16 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { getAssessmentSessionStorageKey, type AssessmentSessionSnapshot } from "@/lib/assessment-session";
+import { useLanguage } from "@/lib/i18n";
 
 export function StartQuizButton({ mode }: { mode: "quick" | "standard" }) {
   const router = useRouter();
+  const { translations } = useLanguage();
+  const label = mode === "standard" ? translations.quiz.selectStandard : translations.quiz.selectSpeed;
 
   return (
     <button
-      className="race-button race-button-primary mt-8 px-7 py-4"
+      className="quiz-mode-card__button"
       onClick={async () => {
         const response = await fetch("/api/quiz/session", {
           method: "POST",
@@ -41,7 +44,7 @@ export function StartQuizButton({ mode }: { mode: "quick" | "standard" }) {
         router.push(`/quiz/${session.sessionId}`);
       }}
     >
-      点火进入正式答题
+      {label}
     </button>
   );
 }

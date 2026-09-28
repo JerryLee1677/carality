@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AUTH_SESSION_CHANGE_EVENT, logoutAuthSession } from "@/lib/auth-session";
+import { useLanguage } from "@/lib/i18n";
 
 type MeResponse = {
   user: {
@@ -25,6 +26,7 @@ function formatEmail(email: string) {
 
 export function AuthActions() {
   const pathname = usePathname();
+  const { translations } = useLanguage();
   const [me, setMe] = React.useState<MeResponse["user"] | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -81,13 +83,13 @@ export function AuthActions() {
     return (
       <div className="hidden items-center gap-2 md:flex">
         <Link href={`/login?sourceUrl=${encodeURIComponent(sourceUrl)}`} className="race-button race-button-ghost">
-          登录
+          {translations.site.login}
         </Link>
         <Link
           href={`/register?sourceUrl=${encodeURIComponent(sourceUrl)}`}
           className="race-button race-button-primary"
         >
-          注册
+          {translations.site.register}
         </Link>
       </div>
     );
@@ -100,10 +102,10 @@ export function AuthActions() {
         <span title={me.email}>{formatEmail(me.email)}</span>
       </div>
       <Link href="/account/history" className="race-button race-button-ghost">
-        历史记录
+        {translations.site.history}
       </Link>
       <button type="button" className="race-button race-button-ghost" onClick={handleLogout}>
-        退出
+        {translations.site.logout}
       </button>
     </div>
   );

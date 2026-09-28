@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { LanguageProvider } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Carality",
@@ -12,11 +13,13 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-CN">
+    <html lang="en">
       <body className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
-        <SiteHeader />
-        {children}
-        <SiteFooter />
+        <LanguageProvider>
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -32,7 +32,7 @@ describe("QuizSessionClient", () => {
           nextQuestion: {
             id: "question_3",
             slug: "group-trip-role",
-            title: "和朋友一起出游时，你通常更像哪种角色？",
+            title: "If friends go car shopping or test-driving together, I usually organize the order and comparison points.",
             description: null,
             branchKey: "social-expression",
             type: "LIFE_STYLE",
@@ -102,14 +102,14 @@ describe("QuizSessionClient", () => {
     render(<QuizSessionClient sessionId="session_123" />);
 
     await waitFor(() => {
-      expect(screen.getByText("和朋友一起出游时，你通常更像哪种角色？")).toBeInTheDocument();
+      expect(screen.getByText("If friends go car shopping or test-driving together, I usually organize the order and comparison points.")).toBeInTheDocument();
     });
 
     expect(fetch).toHaveBeenCalledWith("/api/quiz/session_123", {
       method: "GET",
     });
-    expect(screen.getByText("强烈不认同")).toBeInTheDocument();
-    expect(screen.getByText("强烈认同")).toBeInTheDocument();
+    expect(screen.getAllByText("Strongly Disagree")[0]).toBeInTheDocument();
+    expect(screen.getAllByText("Strongly Agree")[0]).toBeInTheDocument();
   });
 
   it("submits immediately when an option is selected and does not render a submit button", async () => {
@@ -127,7 +127,7 @@ describe("QuizSessionClient", () => {
             nextQuestion: {
               id: "question_1",
               slug: "driving-style",
-              title: "我希望车辆在超车和并线时给我更直接的响应。",
+              title: "My driving style leans toward steady, easy, and low-hassle.",
               description: "请选择你对这句话的认同程度",
               branchKey: null,
               type: "CAR_USAGE",
@@ -149,8 +149,8 @@ describe("QuizSessionClient", () => {
             lockedQuestionId: "question_1",
             nextQuestion: {
               id: "question_2",
-              slug: "smart-cockpit",
-              title: "我愿意为了更强的智能座舱和车机体验付出一些学习成本。",
+              slug: "cabin-tech-attitude",
+              title: "A high-tech, seamlessly connected cabin easily impresses me.",
               description: "请选择你对这句话的认同程度",
               branchKey: null,
               type: "CAR_USAGE",
@@ -170,13 +170,13 @@ describe("QuizSessionClient", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("我希望车辆在超车和并线时给我更直接的响应。"),
+        screen.getByText("My driving style leans toward steady, easy, and low-hassle."),
       ).toBeInTheDocument();
     });
 
-    expect(screen.queryByRole("button", { name: /锁定答案并继续|提交中/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText("Strongly Agree"));
 
-    fireEvent.click(screen.getByLabelText("强烈认同"));
+    expect(screen.queryByRole("button", { name: /previous|next/i })).not.toBeInTheDocument();
 
     await waitFor(() => {
       expect(fetch).toHaveBeenNthCalledWith(2, "/api/quiz/session_auto/answer", {
@@ -193,7 +193,7 @@ describe("QuizSessionClient", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("我愿意为了更强的智能座舱和车机体验付出一些学习成本。"),
+        screen.getByText("A high-tech, seamlessly connected cabin easily impresses me."),
       ).toBeInTheDocument();
     });
   });
@@ -213,7 +213,7 @@ describe("QuizSessionClient", () => {
             nextQuestion: {
               id: "question_1",
               slug: "driving-style",
-              title: "我希望车辆在超车和并线时给我更直接的响应。",
+              title: "My driving style leans toward steady, easy, and low-hassle.",
               description: "请选择你对这句话的认同程度",
               branchKey: null,
               type: "CAR_USAGE",
@@ -239,15 +239,15 @@ describe("QuizSessionClient", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("我希望车辆在超车和并线时给我更直接的响应。"),
+        screen.getByText("My driving style leans toward steady, easy, and low-hassle."),
       ).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByLabelText("强烈认同"));
+    fireEvent.click(screen.getByLabelText("Strongly Agree"));
 
     await waitFor(() => {
       expect(
-        screen.getByText("答案提交失败：Assessment API request failed with status 409"),
+        screen.getByText("Answer submission failed: Assessment API request failed with status 409"),
       ).toBeInTheDocument();
     });
   });
@@ -277,7 +277,7 @@ describe("QuizSessionClient", () => {
             nextQuestion: {
               id: "question_1",
               slug: "driving-style",
-              title: "我希望车辆在超车和并线时给我更直接的响应。",
+              title: "My driving style leans toward steady, easy, and low-hassle.",
               description: "请选择你对这句话的认同程度",
               branchKey: null,
               type: "CAR_USAGE",
@@ -303,17 +303,27 @@ describe("QuizSessionClient", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("我希望车辆在超车和并线时给我更直接的响应。"),
+        screen.getByText("My driving style leans toward steady, easy, and low-hassle."),
       ).toBeInTheDocument();
     });
 
-    const option = screen.getByLabelText("强烈认同");
+    const option = screen.getByLabelText("Strongly Agree");
 
     fireEvent.click(option);
     fireEvent.click(option);
 
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledTimes(2);
+      expect(fetch).toHaveBeenNthCalledWith(2, "/api/quiz/session_once/answer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          questionId: "question_1",
+          optionId: "option_5",
+        }),
+      });
     });
 
     resolveAnswer?.({

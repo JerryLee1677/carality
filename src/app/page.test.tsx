@@ -3,20 +3,19 @@ import { render, screen } from "@testing-library/react";
 import HomePage from "./page";
 
 describe("HomePage", () => {
-  it("renders a minimal personality-first hero without legacy cards", () => {
+  it("renders the personality-first hero and feature sections", () => {
     render(<HomePage />);
 
     expect(
       screen.getByRole("heading", {
-        name: /识别你的汽车人格/i,
+        name: /Personality\. Meets Performance\./i,
       }),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByRole("link", { name: /开始测试/i }),
-    ).toHaveAttribute("href", "/quiz");
-    expect(screen.queryByText(/比亚迪/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/12 Questions/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/移动端/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Take the Test/i })).toHaveAttribute("href", "/quiz");
+    expect(screen.getByRole("link", { name: /Learn more/i })).toHaveAttribute("href", "/guides");
+    expect(screen.getByRole("heading", { name: /Your data stays yours\./i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Powered by real data\./i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /One dashboard for every decision\./i })).toBeInTheDocument();
   });
 });
