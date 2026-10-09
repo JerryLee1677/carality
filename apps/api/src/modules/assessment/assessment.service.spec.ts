@@ -620,7 +620,7 @@ describe("AssessmentService", () => {
           series: "宋 PLUS",
           energyType: "ICE",
           rank: 1,
-          score: 70,
+          score: 73,
           reason: "你当前更看重空间实用性、家庭适配、使用成本，这台车在家庭适配、使用成本上更贴合你的选择。",
           diagnostics: expect.any(Object),
         },
@@ -630,7 +630,7 @@ describe("AssessmentService", () => {
           series: "Model 3",
           energyType: "ICE",
           rank: 2,
-          score: 39,
+          score: 42,
           reason: "你当前更看重空间实用性、家庭适配、使用成本，但这台车在这些维度上的匹配度偏低。",
           diagnostics: expect.any(Object),
         },
@@ -654,6 +654,7 @@ describe("AssessmentService", () => {
       },
       where: {
         status: "active",
+        recommendationStatus: "ACTIVE",
       },
     });
     expect(resultCreate).toHaveBeenCalledWith({
@@ -675,14 +676,14 @@ describe("AssessmentService", () => {
           resultId: "result_1",
           vehicleId: "vehicle_1",
           rank: 1,
-          score: 70,
+          score: 73,
           reason: "你当前更看重空间实用性、家庭适配、使用成本，这台车在家庭适配、使用成本上更贴合你的选择。",
         },
         {
           resultId: "result_1",
           vehicleId: "vehicle_2",
           rank: 2,
-          score: 39,
+          score: 42,
           reason: "你当前更看重空间实用性、家庭适配、使用成本，但这台车在这些维度上的匹配度偏低。",
         },
       ],
@@ -873,6 +874,25 @@ describe("AssessmentService", () => {
           { targetType: "PERSONALITY_TRAIT", targetKey: "stability_preference", weight: 100 },
         ],
       },
+      {
+        id: "vehicle_pass_alternative",
+        slug: "honda-accord",
+        brand: "本田",
+        series: "雅阁",
+        modelName: "260TURBO",
+        recommendation: "static",
+        constraintRules: [
+          {
+            targetType: "PERSONALITY_TRAIT",
+            targetKey: "stability_preference",
+            traitOperator: "GTE",
+            traitThreshold: 3,
+          },
+        ],
+        traitWeights: [
+          { targetType: "PERSONALITY_TRAIT", targetKey: "stability_preference", weight: 8 },
+        ],
+      },
     ]);
     const resultCreate = vi.fn().mockResolvedValue({
       id: "result_constraints_1",
@@ -939,18 +959,24 @@ describe("AssessmentService", () => {
       summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
     });
     expect(result.recommendations).toHaveLength(2);
+    expect(result.recommendations.map((item) => item.diagnostics.strictMatch)).toEqual([
+      true,
+      true,
+    ]);
+    expect(result.recommendations[0].diagnostics.strictMatch).toBe(true);
+    expect(result.recommendations.map((item) => item.slug)).not.toContain("future-ev-x");
     expect(result.recommendations[0]).toMatchObject({
       slug: "toyota-camry",
       brand: "丰田",
       series: "凯美瑞",
       rank: 1,
-      score: 45,
+      score: 43,
       reason: "你当前更看重家庭适配、舒适性、空间实用性，但这台车在这些维度上的匹配度偏低。",
     });
     expect(result.recommendations[1]).toMatchObject({
-      slug: "future-ev-x",
-      brand: "未来",
-      series: "EV",
+      slug: "honda-accord",
+      brand: "本田",
+      series: "雅阁",
       rank: 2,
     });
 
@@ -960,12 +986,12 @@ describe("AssessmentService", () => {
           resultId: "result_constraints_1",
           vehicleId: "vehicle_pass",
           rank: 1,
-          score: 45,
+          score: 43,
           reason: "你当前更看重家庭适配、舒适性、空间实用性，但这台车在这些维度上的匹配度偏低。",
         },
         expect.objectContaining({
           resultId: "result_constraints_1",
-          vehicleId: "vehicle_fail",
+          vehicleId: "vehicle_pass_alternative",
           rank: 2,
         }),
       ],
@@ -1191,7 +1217,7 @@ describe("AssessmentService", () => {
     const result = await service.completeSession("session_reject_plugin_1");
 
     expect(result.sessionId).toBe("session_reject_plugin_1");
-    expect(result.recommendations).toHaveLength(6);
+    expect(result.recommendations).toHaveLength(5);
     expect(
       result.recommendations.filter((vehicle) =>
         ["EV", "PHEV", "EREV"].includes(vehicle.energyType),
@@ -1201,9 +1227,17 @@ describe("AssessmentService", () => {
       result.recommendations.filter((vehicle) =>
         ["ICE", "HEV"].includes(vehicle.energyType),
       ),
-    ).toHaveLength(3);
-    expect(result.recommendations.slice(0, 3).every((vehicle) => ["EV", "PHEV", "EREV"].includes(vehicle.energyType))).toBe(true);
-    expect(result.recommendations.slice(3).every((vehicle) => ["ICE", "HEV"].includes(vehicle.energyType))).toBe(true);
+    ).toHaveLength(2);
+    expect(
+      result.recommendations
+        .slice(0, 3)
+        .every((vehicle) => ["EV", "PHEV", "EREV"].includes(vehicle.energyType)),
+    ).toBe(true);
+    expect(
+      result.recommendations
+        .slice(3)
+        .every((vehicle) => ["ICE", "HEV"].includes(vehicle.energyType)),
+    ).toBe(true);
 
     expect(prisma.sessionVehicleRecommendation.createMany).toHaveBeenCalledWith({
       data: expect.arrayContaining([
@@ -1216,9 +1250,6 @@ describe("AssessmentService", () => {
         }),
         expect.objectContaining({
           vehicleId: "vehicle_erev",
-        }),
-        expect.objectContaining({
-          vehicleId: "vehicle_hev",
         }),
         expect.objectContaining({
           vehicleId: "vehicle_ice",
@@ -1732,7 +1763,7 @@ describe("AssessmentService", () => {
       name: "务实省心型",
       summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
     });
-    expect(result.recommendations).toHaveLength(2);
+    expect(result.recommendations).toHaveLength(1);
     expect(result.recommendations[0]).toMatchObject({
       slug: "right-type-car",
       brand: "品牌D",
@@ -1740,12 +1771,6 @@ describe("AssessmentService", () => {
       rank: 1,
       score: expect.any(Number),
       reason: expect.any(String),
-    });
-    expect(result.recommendations[1]).toMatchObject({
-      slug: "wrong-type-car",
-      brand: "品牌C",
-      series: "系列C",
-      rank: 2,
     });
   });
 
@@ -2397,7 +2422,7 @@ describe("AssessmentService", () => {
             brand: "比亚迪",
             series: "宋 PLUS",
             rank: 1,
-            score: 70,
+            score: 73,
             reason: "你当前更看重空间实用性、家庭适配、使用成本，这台车在家庭适配、使用成本上更贴合你的选择。",
           },
         ],
@@ -3039,6 +3064,7 @@ describe("AssessmentService", () => {
       },
       where: {
         status: "active",
+        recommendationStatus: "ACTIVE",
       },
     });
   });
@@ -3373,15 +3399,75 @@ describe("AssessmentService", () => {
       slug: "budget-friendly-car",
       diagnostics: { strictMatch: true, constraintMisses: [] },
     });
-    expect(result.recommendations[1]).toMatchObject({
-      slug: "over-budget-car",
-      reason: expect.stringContaining("起售价高于当前预算"),
-      diagnostics: {
-        strictMatch: false,
-        constraintMisses: expect.arrayContaining(["budget"]),
-      },
-    });
     expect(result.recommendations[0].diagnostics.scoreBreakdown.priceFit).toBe(100);
-    expect(result.recommendations[1].diagnostics.scoreBreakdown.priceFit).toBeLessThan(100);
+  });
+
+  it("limits recommendations to one series and two vehicles per brand", async () => {
+    const prisma = {
+      assessmentSession: {
+        findUnique: vi.fn().mockResolvedValue({ id: "session_diversity", status: "IN_PROGRESS" }),
+        update: vi.fn().mockResolvedValue(undefined),
+      },
+      sessionTraitSnapshot: {
+        findMany: vi.fn().mockResolvedValue([
+          { targetType: "VEHICLE_PREFERENCE", traitKey: "family_fit", traitValue: 7 },
+        ]),
+      },
+      personalityProfile: {
+        findMany: vi.fn().mockResolvedValue([
+          { id: "profile", code: "STEADY_PRAGMATIST", name: "name", summary: "summary", detail: "detail", rules: [] },
+        ]),
+      },
+      vehicle: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "vehicle_same_series_1",
+            slug: "same-series-1",
+            brand: "品牌A",
+            series: "重复车系",
+            energyType: "ICE",
+            priceMin: 100_000,
+            priceMax: 120_000,
+            constraintRules: [],
+            traitWeights: [],
+          },
+          {
+            id: "vehicle_same_series_2",
+            slug: "same-series-2",
+            brand: "品牌A",
+            series: "重复车系",
+            energyType: "ICE",
+            priceMin: 100_000,
+            priceMax: 120_000,
+            constraintRules: [],
+            traitWeights: [],
+          },
+          ...Array.from({ length: 4 }, (_, index) => ({
+            id: `vehicle_brand_${index}`,
+            slug: `brand-${String.fromCharCode(66 + index)}`,
+            brand: `品牌${String.fromCharCode(66 + index)}`,
+            series: `品牌${String.fromCharCode(66 + index)}车系`,
+            energyType: index % 2 === 0 ? "EV" : "ICE",
+            priceMin: 100_000,
+            priceMax: 120_000,
+            constraintRules: [],
+            traitWeights: [],
+          })),
+        ]),
+      },
+      sessionResult: {
+        create: vi.fn().mockResolvedValue({ id: "result_diversity", sessionId: "session_diversity" }),
+      },
+      sessionVehicleRecommendation: {
+        createMany: vi.fn().mockResolvedValue(undefined),
+      },
+    };
+    const service = new AssessmentService(prisma as never, {} as never);
+
+    const result = await service.completeSession("session_diversity");
+
+    expect(result.recommendations).toHaveLength(5);
+    expect(new Set(result.recommendations.map((item) => item.series)).size).toBe(5);
+    expect(result.recommendations.filter((item) => item.brand === "品牌A").length).toBeLessThanOrEqual(2);
   });
 });

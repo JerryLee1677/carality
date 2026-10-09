@@ -139,6 +139,8 @@ async function seedVehicles(prisma: Awaited<ReturnType<typeof resetDatabase>>) {
         familyScore: vehicle.familyScore,
         summary: vehicle.summary,
         recommendation: vehicle.recommendation,
+        source: "internal",
+        recommendationStatus: "ACTIVE",
         traitWeights: {
           create: vehicle.traitWeights.map((weight) => ({
             targetType: weight.targetType,

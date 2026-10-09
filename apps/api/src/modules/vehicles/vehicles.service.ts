@@ -22,6 +22,7 @@ export type RecommendationVehicle = {
   summary: string;
   recommendation: string;
   status: string;
+  dataConfidence?: number | { toString(): string } | null;
   handlingScore: number;
   comfortScore: number;
   spaceScore: number;
@@ -61,6 +62,7 @@ export class VehiclesService {
         },
         where: {
           status: "active",
+          recommendationStatus: "ACTIVE",
         },
       }) as Promise<RecommendationVehicle[]>;
     }
@@ -79,7 +81,11 @@ export class VehiclesService {
 
     return vehicleRecords
       .map((record) => record.fields)
-      .filter((fields) => this.getText(fields.status, "active") === "active")
+      .filter(
+        (fields) =>
+          this.getText(fields.status, "active") === "active" &&
+          this.getText(fields.recommendationStatus, "ACTIVE") === "ACTIVE",
+      )
       .map((fields) => {
         const slug = this.requireText(fields.slug, "slug");
 

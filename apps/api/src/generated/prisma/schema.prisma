@@ -219,12 +219,20 @@ model Vehicle {
   summary                String
   recommendation         String
   status                 String                         @default("active")
+  source                 String                         @default("internal")
+  sourceSeriesId         Int?
+  sourceCarId            Int?
+  dataConfidence         Decimal?                       @db.Decimal(4, 2)
+  recommendationStatus   String                         @default("ACTIVE")
   createdAt              DateTime                       @default(now())
   updatedAt              DateTime                       @updatedAt
   traitWeights           VehicleTraitWeight[]
   constraintRules        VehicleConstraintRule[]
   tagMappings            VehicleTagMapping[]
   sessionRecommendations SessionVehicleRecommendation[]
+
+  @@index([source, sourceSeriesId, sourceCarId])
+  @@index([recommendationStatus])
 }
 
 model VehicleTraitWeight {

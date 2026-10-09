@@ -14923,6 +14923,9 @@ export namespace Prisma {
     designScore: number | null
     reliabilityScore: number | null
     familyScore: number | null
+    sourceSeriesId: number | null
+    sourceCarId: number | null
+    dataConfidence: Decimal | null
   }
 
   export type VehicleSumAggregateOutputType = {
@@ -14938,6 +14941,9 @@ export namespace Prisma {
     designScore: number | null
     reliabilityScore: number | null
     familyScore: number | null
+    sourceSeriesId: number | null
+    sourceCarId: number | null
+    dataConfidence: Decimal | null
   }
 
   export type VehicleMinAggregateOutputType = {
@@ -14963,6 +14969,11 @@ export namespace Prisma {
     summary: string | null
     recommendation: string | null
     status: string | null
+    source: string | null
+    sourceSeriesId: number | null
+    sourceCarId: number | null
+    dataConfidence: Decimal | null
+    recommendationStatus: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -14990,6 +15001,11 @@ export namespace Prisma {
     summary: string | null
     recommendation: string | null
     status: string | null
+    source: string | null
+    sourceSeriesId: number | null
+    sourceCarId: number | null
+    dataConfidence: Decimal | null
+    recommendationStatus: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -15017,6 +15033,11 @@ export namespace Prisma {
     summary: number
     recommendation: number
     status: number
+    source: number
+    sourceSeriesId: number
+    sourceCarId: number
+    dataConfidence: number
+    recommendationStatus: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -15036,6 +15057,9 @@ export namespace Prisma {
     designScore?: true
     reliabilityScore?: true
     familyScore?: true
+    sourceSeriesId?: true
+    sourceCarId?: true
+    dataConfidence?: true
   }
 
   export type VehicleSumAggregateInputType = {
@@ -15051,6 +15075,9 @@ export namespace Prisma {
     designScore?: true
     reliabilityScore?: true
     familyScore?: true
+    sourceSeriesId?: true
+    sourceCarId?: true
+    dataConfidence?: true
   }
 
   export type VehicleMinAggregateInputType = {
@@ -15076,6 +15103,11 @@ export namespace Prisma {
     summary?: true
     recommendation?: true
     status?: true
+    source?: true
+    sourceSeriesId?: true
+    sourceCarId?: true
+    dataConfidence?: true
+    recommendationStatus?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -15103,6 +15135,11 @@ export namespace Prisma {
     summary?: true
     recommendation?: true
     status?: true
+    source?: true
+    sourceSeriesId?: true
+    sourceCarId?: true
+    dataConfidence?: true
+    recommendationStatus?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -15130,6 +15167,11 @@ export namespace Prisma {
     summary?: true
     recommendation?: true
     status?: true
+    source?: true
+    sourceSeriesId?: true
+    sourceCarId?: true
+    dataConfidence?: true
+    recommendationStatus?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -15244,6 +15286,11 @@ export namespace Prisma {
     summary: string
     recommendation: string
     status: string
+    source: string
+    sourceSeriesId: number | null
+    sourceCarId: number | null
+    dataConfidence: Decimal | null
+    recommendationStatus: string
     createdAt: Date
     updatedAt: Date
     _count: VehicleCountAggregateOutputType | null
@@ -15290,6 +15337,11 @@ export namespace Prisma {
     summary?: boolean
     recommendation?: boolean
     status?: boolean
+    source?: boolean
+    sourceSeriesId?: boolean
+    sourceCarId?: boolean
+    dataConfidence?: boolean
+    recommendationStatus?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     traitWeights?: boolean | Vehicle$traitWeightsArgs<ExtArgs>
@@ -15322,6 +15374,11 @@ export namespace Prisma {
     summary?: boolean
     recommendation?: boolean
     status?: boolean
+    source?: boolean
+    sourceSeriesId?: boolean
+    sourceCarId?: boolean
+    dataConfidence?: boolean
+    recommendationStatus?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["vehicle"]>
@@ -15349,6 +15406,11 @@ export namespace Prisma {
     summary?: boolean
     recommendation?: boolean
     status?: boolean
+    source?: boolean
+    sourceSeriesId?: boolean
+    sourceCarId?: boolean
+    dataConfidence?: boolean
+    recommendationStatus?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["vehicle"]>
@@ -15376,11 +15438,16 @@ export namespace Prisma {
     summary?: boolean
     recommendation?: boolean
     status?: boolean
+    source?: boolean
+    sourceSeriesId?: boolean
+    sourceCarId?: boolean
+    dataConfidence?: boolean
+    recommendationStatus?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type VehicleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "slug" | "brand" | "series" | "modelName" | "priceMin" | "priceMax" | "energyType" | "bodyType" | "handlingScore" | "comfortScore" | "spaceScore" | "smartScore" | "powerScore" | "economyScore" | "brandScore" | "designScore" | "reliabilityScore" | "familyScore" | "summary" | "recommendation" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicle"]>
+  export type VehicleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "slug" | "brand" | "series" | "modelName" | "priceMin" | "priceMax" | "energyType" | "bodyType" | "handlingScore" | "comfortScore" | "spaceScore" | "smartScore" | "powerScore" | "economyScore" | "brandScore" | "designScore" | "reliabilityScore" | "familyScore" | "summary" | "recommendation" | "status" | "source" | "sourceSeriesId" | "sourceCarId" | "dataConfidence" | "recommendationStatus" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicle"]>
   export type VehicleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     traitWeights?: boolean | Vehicle$traitWeightsArgs<ExtArgs>
     constraintRules?: boolean | Vehicle$constraintRulesArgs<ExtArgs>
@@ -15422,6 +15489,11 @@ export namespace Prisma {
       summary: string
       recommendation: string
       status: string
+      source: string
+      sourceSeriesId: number | null
+      sourceCarId: number | null
+      dataConfidence: Prisma.Decimal | null
+      recommendationStatus: string
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["vehicle"]>
@@ -15873,6 +15945,11 @@ export namespace Prisma {
     readonly summary: FieldRef<"Vehicle", 'String'>
     readonly recommendation: FieldRef<"Vehicle", 'String'>
     readonly status: FieldRef<"Vehicle", 'String'>
+    readonly source: FieldRef<"Vehicle", 'String'>
+    readonly sourceSeriesId: FieldRef<"Vehicle", 'Int'>
+    readonly sourceCarId: FieldRef<"Vehicle", 'Int'>
+    readonly dataConfidence: FieldRef<"Vehicle", 'Decimal'>
+    readonly recommendationStatus: FieldRef<"Vehicle", 'String'>
     readonly createdAt: FieldRef<"Vehicle", 'DateTime'>
     readonly updatedAt: FieldRef<"Vehicle", 'DateTime'>
   }
@@ -27901,6 +27978,11 @@ export namespace Prisma {
     summary: 'summary',
     recommendation: 'recommendation',
     status: 'status',
+    source: 'source',
+    sourceSeriesId: 'sourceSeriesId',
+    sourceCarId: 'sourceCarId',
+    dataConfidence: 'dataConfidence',
+    recommendationStatus: 'recommendationStatus',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -29086,6 +29168,11 @@ export namespace Prisma {
     summary?: StringFilter<"Vehicle"> | string
     recommendation?: StringFilter<"Vehicle"> | string
     status?: StringFilter<"Vehicle"> | string
+    source?: StringFilter<"Vehicle"> | string
+    sourceSeriesId?: IntNullableFilter<"Vehicle"> | number | null
+    sourceCarId?: IntNullableFilter<"Vehicle"> | number | null
+    dataConfidence?: DecimalNullableFilter<"Vehicle"> | Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: StringFilter<"Vehicle"> | string
     createdAt?: DateTimeFilter<"Vehicle"> | Date | string
     updatedAt?: DateTimeFilter<"Vehicle"> | Date | string
     traitWeights?: VehicleTraitWeightListRelationFilter
@@ -29117,6 +29204,11 @@ export namespace Prisma {
     summary?: SortOrder
     recommendation?: SortOrder
     status?: SortOrder
+    source?: SortOrder
+    sourceSeriesId?: SortOrderInput | SortOrder
+    sourceCarId?: SortOrderInput | SortOrder
+    dataConfidence?: SortOrderInput | SortOrder
+    recommendationStatus?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     traitWeights?: VehicleTraitWeightOrderByRelationAggregateInput
@@ -29151,6 +29243,11 @@ export namespace Prisma {
     summary?: StringFilter<"Vehicle"> | string
     recommendation?: StringFilter<"Vehicle"> | string
     status?: StringFilter<"Vehicle"> | string
+    source?: StringFilter<"Vehicle"> | string
+    sourceSeriesId?: IntNullableFilter<"Vehicle"> | number | null
+    sourceCarId?: IntNullableFilter<"Vehicle"> | number | null
+    dataConfidence?: DecimalNullableFilter<"Vehicle"> | Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: StringFilter<"Vehicle"> | string
     createdAt?: DateTimeFilter<"Vehicle"> | Date | string
     updatedAt?: DateTimeFilter<"Vehicle"> | Date | string
     traitWeights?: VehicleTraitWeightListRelationFilter
@@ -29182,6 +29279,11 @@ export namespace Prisma {
     summary?: SortOrder
     recommendation?: SortOrder
     status?: SortOrder
+    source?: SortOrder
+    sourceSeriesId?: SortOrderInput | SortOrder
+    sourceCarId?: SortOrderInput | SortOrder
+    dataConfidence?: SortOrderInput | SortOrder
+    recommendationStatus?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: VehicleCountOrderByAggregateInput
@@ -29217,6 +29319,11 @@ export namespace Prisma {
     summary?: StringWithAggregatesFilter<"Vehicle"> | string
     recommendation?: StringWithAggregatesFilter<"Vehicle"> | string
     status?: StringWithAggregatesFilter<"Vehicle"> | string
+    source?: StringWithAggregatesFilter<"Vehicle"> | string
+    sourceSeriesId?: IntNullableWithAggregatesFilter<"Vehicle"> | number | null
+    sourceCarId?: IntNullableWithAggregatesFilter<"Vehicle"> | number | null
+    dataConfidence?: DecimalNullableWithAggregatesFilter<"Vehicle"> | Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: StringWithAggregatesFilter<"Vehicle"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Vehicle"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Vehicle"> | Date | string
   }
@@ -30846,6 +30953,11 @@ export namespace Prisma {
     summary: string
     recommendation: string
     status?: string
+    source?: string
+    sourceSeriesId?: number | null
+    sourceCarId?: number | null
+    dataConfidence?: Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     traitWeights?: VehicleTraitWeightCreateNestedManyWithoutVehicleInput
@@ -30877,6 +30989,11 @@ export namespace Prisma {
     summary: string
     recommendation: string
     status?: string
+    source?: string
+    sourceSeriesId?: number | null
+    sourceCarId?: number | null
+    dataConfidence?: Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     traitWeights?: VehicleTraitWeightUncheckedCreateNestedManyWithoutVehicleInput
@@ -30908,6 +31025,11 @@ export namespace Prisma {
     summary?: StringFieldUpdateOperationsInput | string
     recommendation?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceCarId?: NullableIntFieldUpdateOperationsInput | number | null
+    dataConfidence?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     traitWeights?: VehicleTraitWeightUpdateManyWithoutVehicleNestedInput
@@ -30939,6 +31061,11 @@ export namespace Prisma {
     summary?: StringFieldUpdateOperationsInput | string
     recommendation?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceCarId?: NullableIntFieldUpdateOperationsInput | number | null
+    dataConfidence?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     traitWeights?: VehicleTraitWeightUncheckedUpdateManyWithoutVehicleNestedInput
@@ -30970,6 +31097,11 @@ export namespace Prisma {
     summary: string
     recommendation: string
     status?: string
+    source?: string
+    sourceSeriesId?: number | null
+    sourceCarId?: number | null
+    dataConfidence?: Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -30997,6 +31129,11 @@ export namespace Prisma {
     summary?: StringFieldUpdateOperationsInput | string
     recommendation?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceCarId?: NullableIntFieldUpdateOperationsInput | number | null
+    dataConfidence?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -31024,6 +31161,11 @@ export namespace Prisma {
     summary?: StringFieldUpdateOperationsInput | string
     recommendation?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceCarId?: NullableIntFieldUpdateOperationsInput | number | null
+    dataConfidence?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -32885,6 +33027,11 @@ export namespace Prisma {
     summary?: SortOrder
     recommendation?: SortOrder
     status?: SortOrder
+    source?: SortOrder
+    sourceSeriesId?: SortOrder
+    sourceCarId?: SortOrder
+    dataConfidence?: SortOrder
+    recommendationStatus?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -32902,6 +33049,9 @@ export namespace Prisma {
     designScore?: SortOrder
     reliabilityScore?: SortOrder
     familyScore?: SortOrder
+    sourceSeriesId?: SortOrder
+    sourceCarId?: SortOrder
+    dataConfidence?: SortOrder
   }
 
   export type VehicleMaxOrderByAggregateInput = {
@@ -32927,6 +33077,11 @@ export namespace Prisma {
     summary?: SortOrder
     recommendation?: SortOrder
     status?: SortOrder
+    source?: SortOrder
+    sourceSeriesId?: SortOrder
+    sourceCarId?: SortOrder
+    dataConfidence?: SortOrder
+    recommendationStatus?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -32954,6 +33109,11 @@ export namespace Prisma {
     summary?: SortOrder
     recommendation?: SortOrder
     status?: SortOrder
+    source?: SortOrder
+    sourceSeriesId?: SortOrder
+    sourceCarId?: SortOrder
+    dataConfidence?: SortOrder
+    recommendationStatus?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -32971,6 +33131,9 @@ export namespace Prisma {
     designScore?: SortOrder
     reliabilityScore?: SortOrder
     familyScore?: SortOrder
+    sourceSeriesId?: SortOrder
+    sourceCarId?: SortOrder
+    dataConfidence?: SortOrder
   }
 
   export type VehicleScalarRelationFilter = {
@@ -37316,6 +37479,11 @@ export namespace Prisma {
     summary: string
     recommendation: string
     status?: string
+    source?: string
+    sourceSeriesId?: number | null
+    sourceCarId?: number | null
+    dataConfidence?: Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     constraintRules?: VehicleConstraintRuleCreateNestedManyWithoutVehicleInput
@@ -37346,6 +37514,11 @@ export namespace Prisma {
     summary: string
     recommendation: string
     status?: string
+    source?: string
+    sourceSeriesId?: number | null
+    sourceCarId?: number | null
+    dataConfidence?: Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     constraintRules?: VehicleConstraintRuleUncheckedCreateNestedManyWithoutVehicleInput
@@ -37392,6 +37565,11 @@ export namespace Prisma {
     summary?: StringFieldUpdateOperationsInput | string
     recommendation?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceCarId?: NullableIntFieldUpdateOperationsInput | number | null
+    dataConfidence?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     constraintRules?: VehicleConstraintRuleUpdateManyWithoutVehicleNestedInput
@@ -37422,6 +37600,11 @@ export namespace Prisma {
     summary?: StringFieldUpdateOperationsInput | string
     recommendation?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceCarId?: NullableIntFieldUpdateOperationsInput | number | null
+    dataConfidence?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     constraintRules?: VehicleConstraintRuleUncheckedUpdateManyWithoutVehicleNestedInput
@@ -37452,6 +37635,11 @@ export namespace Prisma {
     summary: string
     recommendation: string
     status?: string
+    source?: string
+    sourceSeriesId?: number | null
+    sourceCarId?: number | null
+    dataConfidence?: Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     traitWeights?: VehicleTraitWeightCreateNestedManyWithoutVehicleInput
@@ -37482,6 +37670,11 @@ export namespace Prisma {
     summary: string
     recommendation: string
     status?: string
+    source?: string
+    sourceSeriesId?: number | null
+    sourceCarId?: number | null
+    dataConfidence?: Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     traitWeights?: VehicleTraitWeightUncheckedCreateNestedManyWithoutVehicleInput
@@ -37528,6 +37721,11 @@ export namespace Prisma {
     summary?: StringFieldUpdateOperationsInput | string
     recommendation?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceCarId?: NullableIntFieldUpdateOperationsInput | number | null
+    dataConfidence?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     traitWeights?: VehicleTraitWeightUpdateManyWithoutVehicleNestedInput
@@ -37558,6 +37756,11 @@ export namespace Prisma {
     summary?: StringFieldUpdateOperationsInput | string
     recommendation?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceCarId?: NullableIntFieldUpdateOperationsInput | number | null
+    dataConfidence?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     traitWeights?: VehicleTraitWeightUncheckedUpdateManyWithoutVehicleNestedInput
@@ -37624,6 +37827,11 @@ export namespace Prisma {
     summary: string
     recommendation: string
     status?: string
+    source?: string
+    sourceSeriesId?: number | null
+    sourceCarId?: number | null
+    dataConfidence?: Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     traitWeights?: VehicleTraitWeightCreateNestedManyWithoutVehicleInput
@@ -37654,6 +37862,11 @@ export namespace Prisma {
     summary: string
     recommendation: string
     status?: string
+    source?: string
+    sourceSeriesId?: number | null
+    sourceCarId?: number | null
+    dataConfidence?: Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     traitWeights?: VehicleTraitWeightUncheckedCreateNestedManyWithoutVehicleInput
@@ -37717,6 +37930,11 @@ export namespace Prisma {
     summary?: StringFieldUpdateOperationsInput | string
     recommendation?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceCarId?: NullableIntFieldUpdateOperationsInput | number | null
+    dataConfidence?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     traitWeights?: VehicleTraitWeightUpdateManyWithoutVehicleNestedInput
@@ -37747,6 +37965,11 @@ export namespace Prisma {
     summary?: StringFieldUpdateOperationsInput | string
     recommendation?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceCarId?: NullableIntFieldUpdateOperationsInput | number | null
+    dataConfidence?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     traitWeights?: VehicleTraitWeightUncheckedUpdateManyWithoutVehicleNestedInput
@@ -38015,6 +38238,11 @@ export namespace Prisma {
     summary: string
     recommendation: string
     status?: string
+    source?: string
+    sourceSeriesId?: number | null
+    sourceCarId?: number | null
+    dataConfidence?: Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     traitWeights?: VehicleTraitWeightCreateNestedManyWithoutVehicleInput
@@ -38045,6 +38273,11 @@ export namespace Prisma {
     summary: string
     recommendation: string
     status?: string
+    source?: string
+    sourceSeriesId?: number | null
+    sourceCarId?: number | null
+    dataConfidence?: Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     traitWeights?: VehicleTraitWeightUncheckedCreateNestedManyWithoutVehicleInput
@@ -38122,6 +38355,11 @@ export namespace Prisma {
     summary?: StringFieldUpdateOperationsInput | string
     recommendation?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceCarId?: NullableIntFieldUpdateOperationsInput | number | null
+    dataConfidence?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     traitWeights?: VehicleTraitWeightUpdateManyWithoutVehicleNestedInput
@@ -38152,6 +38390,11 @@ export namespace Prisma {
     summary?: StringFieldUpdateOperationsInput | string
     recommendation?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceCarId?: NullableIntFieldUpdateOperationsInput | number | null
+    dataConfidence?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    recommendationStatus?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     traitWeights?: VehicleTraitWeightUncheckedUpdateManyWithoutVehicleNestedInput

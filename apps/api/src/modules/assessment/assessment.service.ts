@@ -48,6 +48,8 @@ type VehicleScoreSource = {
   priceMin?: number | null;
   priceMax?: number | null;
   energyType?: string | null;
+  bodyType?: string | null;
+  dataConfidence?: number | { toString(): string } | null;
   traitWeights: Array<{
     targetType: TraitTargetType;
     targetKey: string;
@@ -77,6 +79,32 @@ type VehicleRecommendationSource = VehicleScoreSource & {
   brand: string;
   series: string;
   energyType?: string | null;
+};
+
+type ScoredVehicleRecommendation = {
+  vehicleId: string;
+  slug: string;
+  brand: string;
+  series: string;
+  energyType?: string | null;
+  rank: number;
+  score: number;
+  reason: string;
+  diagnostics: {
+    strictMatch: boolean;
+    constraintMisses: string[];
+    userPreferenceVector: Array<{ key: string; label: string; value: number }>;
+    vehicleScores: Array<{ key: string; label: string; value: number }>;
+    scoreBreakdown: {
+      vectorFit: number;
+      energyFit: number;
+      priceFit: number;
+      constraintFit: number;
+      preferenceAlignment: number;
+      personalityAlignment: number;
+      corePenalty: number;
+    };
+  };
 };
 
 type VehicleRecommendationDiagnostics = ReturnType<AssessmentService["buildRecommendationDiagnostics"]>;
@@ -681,6 +709,7 @@ export class AssessmentService {
       },
       where: {
         status: "active",
+        recommendationStatus: "ACTIVE",
       },
     });
   }
@@ -1075,10 +1104,54 @@ export class AssessmentService {
       aggregatedTraits,
     );
 
-    return [...electricRecommendations, ...fuelRecommendations].map((vehicle, index) => ({
+    return this.selectDiverseRecommendations([
+      ...electricRecommendations,
+      ...fuelRecommendations,
+    ]).map((vehicle, index) => ({
       ...vehicle,
       rank: index + 1,
     }));
+  }
+
+  private selectDiverseRecommendations(scoredVehicles: ScoredVehicleRecommendation[]) {
+    const selected: ScoredVehicleRecommendation[] = [];
+    const seriesCount = new Map<string, number>();
+    const brandCount = new Map<string, number>();
+    const energyCount = new Map<string, number>();
+
+    const canSelect = (vehicle: ScoredVehicleRecommendation) => {
+      const seriesKey = vehicle.series || vehicle.slug;
+      const brandKey = vehicle.brand || vehicle.slug;
+      const energyKey = this.getEnergyBucket(vehicle.energyType);
+
+      return (
+        (seriesCount.get(seriesKey) ?? 0) < 1 &&
+        (brandCount.get(brandKey) ?? 0) < 2 &&
+        (energyCount.get(energyKey) ?? 0) < 5
+      );
+    };
+
+    const selectVehicle = (vehicle: ScoredVehicleRecommendation) => {
+      selected.push(vehicle);
+      const seriesKey = vehicle.series || vehicle.slug;
+      const brandKey = vehicle.brand || vehicle.slug;
+      const energyKey = this.getEnergyBucket(vehicle.energyType);
+
+      seriesCount.set(seriesKey, (seriesCount.get(seriesKey) ?? 0) + 1);
+      brandCount.set(brandKey, (brandCount.get(brandKey) ?? 0) + 1);
+      energyCount.set(energyKey, (energyCount.get(energyKey) ?? 0) + 1);
+    };
+
+    for (const vehicle of scoredVehicles) {
+      if (selected.length >= 6) {
+        break;
+      }
+      if (canSelect(vehicle)) {
+        selectVehicle(vehicle);
+      }
+    }
+
+    return selected;
   }
 
   private calculateRecommendationConfidence(
@@ -1155,12 +1228,17 @@ export class AssessmentService {
       ...scoredVehicles.filter((vehicle) => !strictlyMatchedVehicleIds.has(vehicle.vehicleId)),
     ];
 
-    return prioritizedVehicles
+    const recommendedVehicles =
+      strictlyMatchedVehicleIds.size > 0
+        ? prioritizedVehicles.filter((vehicle) => vehicle.diagnostics.strictMatch)
+        : prioritizedVehicles;
+
+    return recommendedVehicles
       .map((vehicle, index) => ({
         ...vehicle,
         rank: index + 1,
       }))
-      .slice(0, 3);
+      .slice(0, 6);
   }
 
   private isElectricVehicle(energyType?: string | null) {
@@ -1171,6 +1249,10 @@ export class AssessmentService {
       normalizedEnergyType === "PHEV" ||
       normalizedEnergyType === "EREV"
     );
+  }
+
+  private getEnergyBucket(energyType?: string | null) {
+    return this.isElectricVehicle(energyType) ? "ELECTRIC" : "FUEL";
   }
 
   private toDiagnosticDimensions(vector: CorePreferenceVector) {
@@ -1226,16 +1308,20 @@ export class AssessmentService {
     const vectorFit = this.getCoreVectorFitScore(aggregatedTraits, vehicle);
     const energyFit = this.getEnergyAlignmentScore(aggregatedTraits, vehicle);
     const corePenalty = this.getCoreMismatchPenalty(aggregatedTraits, vehicle);
+    const practicalFit = this.getPracticalFitScore(aggregatedTraits, vehicle);
+    const dataQuality = this.getDataQualityScore(vehicle);
+    const diversityBonus = this.getRecommendationDiversityScore(vehicle);
 
     return Math.max(
       0,
       Math.round(
-        vectorFit * 0.45 +
-          energyFit * 0.18 +
-          priceFit * 0.12 +
-          constraintFit * 0.12 +
-          preferenceAlignment * 0.08 +
-          personalityAlignment * 0.05 -
+        vectorFit * 0.3 +
+          preferenceAlignment * 0.18 +
+          priceFit * 0.15 +
+          energyFit * 0.13 +
+          practicalFit * 0.1 +
+          dataQuality * 0.07 +
+          diversityBonus * 0.07 -
           corePenalty,
       ),
     );
@@ -1249,6 +1335,43 @@ export class AssessmentService {
     const minimumVehiclePrice = vehicle.priceMin ?? vehicle.priceMax ?? 0;
 
     return budgetLimit !== null && minimumVehiclePrice > budgetLimit;
+  }
+
+  private getPracticalFitScore(
+    aggregatedTraits: AggregatedTraits,
+    vehicle: Pick<VehicleScoreSource, "bodyType">,
+  ) {
+    const familyFit = this.getTraitValue(aggregatedTraits, "family_fit", "PERSONALITY_TRAIT");
+    const familyFriendlyBodyType = /MPV|SUV|三厢车|旅行车/i.test(vehicle.bodyType ?? "");
+
+    return familyFit >= 6 && familyFriendlyBodyType ? 90 : familyFit >= 6 ? 55 : 75;
+  }
+
+  private getDataQualityScore(vehicle: Pick<VehicleScoreSource, "dataConfidence">) {
+    const confidence =
+      vehicle.dataConfidence === null || vehicle.dataConfidence === undefined
+        ? 1
+        : Number(vehicle.dataConfidence);
+
+    if (!Number.isFinite(confidence)) {
+      return 60;
+    }
+
+    return Math.max(0, Math.min(100, Math.round(confidence * 100)));
+  }
+
+  private getRecommendationDiversityScore(
+    vehicle: Pick<VehicleScoreSource, "energyType" | "bodyType">,
+  ) {
+    const normalizedEnergyType = (vehicle.energyType ?? "ICE").toUpperCase();
+    const electric =
+      normalizedEnergyType === "EV" ||
+      normalizedEnergyType === "PHEV" ||
+      normalizedEnergyType === "EREV";
+    const suvOrMpv = /SUV|MPV/i.test(vehicle.bodyType ?? "");
+    const sedan = /三厢车|两厢车|轿车|掀背车/i.test(vehicle.bodyType ?? "");
+
+    return electric && suvOrMpv ? 85 : electric ? 80 : sedan ? 70 : 60;
   }
 
   private getBudgetPriceLimit(aggregatedTraits: AggregatedTraits) {

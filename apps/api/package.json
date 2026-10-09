@@ -12,7 +12,9 @@
     "prisma:studio": "prisma studio --schema prisma/schema.prisma",
     "db:seed": "tsx prisma/seed.ts",
     "sync:dongchedi": "tsx scripts/sync-dongchedi-series.ts",
-    "sync:dongchedi-details": "tsx scripts/sync-dongchedi-car-details.ts"
+    "sync:dongchedi-details": "tsx scripts/sync-dongchedi-car-details.ts",
+    "import:dongchedi-candidates": "tsx scripts/import-dongchedi-candidates.ts",
+    "approve:dongchedi-vehicles": "tsx scripts/approve-dongchedi-vehicles.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",

@@ -253,6 +253,11 @@ exports.Prisma.VehicleScalarFieldEnum = {
   summary: 'summary',
   recommendation: 'recommendation',
   status: 'status',
+  source: 'source',
+  sourceSeriesId: 'sourceSeriesId',
+  sourceCarId: 'sourceCarId',
+  dataConfidence: 'dataConfidence',
+  recommendationStatus: 'recommendationStatus',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

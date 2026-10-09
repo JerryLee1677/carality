@@ -61,6 +61,7 @@ describe("VehiclesService", () => {
                     reliabilityScore: 18,
                     familyScore: 100,
                     status: "active",
+                    recommendationStatus: "ACTIVE",
                   },
                 },
                 {
@@ -71,6 +72,7 @@ describe("VehiclesService", () => {
                     series: "旧车系",
                     modelName: "旧车型",
                     status: "archived",
+                    recommendationStatus: "ACTIVE",
                   },
                 },
               ],
