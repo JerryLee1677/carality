@@ -109,6 +109,7 @@ describe("QuestionsService", () => {
         currentBranchKey: "social-expression",
         lifeQuestionCount: 1,
         carQuestionCount: 0,
+        coveredTraitKeys: [],
       }),
     ).resolves.toEqual({
       nextQuestion: {
@@ -177,6 +178,7 @@ describe("QuestionsService", () => {
         currentBranchKey: "social-expression",
         lifeQuestionCount: 4,
         carQuestionCount: 1,
+        coveredTraitKeys: [],
       }),
     ).resolves.toEqual({
       nextQuestion: {
@@ -204,6 +206,73 @@ describe("QuestionsService", () => {
           wasSelected: false,
         },
       ],
+    });
+  });
+
+  it("boosts questions that cover decision traits missing from earlier answers", async () => {
+    const findMany = vi.fn().mockResolvedValue([
+      {
+        id: "question_covered",
+        slug: "covered-question",
+        title: "已覆盖的问题",
+        description: null,
+        branchKey: "social-expression",
+        type: "LIFE_STYLE",
+        priority: 40,
+        discrimination: 40,
+        options: [
+          {
+            id: "option_covered",
+            label: "选项",
+            order: 1,
+            effects: [{ targetKey: "covered_trait" }],
+          },
+        ],
+      },
+      {
+        id: "question_uncovered",
+        slug: "uncovered-question",
+        title: "未覆盖的问题",
+        description: null,
+        branchKey: "social-expression",
+        type: "LIFE_STYLE",
+        priority: 80,
+        discrimination: 70,
+        options: [
+          {
+            id: "option_uncovered",
+            label: "选项",
+            order: 1,
+            effects: [
+              { targetKey: "uncovered_trait_1" },
+              { targetKey: "uncovered_trait_2" },
+              { targetKey: "uncovered_trait_3" },
+              { targetKey: "uncovered_trait_4" },
+              { targetKey: "uncovered_trait_5" },
+            ],
+          },
+        ],
+      },
+    ]);
+    const prisma = {
+      question: {
+        findMany,
+      },
+    };
+
+    const service = new QuestionsService(prisma as never);
+    const result = await service.getNextQuestion({
+      answeredQuestionIds: ["question_1"],
+      currentBranchKey: "social-expression",
+      lifeQuestionCount: 1,
+      carQuestionCount: 1,
+      coveredTraitKeys: ["covered_trait"],
+    });
+
+    expect(result.nextQuestion?.id).toBe("question_uncovered");
+    expect(result.candidates[0]).toMatchObject({
+      questionId: "question_uncovered",
+      rankingScore: 265,
     });
   });
 });

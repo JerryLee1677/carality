@@ -3,4 +3,5 @@ export type NextQuestionInput = {
   currentBranchKey: string | null;
   lifeQuestionCount: number;
   carQuestionCount: number;
+  coveredTraitKeys: string[];
 };

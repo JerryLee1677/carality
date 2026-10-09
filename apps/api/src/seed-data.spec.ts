@@ -242,7 +242,11 @@ describe("assessment seed data", () => {
   });
 
   it("keeps personality profiles rule-driven", () => {
-    expect(personalityProfiles.length).toBeGreaterThanOrEqual(2);
+    expect(personalityProfiles).toHaveLength(16);
+    expect(new Set(personalityProfiles.map((profile) => profile.code)).size).toBe(16);
+    expect(
+      personalityProfiles.every((profile) => /^[PE][SQ][CD][BV]$/.test(profile.code)),
+    ).toBe(true);
     expect(personalityProfiles.every((profile) => profile.rules.length >= 3)).toBe(true);
   });
 });

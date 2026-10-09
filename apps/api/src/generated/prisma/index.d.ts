@@ -94,6 +94,11 @@ export type VehicleTagMapping = $Result.DefaultSelection<Prisma.$VehicleTagMappi
  */
 export type ExternalVehicleSeries = $Result.DefaultSelection<Prisma.$ExternalVehicleSeriesPayload>
 /**
+ * Model ExternalVehicleCandidate
+ * 
+ */
+export type ExternalVehicleCandidate = $Result.DefaultSelection<Prisma.$ExternalVehicleCandidatePayload>
+/**
  * Model SessionResult
  * 
  */
@@ -477,6 +482,16 @@ export class PrismaClient<
     * ```
     */
   get externalVehicleSeries(): Prisma.ExternalVehicleSeriesDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.externalVehicleCandidate`: Exposes CRUD operations for the **ExternalVehicleCandidate** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ExternalVehicleCandidates
+    * const externalVehicleCandidates = await prisma.externalVehicleCandidate.findMany()
+    * ```
+    */
+  get externalVehicleCandidate(): Prisma.ExternalVehicleCandidateDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.sessionResult`: Exposes CRUD operations for the **SessionResult** model.
@@ -974,6 +989,7 @@ export namespace Prisma {
     VehicleTag: 'VehicleTag',
     VehicleTagMapping: 'VehicleTagMapping',
     ExternalVehicleSeries: 'ExternalVehicleSeries',
+    ExternalVehicleCandidate: 'ExternalVehicleCandidate',
     SessionResult: 'SessionResult',
     SessionVehicleRecommendation: 'SessionVehicleRecommendation',
     User: 'User',
@@ -996,7 +1012,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "question" | "questionOption" | "optionEffect" | "questionBranchRule" | "assessmentSession" | "assessmentAnswer" | "sessionTraitSnapshot" | "sessionQuestionCandidate" | "personalityProfile" | "personalityProfileRule" | "vehicle" | "vehicleTraitWeight" | "vehicleConstraintRule" | "vehicleTag" | "vehicleTagMapping" | "externalVehicleSeries" | "sessionResult" | "sessionVehicleRecommendation" | "user" | "authSession"
+      modelProps: "question" | "questionOption" | "optionEffect" | "questionBranchRule" | "assessmentSession" | "assessmentAnswer" | "sessionTraitSnapshot" | "sessionQuestionCandidate" | "personalityProfile" | "personalityProfileRule" | "vehicle" | "vehicleTraitWeight" | "vehicleConstraintRule" | "vehicleTag" | "vehicleTagMapping" | "externalVehicleSeries" | "externalVehicleCandidate" | "sessionResult" | "sessionVehicleRecommendation" | "user" | "authSession"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2184,6 +2200,80 @@ export namespace Prisma {
           }
         }
       }
+      ExternalVehicleCandidate: {
+        payload: Prisma.$ExternalVehicleCandidatePayload<ExtArgs>
+        fields: Prisma.ExternalVehicleCandidateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ExternalVehicleCandidateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleCandidatePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ExternalVehicleCandidateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleCandidatePayload>
+          }
+          findFirst: {
+            args: Prisma.ExternalVehicleCandidateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleCandidatePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ExternalVehicleCandidateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleCandidatePayload>
+          }
+          findMany: {
+            args: Prisma.ExternalVehicleCandidateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleCandidatePayload>[]
+          }
+          create: {
+            args: Prisma.ExternalVehicleCandidateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleCandidatePayload>
+          }
+          createMany: {
+            args: Prisma.ExternalVehicleCandidateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ExternalVehicleCandidateCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleCandidatePayload>[]
+          }
+          delete: {
+            args: Prisma.ExternalVehicleCandidateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleCandidatePayload>
+          }
+          update: {
+            args: Prisma.ExternalVehicleCandidateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleCandidatePayload>
+          }
+          deleteMany: {
+            args: Prisma.ExternalVehicleCandidateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ExternalVehicleCandidateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ExternalVehicleCandidateUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleCandidatePayload>[]
+          }
+          upsert: {
+            args: Prisma.ExternalVehicleCandidateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalVehicleCandidatePayload>
+          }
+          aggregate: {
+            args: Prisma.ExternalVehicleCandidateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateExternalVehicleCandidate>
+          }
+          groupBy: {
+            args: Prisma.ExternalVehicleCandidateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ExternalVehicleCandidateGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ExternalVehicleCandidateCountArgs<ExtArgs>
+            result: $Utils.Optional<ExternalVehicleCandidateCountAggregateOutputType> | number
+          }
+        }
+      }
       SessionResult: {
         payload: Prisma.$SessionResultPayload<ExtArgs>
         fields: Prisma.SessionResultFieldRefs
@@ -2592,6 +2682,7 @@ export namespace Prisma {
     vehicleTag?: VehicleTagOmit
     vehicleTagMapping?: VehicleTagMappingOmit
     externalVehicleSeries?: ExternalVehicleSeriesOmit
+    externalVehicleCandidate?: ExternalVehicleCandidateOmit
     sessionResult?: SessionResultOmit
     sessionVehicleRecommendation?: SessionVehicleRecommendationOmit
     user?: UserOmit
@@ -21900,6 +21991,1273 @@ export namespace Prisma {
 
 
   /**
+   * Model ExternalVehicleCandidate
+   */
+
+  export type AggregateExternalVehicleCandidate = {
+    _count: ExternalVehicleCandidateCountAggregateOutputType | null
+    _avg: ExternalVehicleCandidateAvgAggregateOutputType | null
+    _sum: ExternalVehicleCandidateSumAggregateOutputType | null
+    _min: ExternalVehicleCandidateMinAggregateOutputType | null
+    _max: ExternalVehicleCandidateMaxAggregateOutputType | null
+  }
+
+  export type ExternalVehicleCandidateAvgAggregateOutputType = {
+    sourceSeriesId: number | null
+    sourceCarId: number | null
+    saleStatus: number | null
+    priceMin: number | null
+    priceMax: number | null
+    dataConfidence: Decimal | null
+  }
+
+  export type ExternalVehicleCandidateSumAggregateOutputType = {
+    sourceSeriesId: number | null
+    sourceCarId: number | null
+    saleStatus: number | null
+    priceMin: number | null
+    priceMax: number | null
+    dataConfidence: Decimal | null
+  }
+
+  export type ExternalVehicleCandidateMinAggregateOutputType = {
+    id: string | null
+    source: string | null
+    sourceSeriesId: number | null
+    sourceCarId: number | null
+    brandName: string | null
+    seriesName: string | null
+    carName: string | null
+    saleStatus: number | null
+    energyType: string | null
+    bodyType: string | null
+    priceMin: number | null
+    priceMax: number | null
+    dataConfidence: Decimal | null
+    qualityStatus: string | null
+    rejectReason: string | null
+    generatedAt: Date | null
+    lastCheckedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ExternalVehicleCandidateMaxAggregateOutputType = {
+    id: string | null
+    source: string | null
+    sourceSeriesId: number | null
+    sourceCarId: number | null
+    brandName: string | null
+    seriesName: string | null
+    carName: string | null
+    saleStatus: number | null
+    energyType: string | null
+    bodyType: string | null
+    priceMin: number | null
+    priceMax: number | null
+    dataConfidence: Decimal | null
+    qualityStatus: string | null
+    rejectReason: string | null
+    generatedAt: Date | null
+    lastCheckedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ExternalVehicleCandidateCountAggregateOutputType = {
+    id: number
+    source: number
+    sourceSeriesId: number
+    sourceCarId: number
+    brandName: number
+    seriesName: number
+    carName: number
+    saleStatus: number
+    energyType: number
+    bodyType: number
+    priceMin: number
+    priceMax: number
+    parsedParams: number
+    coreScores: number
+    traitWeights: number
+    constraintRules: number
+    dataConfidence: number
+    qualityStatus: number
+    rejectReason: number
+    generatedAt: number
+    lastCheckedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ExternalVehicleCandidateAvgAggregateInputType = {
+    sourceSeriesId?: true
+    sourceCarId?: true
+    saleStatus?: true
+    priceMin?: true
+    priceMax?: true
+    dataConfidence?: true
+  }
+
+  export type ExternalVehicleCandidateSumAggregateInputType = {
+    sourceSeriesId?: true
+    sourceCarId?: true
+    saleStatus?: true
+    priceMin?: true
+    priceMax?: true
+    dataConfidence?: true
+  }
+
+  export type ExternalVehicleCandidateMinAggregateInputType = {
+    id?: true
+    source?: true
+    sourceSeriesId?: true
+    sourceCarId?: true
+    brandName?: true
+    seriesName?: true
+    carName?: true
+    saleStatus?: true
+    energyType?: true
+    bodyType?: true
+    priceMin?: true
+    priceMax?: true
+    dataConfidence?: true
+    qualityStatus?: true
+    rejectReason?: true
+    generatedAt?: true
+    lastCheckedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ExternalVehicleCandidateMaxAggregateInputType = {
+    id?: true
+    source?: true
+    sourceSeriesId?: true
+    sourceCarId?: true
+    brandName?: true
+    seriesName?: true
+    carName?: true
+    saleStatus?: true
+    energyType?: true
+    bodyType?: true
+    priceMin?: true
+    priceMax?: true
+    dataConfidence?: true
+    qualityStatus?: true
+    rejectReason?: true
+    generatedAt?: true
+    lastCheckedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ExternalVehicleCandidateCountAggregateInputType = {
+    id?: true
+    source?: true
+    sourceSeriesId?: true
+    sourceCarId?: true
+    brandName?: true
+    seriesName?: true
+    carName?: true
+    saleStatus?: true
+    energyType?: true
+    bodyType?: true
+    priceMin?: true
+    priceMax?: true
+    parsedParams?: true
+    coreScores?: true
+    traitWeights?: true
+    constraintRules?: true
+    dataConfidence?: true
+    qualityStatus?: true
+    rejectReason?: true
+    generatedAt?: true
+    lastCheckedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ExternalVehicleCandidateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ExternalVehicleCandidate to aggregate.
+     */
+    where?: ExternalVehicleCandidateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExternalVehicleCandidates to fetch.
+     */
+    orderBy?: ExternalVehicleCandidateOrderByWithRelationInput | ExternalVehicleCandidateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ExternalVehicleCandidateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExternalVehicleCandidates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExternalVehicleCandidates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ExternalVehicleCandidates
+    **/
+    _count?: true | ExternalVehicleCandidateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ExternalVehicleCandidateAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ExternalVehicleCandidateSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ExternalVehicleCandidateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ExternalVehicleCandidateMaxAggregateInputType
+  }
+
+  export type GetExternalVehicleCandidateAggregateType<T extends ExternalVehicleCandidateAggregateArgs> = {
+        [P in keyof T & keyof AggregateExternalVehicleCandidate]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateExternalVehicleCandidate[P]>
+      : GetScalarType<T[P], AggregateExternalVehicleCandidate[P]>
+  }
+
+
+
+
+  export type ExternalVehicleCandidateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ExternalVehicleCandidateWhereInput
+    orderBy?: ExternalVehicleCandidateOrderByWithAggregationInput | ExternalVehicleCandidateOrderByWithAggregationInput[]
+    by: ExternalVehicleCandidateScalarFieldEnum[] | ExternalVehicleCandidateScalarFieldEnum
+    having?: ExternalVehicleCandidateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ExternalVehicleCandidateCountAggregateInputType | true
+    _avg?: ExternalVehicleCandidateAvgAggregateInputType
+    _sum?: ExternalVehicleCandidateSumAggregateInputType
+    _min?: ExternalVehicleCandidateMinAggregateInputType
+    _max?: ExternalVehicleCandidateMaxAggregateInputType
+  }
+
+  export type ExternalVehicleCandidateGroupByOutputType = {
+    id: string
+    source: string
+    sourceSeriesId: number
+    sourceCarId: number
+    brandName: string
+    seriesName: string
+    carName: string
+    saleStatus: number | null
+    energyType: string
+    bodyType: string
+    priceMin: number | null
+    priceMax: number | null
+    parsedParams: JsonValue
+    coreScores: JsonValue
+    traitWeights: JsonValue
+    constraintRules: JsonValue
+    dataConfidence: Decimal
+    qualityStatus: string
+    rejectReason: string | null
+    generatedAt: Date
+    lastCheckedAt: Date
+    createdAt: Date
+    updatedAt: Date
+    _count: ExternalVehicleCandidateCountAggregateOutputType | null
+    _avg: ExternalVehicleCandidateAvgAggregateOutputType | null
+    _sum: ExternalVehicleCandidateSumAggregateOutputType | null
+    _min: ExternalVehicleCandidateMinAggregateOutputType | null
+    _max: ExternalVehicleCandidateMaxAggregateOutputType | null
+  }
+
+  type GetExternalVehicleCandidateGroupByPayload<T extends ExternalVehicleCandidateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ExternalVehicleCandidateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ExternalVehicleCandidateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ExternalVehicleCandidateGroupByOutputType[P]>
+            : GetScalarType<T[P], ExternalVehicleCandidateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ExternalVehicleCandidateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    source?: boolean
+    sourceSeriesId?: boolean
+    sourceCarId?: boolean
+    brandName?: boolean
+    seriesName?: boolean
+    carName?: boolean
+    saleStatus?: boolean
+    energyType?: boolean
+    bodyType?: boolean
+    priceMin?: boolean
+    priceMax?: boolean
+    parsedParams?: boolean
+    coreScores?: boolean
+    traitWeights?: boolean
+    constraintRules?: boolean
+    dataConfidence?: boolean
+    qualityStatus?: boolean
+    rejectReason?: boolean
+    generatedAt?: boolean
+    lastCheckedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["externalVehicleCandidate"]>
+
+  export type ExternalVehicleCandidateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    source?: boolean
+    sourceSeriesId?: boolean
+    sourceCarId?: boolean
+    brandName?: boolean
+    seriesName?: boolean
+    carName?: boolean
+    saleStatus?: boolean
+    energyType?: boolean
+    bodyType?: boolean
+    priceMin?: boolean
+    priceMax?: boolean
+    parsedParams?: boolean
+    coreScores?: boolean
+    traitWeights?: boolean
+    constraintRules?: boolean
+    dataConfidence?: boolean
+    qualityStatus?: boolean
+    rejectReason?: boolean
+    generatedAt?: boolean
+    lastCheckedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["externalVehicleCandidate"]>
+
+  export type ExternalVehicleCandidateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    source?: boolean
+    sourceSeriesId?: boolean
+    sourceCarId?: boolean
+    brandName?: boolean
+    seriesName?: boolean
+    carName?: boolean
+    saleStatus?: boolean
+    energyType?: boolean
+    bodyType?: boolean
+    priceMin?: boolean
+    priceMax?: boolean
+    parsedParams?: boolean
+    coreScores?: boolean
+    traitWeights?: boolean
+    constraintRules?: boolean
+    dataConfidence?: boolean
+    qualityStatus?: boolean
+    rejectReason?: boolean
+    generatedAt?: boolean
+    lastCheckedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["externalVehicleCandidate"]>
+
+  export type ExternalVehicleCandidateSelectScalar = {
+    id?: boolean
+    source?: boolean
+    sourceSeriesId?: boolean
+    sourceCarId?: boolean
+    brandName?: boolean
+    seriesName?: boolean
+    carName?: boolean
+    saleStatus?: boolean
+    energyType?: boolean
+    bodyType?: boolean
+    priceMin?: boolean
+    priceMax?: boolean
+    parsedParams?: boolean
+    coreScores?: boolean
+    traitWeights?: boolean
+    constraintRules?: boolean
+    dataConfidence?: boolean
+    qualityStatus?: boolean
+    rejectReason?: boolean
+    generatedAt?: boolean
+    lastCheckedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ExternalVehicleCandidateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "source" | "sourceSeriesId" | "sourceCarId" | "brandName" | "seriesName" | "carName" | "saleStatus" | "energyType" | "bodyType" | "priceMin" | "priceMax" | "parsedParams" | "coreScores" | "traitWeights" | "constraintRules" | "dataConfidence" | "qualityStatus" | "rejectReason" | "generatedAt" | "lastCheckedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["externalVehicleCandidate"]>
+
+  export type $ExternalVehicleCandidatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ExternalVehicleCandidate"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      source: string
+      sourceSeriesId: number
+      sourceCarId: number
+      brandName: string
+      seriesName: string
+      carName: string
+      saleStatus: number | null
+      energyType: string
+      bodyType: string
+      priceMin: number | null
+      priceMax: number | null
+      parsedParams: Prisma.JsonValue
+      coreScores: Prisma.JsonValue
+      traitWeights: Prisma.JsonValue
+      constraintRules: Prisma.JsonValue
+      dataConfidence: Prisma.Decimal
+      qualityStatus: string
+      rejectReason: string | null
+      generatedAt: Date
+      lastCheckedAt: Date
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["externalVehicleCandidate"]>
+    composites: {}
+  }
+
+  type ExternalVehicleCandidateGetPayload<S extends boolean | null | undefined | ExternalVehicleCandidateDefaultArgs> = $Result.GetResult<Prisma.$ExternalVehicleCandidatePayload, S>
+
+  type ExternalVehicleCandidateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ExternalVehicleCandidateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ExternalVehicleCandidateCountAggregateInputType | true
+    }
+
+  export interface ExternalVehicleCandidateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ExternalVehicleCandidate'], meta: { name: 'ExternalVehicleCandidate' } }
+    /**
+     * Find zero or one ExternalVehicleCandidate that matches the filter.
+     * @param {ExternalVehicleCandidateFindUniqueArgs} args - Arguments to find a ExternalVehicleCandidate
+     * @example
+     * // Get one ExternalVehicleCandidate
+     * const externalVehicleCandidate = await prisma.externalVehicleCandidate.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ExternalVehicleCandidateFindUniqueArgs>(args: SelectSubset<T, ExternalVehicleCandidateFindUniqueArgs<ExtArgs>>): Prisma__ExternalVehicleCandidateClient<$Result.GetResult<Prisma.$ExternalVehicleCandidatePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ExternalVehicleCandidate that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ExternalVehicleCandidateFindUniqueOrThrowArgs} args - Arguments to find a ExternalVehicleCandidate
+     * @example
+     * // Get one ExternalVehicleCandidate
+     * const externalVehicleCandidate = await prisma.externalVehicleCandidate.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ExternalVehicleCandidateFindUniqueOrThrowArgs>(args: SelectSubset<T, ExternalVehicleCandidateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ExternalVehicleCandidateClient<$Result.GetResult<Prisma.$ExternalVehicleCandidatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ExternalVehicleCandidate that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalVehicleCandidateFindFirstArgs} args - Arguments to find a ExternalVehicleCandidate
+     * @example
+     * // Get one ExternalVehicleCandidate
+     * const externalVehicleCandidate = await prisma.externalVehicleCandidate.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ExternalVehicleCandidateFindFirstArgs>(args?: SelectSubset<T, ExternalVehicleCandidateFindFirstArgs<ExtArgs>>): Prisma__ExternalVehicleCandidateClient<$Result.GetResult<Prisma.$ExternalVehicleCandidatePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ExternalVehicleCandidate that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalVehicleCandidateFindFirstOrThrowArgs} args - Arguments to find a ExternalVehicleCandidate
+     * @example
+     * // Get one ExternalVehicleCandidate
+     * const externalVehicleCandidate = await prisma.externalVehicleCandidate.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ExternalVehicleCandidateFindFirstOrThrowArgs>(args?: SelectSubset<T, ExternalVehicleCandidateFindFirstOrThrowArgs<ExtArgs>>): Prisma__ExternalVehicleCandidateClient<$Result.GetResult<Prisma.$ExternalVehicleCandidatePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ExternalVehicleCandidates that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalVehicleCandidateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ExternalVehicleCandidates
+     * const externalVehicleCandidates = await prisma.externalVehicleCandidate.findMany()
+     * 
+     * // Get first 10 ExternalVehicleCandidates
+     * const externalVehicleCandidates = await prisma.externalVehicleCandidate.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const externalVehicleCandidateWithIdOnly = await prisma.externalVehicleCandidate.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ExternalVehicleCandidateFindManyArgs>(args?: SelectSubset<T, ExternalVehicleCandidateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExternalVehicleCandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ExternalVehicleCandidate.
+     * @param {ExternalVehicleCandidateCreateArgs} args - Arguments to create a ExternalVehicleCandidate.
+     * @example
+     * // Create one ExternalVehicleCandidate
+     * const ExternalVehicleCandidate = await prisma.externalVehicleCandidate.create({
+     *   data: {
+     *     // ... data to create a ExternalVehicleCandidate
+     *   }
+     * })
+     * 
+     */
+    create<T extends ExternalVehicleCandidateCreateArgs>(args: SelectSubset<T, ExternalVehicleCandidateCreateArgs<ExtArgs>>): Prisma__ExternalVehicleCandidateClient<$Result.GetResult<Prisma.$ExternalVehicleCandidatePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ExternalVehicleCandidates.
+     * @param {ExternalVehicleCandidateCreateManyArgs} args - Arguments to create many ExternalVehicleCandidates.
+     * @example
+     * // Create many ExternalVehicleCandidates
+     * const externalVehicleCandidate = await prisma.externalVehicleCandidate.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ExternalVehicleCandidateCreateManyArgs>(args?: SelectSubset<T, ExternalVehicleCandidateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ExternalVehicleCandidates and returns the data saved in the database.
+     * @param {ExternalVehicleCandidateCreateManyAndReturnArgs} args - Arguments to create many ExternalVehicleCandidates.
+     * @example
+     * // Create many ExternalVehicleCandidates
+     * const externalVehicleCandidate = await prisma.externalVehicleCandidate.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ExternalVehicleCandidates and only return the `id`
+     * const externalVehicleCandidateWithIdOnly = await prisma.externalVehicleCandidate.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ExternalVehicleCandidateCreateManyAndReturnArgs>(args?: SelectSubset<T, ExternalVehicleCandidateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExternalVehicleCandidatePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ExternalVehicleCandidate.
+     * @param {ExternalVehicleCandidateDeleteArgs} args - Arguments to delete one ExternalVehicleCandidate.
+     * @example
+     * // Delete one ExternalVehicleCandidate
+     * const ExternalVehicleCandidate = await prisma.externalVehicleCandidate.delete({
+     *   where: {
+     *     // ... filter to delete one ExternalVehicleCandidate
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ExternalVehicleCandidateDeleteArgs>(args: SelectSubset<T, ExternalVehicleCandidateDeleteArgs<ExtArgs>>): Prisma__ExternalVehicleCandidateClient<$Result.GetResult<Prisma.$ExternalVehicleCandidatePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ExternalVehicleCandidate.
+     * @param {ExternalVehicleCandidateUpdateArgs} args - Arguments to update one ExternalVehicleCandidate.
+     * @example
+     * // Update one ExternalVehicleCandidate
+     * const externalVehicleCandidate = await prisma.externalVehicleCandidate.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ExternalVehicleCandidateUpdateArgs>(args: SelectSubset<T, ExternalVehicleCandidateUpdateArgs<ExtArgs>>): Prisma__ExternalVehicleCandidateClient<$Result.GetResult<Prisma.$ExternalVehicleCandidatePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ExternalVehicleCandidates.
+     * @param {ExternalVehicleCandidateDeleteManyArgs} args - Arguments to filter ExternalVehicleCandidates to delete.
+     * @example
+     * // Delete a few ExternalVehicleCandidates
+     * const { count } = await prisma.externalVehicleCandidate.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ExternalVehicleCandidateDeleteManyArgs>(args?: SelectSubset<T, ExternalVehicleCandidateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ExternalVehicleCandidates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalVehicleCandidateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ExternalVehicleCandidates
+     * const externalVehicleCandidate = await prisma.externalVehicleCandidate.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ExternalVehicleCandidateUpdateManyArgs>(args: SelectSubset<T, ExternalVehicleCandidateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ExternalVehicleCandidates and returns the data updated in the database.
+     * @param {ExternalVehicleCandidateUpdateManyAndReturnArgs} args - Arguments to update many ExternalVehicleCandidates.
+     * @example
+     * // Update many ExternalVehicleCandidates
+     * const externalVehicleCandidate = await prisma.externalVehicleCandidate.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ExternalVehicleCandidates and only return the `id`
+     * const externalVehicleCandidateWithIdOnly = await prisma.externalVehicleCandidate.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ExternalVehicleCandidateUpdateManyAndReturnArgs>(args: SelectSubset<T, ExternalVehicleCandidateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExternalVehicleCandidatePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ExternalVehicleCandidate.
+     * @param {ExternalVehicleCandidateUpsertArgs} args - Arguments to update or create a ExternalVehicleCandidate.
+     * @example
+     * // Update or create a ExternalVehicleCandidate
+     * const externalVehicleCandidate = await prisma.externalVehicleCandidate.upsert({
+     *   create: {
+     *     // ... data to create a ExternalVehicleCandidate
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ExternalVehicleCandidate we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ExternalVehicleCandidateUpsertArgs>(args: SelectSubset<T, ExternalVehicleCandidateUpsertArgs<ExtArgs>>): Prisma__ExternalVehicleCandidateClient<$Result.GetResult<Prisma.$ExternalVehicleCandidatePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ExternalVehicleCandidates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalVehicleCandidateCountArgs} args - Arguments to filter ExternalVehicleCandidates to count.
+     * @example
+     * // Count the number of ExternalVehicleCandidates
+     * const count = await prisma.externalVehicleCandidate.count({
+     *   where: {
+     *     // ... the filter for the ExternalVehicleCandidates we want to count
+     *   }
+     * })
+    **/
+    count<T extends ExternalVehicleCandidateCountArgs>(
+      args?: Subset<T, ExternalVehicleCandidateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ExternalVehicleCandidateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ExternalVehicleCandidate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalVehicleCandidateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ExternalVehicleCandidateAggregateArgs>(args: Subset<T, ExternalVehicleCandidateAggregateArgs>): Prisma.PrismaPromise<GetExternalVehicleCandidateAggregateType<T>>
+
+    /**
+     * Group by ExternalVehicleCandidate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalVehicleCandidateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ExternalVehicleCandidateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ExternalVehicleCandidateGroupByArgs['orderBy'] }
+        : { orderBy?: ExternalVehicleCandidateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ExternalVehicleCandidateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetExternalVehicleCandidateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ExternalVehicleCandidate model
+   */
+  readonly fields: ExternalVehicleCandidateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ExternalVehicleCandidate.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ExternalVehicleCandidateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ExternalVehicleCandidate model
+   */
+  interface ExternalVehicleCandidateFieldRefs {
+    readonly id: FieldRef<"ExternalVehicleCandidate", 'String'>
+    readonly source: FieldRef<"ExternalVehicleCandidate", 'String'>
+    readonly sourceSeriesId: FieldRef<"ExternalVehicleCandidate", 'Int'>
+    readonly sourceCarId: FieldRef<"ExternalVehicleCandidate", 'Int'>
+    readonly brandName: FieldRef<"ExternalVehicleCandidate", 'String'>
+    readonly seriesName: FieldRef<"ExternalVehicleCandidate", 'String'>
+    readonly carName: FieldRef<"ExternalVehicleCandidate", 'String'>
+    readonly saleStatus: FieldRef<"ExternalVehicleCandidate", 'Int'>
+    readonly energyType: FieldRef<"ExternalVehicleCandidate", 'String'>
+    readonly bodyType: FieldRef<"ExternalVehicleCandidate", 'String'>
+    readonly priceMin: FieldRef<"ExternalVehicleCandidate", 'Int'>
+    readonly priceMax: FieldRef<"ExternalVehicleCandidate", 'Int'>
+    readonly parsedParams: FieldRef<"ExternalVehicleCandidate", 'Json'>
+    readonly coreScores: FieldRef<"ExternalVehicleCandidate", 'Json'>
+    readonly traitWeights: FieldRef<"ExternalVehicleCandidate", 'Json'>
+    readonly constraintRules: FieldRef<"ExternalVehicleCandidate", 'Json'>
+    readonly dataConfidence: FieldRef<"ExternalVehicleCandidate", 'Decimal'>
+    readonly qualityStatus: FieldRef<"ExternalVehicleCandidate", 'String'>
+    readonly rejectReason: FieldRef<"ExternalVehicleCandidate", 'String'>
+    readonly generatedAt: FieldRef<"ExternalVehicleCandidate", 'DateTime'>
+    readonly lastCheckedAt: FieldRef<"ExternalVehicleCandidate", 'DateTime'>
+    readonly createdAt: FieldRef<"ExternalVehicleCandidate", 'DateTime'>
+    readonly updatedAt: FieldRef<"ExternalVehicleCandidate", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ExternalVehicleCandidate findUnique
+   */
+  export type ExternalVehicleCandidateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleCandidate
+     */
+    select?: ExternalVehicleCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleCandidate
+     */
+    omit?: ExternalVehicleCandidateOmit<ExtArgs> | null
+    /**
+     * Filter, which ExternalVehicleCandidate to fetch.
+     */
+    where: ExternalVehicleCandidateWhereUniqueInput
+  }
+
+  /**
+   * ExternalVehicleCandidate findUniqueOrThrow
+   */
+  export type ExternalVehicleCandidateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleCandidate
+     */
+    select?: ExternalVehicleCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleCandidate
+     */
+    omit?: ExternalVehicleCandidateOmit<ExtArgs> | null
+    /**
+     * Filter, which ExternalVehicleCandidate to fetch.
+     */
+    where: ExternalVehicleCandidateWhereUniqueInput
+  }
+
+  /**
+   * ExternalVehicleCandidate findFirst
+   */
+  export type ExternalVehicleCandidateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleCandidate
+     */
+    select?: ExternalVehicleCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleCandidate
+     */
+    omit?: ExternalVehicleCandidateOmit<ExtArgs> | null
+    /**
+     * Filter, which ExternalVehicleCandidate to fetch.
+     */
+    where?: ExternalVehicleCandidateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExternalVehicleCandidates to fetch.
+     */
+    orderBy?: ExternalVehicleCandidateOrderByWithRelationInput | ExternalVehicleCandidateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ExternalVehicleCandidates.
+     */
+    cursor?: ExternalVehicleCandidateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExternalVehicleCandidates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExternalVehicleCandidates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ExternalVehicleCandidates.
+     */
+    distinct?: ExternalVehicleCandidateScalarFieldEnum | ExternalVehicleCandidateScalarFieldEnum[]
+  }
+
+  /**
+   * ExternalVehicleCandidate findFirstOrThrow
+   */
+  export type ExternalVehicleCandidateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleCandidate
+     */
+    select?: ExternalVehicleCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleCandidate
+     */
+    omit?: ExternalVehicleCandidateOmit<ExtArgs> | null
+    /**
+     * Filter, which ExternalVehicleCandidate to fetch.
+     */
+    where?: ExternalVehicleCandidateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExternalVehicleCandidates to fetch.
+     */
+    orderBy?: ExternalVehicleCandidateOrderByWithRelationInput | ExternalVehicleCandidateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ExternalVehicleCandidates.
+     */
+    cursor?: ExternalVehicleCandidateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExternalVehicleCandidates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExternalVehicleCandidates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ExternalVehicleCandidates.
+     */
+    distinct?: ExternalVehicleCandidateScalarFieldEnum | ExternalVehicleCandidateScalarFieldEnum[]
+  }
+
+  /**
+   * ExternalVehicleCandidate findMany
+   */
+  export type ExternalVehicleCandidateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleCandidate
+     */
+    select?: ExternalVehicleCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleCandidate
+     */
+    omit?: ExternalVehicleCandidateOmit<ExtArgs> | null
+    /**
+     * Filter, which ExternalVehicleCandidates to fetch.
+     */
+    where?: ExternalVehicleCandidateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExternalVehicleCandidates to fetch.
+     */
+    orderBy?: ExternalVehicleCandidateOrderByWithRelationInput | ExternalVehicleCandidateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ExternalVehicleCandidates.
+     */
+    cursor?: ExternalVehicleCandidateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExternalVehicleCandidates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExternalVehicleCandidates.
+     */
+    skip?: number
+    distinct?: ExternalVehicleCandidateScalarFieldEnum | ExternalVehicleCandidateScalarFieldEnum[]
+  }
+
+  /**
+   * ExternalVehicleCandidate create
+   */
+  export type ExternalVehicleCandidateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleCandidate
+     */
+    select?: ExternalVehicleCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleCandidate
+     */
+    omit?: ExternalVehicleCandidateOmit<ExtArgs> | null
+    /**
+     * The data needed to create a ExternalVehicleCandidate.
+     */
+    data: XOR<ExternalVehicleCandidateCreateInput, ExternalVehicleCandidateUncheckedCreateInput>
+  }
+
+  /**
+   * ExternalVehicleCandidate createMany
+   */
+  export type ExternalVehicleCandidateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ExternalVehicleCandidates.
+     */
+    data: ExternalVehicleCandidateCreateManyInput | ExternalVehicleCandidateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ExternalVehicleCandidate createManyAndReturn
+   */
+  export type ExternalVehicleCandidateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleCandidate
+     */
+    select?: ExternalVehicleCandidateSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleCandidate
+     */
+    omit?: ExternalVehicleCandidateOmit<ExtArgs> | null
+    /**
+     * The data used to create many ExternalVehicleCandidates.
+     */
+    data: ExternalVehicleCandidateCreateManyInput | ExternalVehicleCandidateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ExternalVehicleCandidate update
+   */
+  export type ExternalVehicleCandidateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleCandidate
+     */
+    select?: ExternalVehicleCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleCandidate
+     */
+    omit?: ExternalVehicleCandidateOmit<ExtArgs> | null
+    /**
+     * The data needed to update a ExternalVehicleCandidate.
+     */
+    data: XOR<ExternalVehicleCandidateUpdateInput, ExternalVehicleCandidateUncheckedUpdateInput>
+    /**
+     * Choose, which ExternalVehicleCandidate to update.
+     */
+    where: ExternalVehicleCandidateWhereUniqueInput
+  }
+
+  /**
+   * ExternalVehicleCandidate updateMany
+   */
+  export type ExternalVehicleCandidateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ExternalVehicleCandidates.
+     */
+    data: XOR<ExternalVehicleCandidateUpdateManyMutationInput, ExternalVehicleCandidateUncheckedUpdateManyInput>
+    /**
+     * Filter which ExternalVehicleCandidates to update
+     */
+    where?: ExternalVehicleCandidateWhereInput
+    /**
+     * Limit how many ExternalVehicleCandidates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ExternalVehicleCandidate updateManyAndReturn
+   */
+  export type ExternalVehicleCandidateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleCandidate
+     */
+    select?: ExternalVehicleCandidateSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleCandidate
+     */
+    omit?: ExternalVehicleCandidateOmit<ExtArgs> | null
+    /**
+     * The data used to update ExternalVehicleCandidates.
+     */
+    data: XOR<ExternalVehicleCandidateUpdateManyMutationInput, ExternalVehicleCandidateUncheckedUpdateManyInput>
+    /**
+     * Filter which ExternalVehicleCandidates to update
+     */
+    where?: ExternalVehicleCandidateWhereInput
+    /**
+     * Limit how many ExternalVehicleCandidates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ExternalVehicleCandidate upsert
+   */
+  export type ExternalVehicleCandidateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleCandidate
+     */
+    select?: ExternalVehicleCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleCandidate
+     */
+    omit?: ExternalVehicleCandidateOmit<ExtArgs> | null
+    /**
+     * The filter to search for the ExternalVehicleCandidate to update in case it exists.
+     */
+    where: ExternalVehicleCandidateWhereUniqueInput
+    /**
+     * In case the ExternalVehicleCandidate found by the `where` argument doesn't exist, create a new ExternalVehicleCandidate with this data.
+     */
+    create: XOR<ExternalVehicleCandidateCreateInput, ExternalVehicleCandidateUncheckedCreateInput>
+    /**
+     * In case the ExternalVehicleCandidate was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ExternalVehicleCandidateUpdateInput, ExternalVehicleCandidateUncheckedUpdateInput>
+  }
+
+  /**
+   * ExternalVehicleCandidate delete
+   */
+  export type ExternalVehicleCandidateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleCandidate
+     */
+    select?: ExternalVehicleCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleCandidate
+     */
+    omit?: ExternalVehicleCandidateOmit<ExtArgs> | null
+    /**
+     * Filter which ExternalVehicleCandidate to delete.
+     */
+    where: ExternalVehicleCandidateWhereUniqueInput
+  }
+
+  /**
+   * ExternalVehicleCandidate deleteMany
+   */
+  export type ExternalVehicleCandidateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ExternalVehicleCandidates to delete
+     */
+    where?: ExternalVehicleCandidateWhereInput
+    /**
+     * Limit how many ExternalVehicleCandidates to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ExternalVehicleCandidate without action
+   */
+  export type ExternalVehicleCandidateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalVehicleCandidate
+     */
+    select?: ExternalVehicleCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalVehicleCandidate
+     */
+    omit?: ExternalVehicleCandidateOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model SessionResult
    */
 
@@ -26625,6 +27983,35 @@ export namespace Prisma {
   export type ExternalVehicleSeriesScalarFieldEnum = (typeof ExternalVehicleSeriesScalarFieldEnum)[keyof typeof ExternalVehicleSeriesScalarFieldEnum]
 
 
+  export const ExternalVehicleCandidateScalarFieldEnum: {
+    id: 'id',
+    source: 'source',
+    sourceSeriesId: 'sourceSeriesId',
+    sourceCarId: 'sourceCarId',
+    brandName: 'brandName',
+    seriesName: 'seriesName',
+    carName: 'carName',
+    saleStatus: 'saleStatus',
+    energyType: 'energyType',
+    bodyType: 'bodyType',
+    priceMin: 'priceMin',
+    priceMax: 'priceMax',
+    parsedParams: 'parsedParams',
+    coreScores: 'coreScores',
+    traitWeights: 'traitWeights',
+    constraintRules: 'constraintRules',
+    dataConfidence: 'dataConfidence',
+    qualityStatus: 'qualityStatus',
+    rejectReason: 'rejectReason',
+    generatedAt: 'generatedAt',
+    lastCheckedAt: 'lastCheckedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ExternalVehicleCandidateScalarFieldEnum = (typeof ExternalVehicleCandidateScalarFieldEnum)[keyof typeof ExternalVehicleCandidateScalarFieldEnum]
+
+
   export const SessionResultScalarFieldEnum: {
     id: 'id',
     sessionId: 'sessionId',
@@ -28216,6 +29603,151 @@ export namespace Prisma {
     lastSyncedAt?: DateTimeWithAggregatesFilter<"ExternalVehicleSeries"> | Date | string
     createdAt?: DateTimeWithAggregatesFilter<"ExternalVehicleSeries"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ExternalVehicleSeries"> | Date | string
+  }
+
+  export type ExternalVehicleCandidateWhereInput = {
+    AND?: ExternalVehicleCandidateWhereInput | ExternalVehicleCandidateWhereInput[]
+    OR?: ExternalVehicleCandidateWhereInput[]
+    NOT?: ExternalVehicleCandidateWhereInput | ExternalVehicleCandidateWhereInput[]
+    id?: StringFilter<"ExternalVehicleCandidate"> | string
+    source?: StringFilter<"ExternalVehicleCandidate"> | string
+    sourceSeriesId?: IntFilter<"ExternalVehicleCandidate"> | number
+    sourceCarId?: IntFilter<"ExternalVehicleCandidate"> | number
+    brandName?: StringFilter<"ExternalVehicleCandidate"> | string
+    seriesName?: StringFilter<"ExternalVehicleCandidate"> | string
+    carName?: StringFilter<"ExternalVehicleCandidate"> | string
+    saleStatus?: IntNullableFilter<"ExternalVehicleCandidate"> | number | null
+    energyType?: StringFilter<"ExternalVehicleCandidate"> | string
+    bodyType?: StringFilter<"ExternalVehicleCandidate"> | string
+    priceMin?: IntNullableFilter<"ExternalVehicleCandidate"> | number | null
+    priceMax?: IntNullableFilter<"ExternalVehicleCandidate"> | number | null
+    parsedParams?: JsonFilter<"ExternalVehicleCandidate">
+    coreScores?: JsonFilter<"ExternalVehicleCandidate">
+    traitWeights?: JsonFilter<"ExternalVehicleCandidate">
+    constraintRules?: JsonFilter<"ExternalVehicleCandidate">
+    dataConfidence?: DecimalFilter<"ExternalVehicleCandidate"> | Decimal | DecimalJsLike | number | string
+    qualityStatus?: StringFilter<"ExternalVehicleCandidate"> | string
+    rejectReason?: StringNullableFilter<"ExternalVehicleCandidate"> | string | null
+    generatedAt?: DateTimeFilter<"ExternalVehicleCandidate"> | Date | string
+    lastCheckedAt?: DateTimeFilter<"ExternalVehicleCandidate"> | Date | string
+    createdAt?: DateTimeFilter<"ExternalVehicleCandidate"> | Date | string
+    updatedAt?: DateTimeFilter<"ExternalVehicleCandidate"> | Date | string
+  }
+
+  export type ExternalVehicleCandidateOrderByWithRelationInput = {
+    id?: SortOrder
+    source?: SortOrder
+    sourceSeriesId?: SortOrder
+    sourceCarId?: SortOrder
+    brandName?: SortOrder
+    seriesName?: SortOrder
+    carName?: SortOrder
+    saleStatus?: SortOrderInput | SortOrder
+    energyType?: SortOrder
+    bodyType?: SortOrder
+    priceMin?: SortOrderInput | SortOrder
+    priceMax?: SortOrderInput | SortOrder
+    parsedParams?: SortOrder
+    coreScores?: SortOrder
+    traitWeights?: SortOrder
+    constraintRules?: SortOrder
+    dataConfidence?: SortOrder
+    qualityStatus?: SortOrder
+    rejectReason?: SortOrderInput | SortOrder
+    generatedAt?: SortOrder
+    lastCheckedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExternalVehicleCandidateWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    source_sourceSeriesId_sourceCarId?: ExternalVehicleCandidateSourceSourceSeriesIdSourceCarIdCompoundUniqueInput
+    AND?: ExternalVehicleCandidateWhereInput | ExternalVehicleCandidateWhereInput[]
+    OR?: ExternalVehicleCandidateWhereInput[]
+    NOT?: ExternalVehicleCandidateWhereInput | ExternalVehicleCandidateWhereInput[]
+    source?: StringFilter<"ExternalVehicleCandidate"> | string
+    sourceSeriesId?: IntFilter<"ExternalVehicleCandidate"> | number
+    sourceCarId?: IntFilter<"ExternalVehicleCandidate"> | number
+    brandName?: StringFilter<"ExternalVehicleCandidate"> | string
+    seriesName?: StringFilter<"ExternalVehicleCandidate"> | string
+    carName?: StringFilter<"ExternalVehicleCandidate"> | string
+    saleStatus?: IntNullableFilter<"ExternalVehicleCandidate"> | number | null
+    energyType?: StringFilter<"ExternalVehicleCandidate"> | string
+    bodyType?: StringFilter<"ExternalVehicleCandidate"> | string
+    priceMin?: IntNullableFilter<"ExternalVehicleCandidate"> | number | null
+    priceMax?: IntNullableFilter<"ExternalVehicleCandidate"> | number | null
+    parsedParams?: JsonFilter<"ExternalVehicleCandidate">
+    coreScores?: JsonFilter<"ExternalVehicleCandidate">
+    traitWeights?: JsonFilter<"ExternalVehicleCandidate">
+    constraintRules?: JsonFilter<"ExternalVehicleCandidate">
+    dataConfidence?: DecimalFilter<"ExternalVehicleCandidate"> | Decimal | DecimalJsLike | number | string
+    qualityStatus?: StringFilter<"ExternalVehicleCandidate"> | string
+    rejectReason?: StringNullableFilter<"ExternalVehicleCandidate"> | string | null
+    generatedAt?: DateTimeFilter<"ExternalVehicleCandidate"> | Date | string
+    lastCheckedAt?: DateTimeFilter<"ExternalVehicleCandidate"> | Date | string
+    createdAt?: DateTimeFilter<"ExternalVehicleCandidate"> | Date | string
+    updatedAt?: DateTimeFilter<"ExternalVehicleCandidate"> | Date | string
+  }, "id" | "source_sourceSeriesId_sourceCarId">
+
+  export type ExternalVehicleCandidateOrderByWithAggregationInput = {
+    id?: SortOrder
+    source?: SortOrder
+    sourceSeriesId?: SortOrder
+    sourceCarId?: SortOrder
+    brandName?: SortOrder
+    seriesName?: SortOrder
+    carName?: SortOrder
+    saleStatus?: SortOrderInput | SortOrder
+    energyType?: SortOrder
+    bodyType?: SortOrder
+    priceMin?: SortOrderInput | SortOrder
+    priceMax?: SortOrderInput | SortOrder
+    parsedParams?: SortOrder
+    coreScores?: SortOrder
+    traitWeights?: SortOrder
+    constraintRules?: SortOrder
+    dataConfidence?: SortOrder
+    qualityStatus?: SortOrder
+    rejectReason?: SortOrderInput | SortOrder
+    generatedAt?: SortOrder
+    lastCheckedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ExternalVehicleCandidateCountOrderByAggregateInput
+    _avg?: ExternalVehicleCandidateAvgOrderByAggregateInput
+    _max?: ExternalVehicleCandidateMaxOrderByAggregateInput
+    _min?: ExternalVehicleCandidateMinOrderByAggregateInput
+    _sum?: ExternalVehicleCandidateSumOrderByAggregateInput
+  }
+
+  export type ExternalVehicleCandidateScalarWhereWithAggregatesInput = {
+    AND?: ExternalVehicleCandidateScalarWhereWithAggregatesInput | ExternalVehicleCandidateScalarWhereWithAggregatesInput[]
+    OR?: ExternalVehicleCandidateScalarWhereWithAggregatesInput[]
+    NOT?: ExternalVehicleCandidateScalarWhereWithAggregatesInput | ExternalVehicleCandidateScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ExternalVehicleCandidate"> | string
+    source?: StringWithAggregatesFilter<"ExternalVehicleCandidate"> | string
+    sourceSeriesId?: IntWithAggregatesFilter<"ExternalVehicleCandidate"> | number
+    sourceCarId?: IntWithAggregatesFilter<"ExternalVehicleCandidate"> | number
+    brandName?: StringWithAggregatesFilter<"ExternalVehicleCandidate"> | string
+    seriesName?: StringWithAggregatesFilter<"ExternalVehicleCandidate"> | string
+    carName?: StringWithAggregatesFilter<"ExternalVehicleCandidate"> | string
+    saleStatus?: IntNullableWithAggregatesFilter<"ExternalVehicleCandidate"> | number | null
+    energyType?: StringWithAggregatesFilter<"ExternalVehicleCandidate"> | string
+    bodyType?: StringWithAggregatesFilter<"ExternalVehicleCandidate"> | string
+    priceMin?: IntNullableWithAggregatesFilter<"ExternalVehicleCandidate"> | number | null
+    priceMax?: IntNullableWithAggregatesFilter<"ExternalVehicleCandidate"> | number | null
+    parsedParams?: JsonWithAggregatesFilter<"ExternalVehicleCandidate">
+    coreScores?: JsonWithAggregatesFilter<"ExternalVehicleCandidate">
+    traitWeights?: JsonWithAggregatesFilter<"ExternalVehicleCandidate">
+    constraintRules?: JsonWithAggregatesFilter<"ExternalVehicleCandidate">
+    dataConfidence?: DecimalWithAggregatesFilter<"ExternalVehicleCandidate"> | Decimal | DecimalJsLike | number | string
+    qualityStatus?: StringWithAggregatesFilter<"ExternalVehicleCandidate"> | string
+    rejectReason?: StringNullableWithAggregatesFilter<"ExternalVehicleCandidate"> | string | null
+    generatedAt?: DateTimeWithAggregatesFilter<"ExternalVehicleCandidate"> | Date | string
+    lastCheckedAt?: DateTimeWithAggregatesFilter<"ExternalVehicleCandidate"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"ExternalVehicleCandidate"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ExternalVehicleCandidate"> | Date | string
   }
 
   export type SessionResultWhereInput = {
@@ -29916,6 +31448,188 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ExternalVehicleCandidateCreateInput = {
+    id?: string
+    source: string
+    sourceSeriesId: number
+    sourceCarId: number
+    brandName: string
+    seriesName: string
+    carName: string
+    saleStatus?: number | null
+    energyType: string
+    bodyType: string
+    priceMin?: number | null
+    priceMax?: number | null
+    parsedParams: JsonNullValueInput | InputJsonValue
+    coreScores: JsonNullValueInput | InputJsonValue
+    traitWeights: JsonNullValueInput | InputJsonValue
+    constraintRules: JsonNullValueInput | InputJsonValue
+    dataConfidence?: Decimal | DecimalJsLike | number | string
+    qualityStatus?: string
+    rejectReason?: string | null
+    generatedAt?: Date | string
+    lastCheckedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExternalVehicleCandidateUncheckedCreateInput = {
+    id?: string
+    source: string
+    sourceSeriesId: number
+    sourceCarId: number
+    brandName: string
+    seriesName: string
+    carName: string
+    saleStatus?: number | null
+    energyType: string
+    bodyType: string
+    priceMin?: number | null
+    priceMax?: number | null
+    parsedParams: JsonNullValueInput | InputJsonValue
+    coreScores: JsonNullValueInput | InputJsonValue
+    traitWeights: JsonNullValueInput | InputJsonValue
+    constraintRules: JsonNullValueInput | InputJsonValue
+    dataConfidence?: Decimal | DecimalJsLike | number | string
+    qualityStatus?: string
+    rejectReason?: string | null
+    generatedAt?: Date | string
+    lastCheckedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExternalVehicleCandidateUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: IntFieldUpdateOperationsInput | number
+    sourceCarId?: IntFieldUpdateOperationsInput | number
+    brandName?: StringFieldUpdateOperationsInput | string
+    seriesName?: StringFieldUpdateOperationsInput | string
+    carName?: StringFieldUpdateOperationsInput | string
+    saleStatus?: NullableIntFieldUpdateOperationsInput | number | null
+    energyType?: StringFieldUpdateOperationsInput | string
+    bodyType?: StringFieldUpdateOperationsInput | string
+    priceMin?: NullableIntFieldUpdateOperationsInput | number | null
+    priceMax?: NullableIntFieldUpdateOperationsInput | number | null
+    parsedParams?: JsonNullValueInput | InputJsonValue
+    coreScores?: JsonNullValueInput | InputJsonValue
+    traitWeights?: JsonNullValueInput | InputJsonValue
+    constraintRules?: JsonNullValueInput | InputJsonValue
+    dataConfidence?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    qualityStatus?: StringFieldUpdateOperationsInput | string
+    rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastCheckedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExternalVehicleCandidateUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: IntFieldUpdateOperationsInput | number
+    sourceCarId?: IntFieldUpdateOperationsInput | number
+    brandName?: StringFieldUpdateOperationsInput | string
+    seriesName?: StringFieldUpdateOperationsInput | string
+    carName?: StringFieldUpdateOperationsInput | string
+    saleStatus?: NullableIntFieldUpdateOperationsInput | number | null
+    energyType?: StringFieldUpdateOperationsInput | string
+    bodyType?: StringFieldUpdateOperationsInput | string
+    priceMin?: NullableIntFieldUpdateOperationsInput | number | null
+    priceMax?: NullableIntFieldUpdateOperationsInput | number | null
+    parsedParams?: JsonNullValueInput | InputJsonValue
+    coreScores?: JsonNullValueInput | InputJsonValue
+    traitWeights?: JsonNullValueInput | InputJsonValue
+    constraintRules?: JsonNullValueInput | InputJsonValue
+    dataConfidence?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    qualityStatus?: StringFieldUpdateOperationsInput | string
+    rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastCheckedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExternalVehicleCandidateCreateManyInput = {
+    id?: string
+    source: string
+    sourceSeriesId: number
+    sourceCarId: number
+    brandName: string
+    seriesName: string
+    carName: string
+    saleStatus?: number | null
+    energyType: string
+    bodyType: string
+    priceMin?: number | null
+    priceMax?: number | null
+    parsedParams: JsonNullValueInput | InputJsonValue
+    coreScores: JsonNullValueInput | InputJsonValue
+    traitWeights: JsonNullValueInput | InputJsonValue
+    constraintRules: JsonNullValueInput | InputJsonValue
+    dataConfidence?: Decimal | DecimalJsLike | number | string
+    qualityStatus?: string
+    rejectReason?: string | null
+    generatedAt?: Date | string
+    lastCheckedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExternalVehicleCandidateUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: IntFieldUpdateOperationsInput | number
+    sourceCarId?: IntFieldUpdateOperationsInput | number
+    brandName?: StringFieldUpdateOperationsInput | string
+    seriesName?: StringFieldUpdateOperationsInput | string
+    carName?: StringFieldUpdateOperationsInput | string
+    saleStatus?: NullableIntFieldUpdateOperationsInput | number | null
+    energyType?: StringFieldUpdateOperationsInput | string
+    bodyType?: StringFieldUpdateOperationsInput | string
+    priceMin?: NullableIntFieldUpdateOperationsInput | number | null
+    priceMax?: NullableIntFieldUpdateOperationsInput | number | null
+    parsedParams?: JsonNullValueInput | InputJsonValue
+    coreScores?: JsonNullValueInput | InputJsonValue
+    traitWeights?: JsonNullValueInput | InputJsonValue
+    constraintRules?: JsonNullValueInput | InputJsonValue
+    dataConfidence?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    qualityStatus?: StringFieldUpdateOperationsInput | string
+    rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastCheckedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExternalVehicleCandidateUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    sourceSeriesId?: IntFieldUpdateOperationsInput | number
+    sourceCarId?: IntFieldUpdateOperationsInput | number
+    brandName?: StringFieldUpdateOperationsInput | string
+    seriesName?: StringFieldUpdateOperationsInput | string
+    carName?: StringFieldUpdateOperationsInput | string
+    saleStatus?: NullableIntFieldUpdateOperationsInput | number | null
+    energyType?: StringFieldUpdateOperationsInput | string
+    bodyType?: StringFieldUpdateOperationsInput | string
+    priceMin?: NullableIntFieldUpdateOperationsInput | number | null
+    priceMax?: NullableIntFieldUpdateOperationsInput | number | null
+    parsedParams?: JsonNullValueInput | InputJsonValue
+    coreScores?: JsonNullValueInput | InputJsonValue
+    traitWeights?: JsonNullValueInput | InputJsonValue
+    constraintRules?: JsonNullValueInput | InputJsonValue
+    dataConfidence?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    qualityStatus?: StringFieldUpdateOperationsInput | string
+    rejectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastCheckedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SessionResultCreateInput = {
     id?: string
     confidenceScore?: Decimal | DecimalJsLike | number | string | null
@@ -31587,6 +33301,100 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedJsonNullableFilter<$PrismaModel>
     _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type ExternalVehicleCandidateSourceSourceSeriesIdSourceCarIdCompoundUniqueInput = {
+    source: string
+    sourceSeriesId: number
+    sourceCarId: number
+  }
+
+  export type ExternalVehicleCandidateCountOrderByAggregateInput = {
+    id?: SortOrder
+    source?: SortOrder
+    sourceSeriesId?: SortOrder
+    sourceCarId?: SortOrder
+    brandName?: SortOrder
+    seriesName?: SortOrder
+    carName?: SortOrder
+    saleStatus?: SortOrder
+    energyType?: SortOrder
+    bodyType?: SortOrder
+    priceMin?: SortOrder
+    priceMax?: SortOrder
+    parsedParams?: SortOrder
+    coreScores?: SortOrder
+    traitWeights?: SortOrder
+    constraintRules?: SortOrder
+    dataConfidence?: SortOrder
+    qualityStatus?: SortOrder
+    rejectReason?: SortOrder
+    generatedAt?: SortOrder
+    lastCheckedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExternalVehicleCandidateAvgOrderByAggregateInput = {
+    sourceSeriesId?: SortOrder
+    sourceCarId?: SortOrder
+    saleStatus?: SortOrder
+    priceMin?: SortOrder
+    priceMax?: SortOrder
+    dataConfidence?: SortOrder
+  }
+
+  export type ExternalVehicleCandidateMaxOrderByAggregateInput = {
+    id?: SortOrder
+    source?: SortOrder
+    sourceSeriesId?: SortOrder
+    sourceCarId?: SortOrder
+    brandName?: SortOrder
+    seriesName?: SortOrder
+    carName?: SortOrder
+    saleStatus?: SortOrder
+    energyType?: SortOrder
+    bodyType?: SortOrder
+    priceMin?: SortOrder
+    priceMax?: SortOrder
+    dataConfidence?: SortOrder
+    qualityStatus?: SortOrder
+    rejectReason?: SortOrder
+    generatedAt?: SortOrder
+    lastCheckedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExternalVehicleCandidateMinOrderByAggregateInput = {
+    id?: SortOrder
+    source?: SortOrder
+    sourceSeriesId?: SortOrder
+    sourceCarId?: SortOrder
+    brandName?: SortOrder
+    seriesName?: SortOrder
+    carName?: SortOrder
+    saleStatus?: SortOrder
+    energyType?: SortOrder
+    bodyType?: SortOrder
+    priceMin?: SortOrder
+    priceMax?: SortOrder
+    dataConfidence?: SortOrder
+    qualityStatus?: SortOrder
+    rejectReason?: SortOrder
+    generatedAt?: SortOrder
+    lastCheckedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExternalVehicleCandidateSumOrderByAggregateInput = {
+    sourceSeriesId?: SortOrder
+    sourceCarId?: SortOrder
+    saleStatus?: SortOrder
+    priceMin?: SortOrder
+    priceMax?: SortOrder
+    dataConfidence?: SortOrder
   }
 
   export type SessionResultCountOrderByAggregateInput = {

@@ -17,6 +17,9 @@ type QuestionRecordWithOptions = {
     id: string;
     label: string;
     order: number;
+    effects?: Array<{
+      targetKey: string;
+    }>;
   }>;
 };
 
@@ -54,6 +57,11 @@ export class QuestionsService {
             id: true,
             label: true,
             order: true,
+            effects: {
+              select: {
+                targetKey: true,
+              },
+            },
           },
         },
       },
@@ -68,11 +76,13 @@ export class QuestionsService {
               ? 40
               : 0;
         const infoGain = candidate.discrimination ?? 0;
+        const coverageBonus = this.getTraitCoverageBonus(candidate, input);
         const rankingScore =
           (candidate.priority ?? 0) +
           branchFit +
           infoGain +
-          this.getTypeBalanceBonus(candidate.type, input);
+          this.getTypeBalanceBonus(candidate.type, input) +
+          coverageBonus;
 
         return {
           candidate,
@@ -131,6 +141,27 @@ export class QuestionsService {
     return 0;
   }
 
+  private getTraitCoverageBonus(
+    candidate: QuestionRecordWithOptions,
+    input: NextQuestionInput,
+  ) {
+    const coveredTraitKeys = new Set(input.coveredTraitKeys);
+    const uncoveredTraitKeys = new Set(
+      candidate.options.flatMap((option) =>
+        (option.effects ?? []).map((effect) => effect.targetKey),
+      ),
+    );
+    let uncoveredCount = 0;
+
+    for (const traitKey of uncoveredTraitKeys) {
+      if (!coveredTraitKeys.has(traitKey)) {
+        uncoveredCount += 1;
+      }
+    }
+
+    return Math.min(15, uncoveredCount * 3);
+  }
+
   private toQuestionSummary(question: QuestionRecordWithOptions | null): QuestionSummary {
     if (!question) {
       throw new NotFoundException("Question not found");
@@ -143,7 +174,7 @@ export class QuestionsService {
       description: question.description,
       branchKey: question.branchKey,
       type: question.type,
-      options: question.options,
+      options: question.options.map(({ id, label, order }) => ({ id, label, order })),
     };
   }
 }

@@ -55,11 +55,14 @@ export type CompleteSessionResponseDto = {
       scoreBreakdown: {
         vectorFit: number;
         energyFit: number;
+        priceFit: number;
         constraintFit: number;
         preferenceAlignment: number;
         personalityAlignment: number;
         corePenalty: number;
       };
+      strictMatch: boolean;
+      constraintMisses: string[];
     };
   }>;
 };

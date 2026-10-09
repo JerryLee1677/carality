@@ -317,6 +317,32 @@ exports.Prisma.ExternalVehicleSeriesScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ExternalVehicleCandidateScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  sourceSeriesId: 'sourceSeriesId',
+  sourceCarId: 'sourceCarId',
+  brandName: 'brandName',
+  seriesName: 'seriesName',
+  carName: 'carName',
+  saleStatus: 'saleStatus',
+  energyType: 'energyType',
+  bodyType: 'bodyType',
+  priceMin: 'priceMin',
+  priceMax: 'priceMax',
+  parsedParams: 'parsedParams',
+  coreScores: 'coreScores',
+  traitWeights: 'traitWeights',
+  constraintRules: 'constraintRules',
+  dataConfidence: 'dataConfidence',
+  qualityStatus: 'qualityStatus',
+  rejectReason: 'rejectReason',
+  generatedAt: 'generatedAt',
+  lastCheckedAt: 'lastCheckedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SessionResultScalarFieldEnum = {
   id: 'id',
   sessionId: 'sessionId',
@@ -440,6 +466,7 @@ exports.Prisma.ModelName = {
   VehicleTag: 'VehicleTag',
   VehicleTagMapping: 'VehicleTagMapping',
   ExternalVehicleSeries: 'ExternalVehicleSeries',
+  ExternalVehicleCandidate: 'ExternalVehicleCandidate',
   SessionResult: 'SessionResult',
   SessionVehicleRecommendation: 'SessionVehicleRecommendation',
   User: 'User',

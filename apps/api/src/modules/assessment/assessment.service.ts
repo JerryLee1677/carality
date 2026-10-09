@@ -18,8 +18,8 @@ type TraitTargetType =
   | "BRANCH_SIGNAL";
 
 type AggregatedTraits = {
-  byKey: Record<string, number>;
-  byTargetType: Partial<Record<TraitTargetType, Record<string, number>>>;
+  byKey: Record<string, { total: number; count: number }>;
+  byTargetType: Partial<Record<TraitTargetType, Record<string, { total: number; count: number }>>>;
   minByTargetType: Partial<Record<TraitTargetType, Record<string, number>>>;
 };
 
@@ -45,6 +45,8 @@ type PersonalityDimension = {
 };
 
 type VehicleScoreSource = {
+  priceMin?: number | null;
+  priceMax?: number | null;
   energyType?: string | null;
   traitWeights: Array<{
     targetType: TraitTargetType;
@@ -482,6 +484,7 @@ export class AssessmentService {
           session.lifeQuestionCount + (currentQuestion.type === "LIFE_STYLE" ? 1 : 0),
         carQuestionCount:
           session.carQuestionCount + (currentQuestion.type === "CAR_USAGE" ? 1 : 0),
+        coveredTraitKeys: Object.keys(aggregatedTraits.byKey),
       });
 
       if (nextQuestionResult.candidates.length > 0) {
@@ -576,7 +579,11 @@ export class AssessmentService {
         rules: true,
       },
     });
-    const selectedProfile = this.selectPersonalityProfile(profiles, aggregatedTraits);
+    const selectedProfile = this.selectPersonalityProfile(
+      profiles,
+      aggregatedTraits,
+      this.buildDisplayPersonalityCode(aggregatedTraits),
+    );
 
     if (!selectedProfile) {
       throw new NotFoundException("No personality profile is configured");
@@ -593,7 +600,7 @@ export class AssessmentService {
       data: {
         sessionId,
         personalityProfileId: selectedProfile.id,
-        confidenceScore: 1,
+        confidenceScore: this.calculateRecommendationConfidence(rankedRecommendations),
         summary: selectedProfile.summary,
         explanation: selectedProfile.name,
       },
@@ -937,7 +944,11 @@ export class AssessmentService {
         weight: number | { toString(): string };
       }>;
     },
-  >(profiles: T[], aggregatedTraits: AggregatedTraits) {
+  >(
+    profiles: T[],
+    aggregatedTraits: AggregatedTraits,
+    preferredCode?: string,
+  ) {
     if (profiles.length === 0) {
       return null;
     }
@@ -958,7 +969,7 @@ export class AssessmentService {
           }
 
           return total + Number(rule.weight);
-        }, 0),
+        }, 0) + (profile.code === preferredCode ? 1 : 0),
       }))
       .sort((left, right) => right.score - left.score);
 
@@ -984,17 +995,37 @@ export class AssessmentService {
     const topAverage =
       topDimensions.reduce((total, { key }) => total + vehicleScores[key], 0) / topDimensions.length;
 
+    const reasonParts: string[] = [];
+
     if (matchedDimensions.length === 0 || topAverage < 55) {
-      return `你当前更看重${labels.join("、")}，但这台车在这些维度上的匹配度偏低。`;
+      reasonParts.push(
+        `你当前更看重${labels.join("、")}，但这台车在这些维度上的匹配度偏低`,
+      );
+    } else {
+      const matchedLabels = matchedDimensions.map(({ key }) => CORE_PREFERENCE_LABELS[key]);
+      reasonParts.push(
+        matchedDimensions.length === topDimensions.length
+          ? `你当前更看重${labels.join("、")}，这台车在这些核心维度上更贴合你的选择`
+          : `你当前更看重${labels.join("、")}，这台车在${matchedLabels.join("、")}上更贴合你的选择`,
+      );
     }
 
-    const matchedLabels = matchedDimensions.map(({ key }) => CORE_PREFERENCE_LABELS[key]);
-
-    if (matchedDimensions.length === topDimensions.length) {
-      return `你当前更看重${labels.join("、")}，这台车在这些核心维度上更贴合你的选择。`;
+    const energyFit = this.getEnergyAlignmentScore(aggregatedTraits, vehicle);
+    if (energyFit >= 75) {
+      reasonParts.push("能源与补能条件也比较匹配");
+    } else if (energyFit < 50) {
+      reasonParts.push("能源与补能条件匹配一般");
     }
 
-    return `你当前更看重${labels.join("、")}，这台车在${matchedLabels.join("、")}上更贴合你的选择。`;
+    if (this.isVehicleOverBudget(vehicle, aggregatedTraits)) {
+      reasonParts.push("起售价高于当前预算，属于兜底参考");
+    }
+
+    if (!this.matchesVehicleConstraints(vehicle, aggregatedTraits)) {
+      reasonParts.push("有硬约束未完全满足");
+    }
+
+    return `${reasonParts.join("；")}。`;
   }
 
   private buildRecommendationDiagnostics(
@@ -1012,7 +1043,8 @@ export class AssessmentService {
       scoreBreakdown: {
         vectorFit: this.getCoreVectorFitScore(aggregatedTraits, vehicle),
         energyFit: this.getEnergyAlignmentScore(aggregatedTraits, vehicle),
-        constraintFit: this.getConstraintFitScore(vehicle.constraintRules, aggregatedTraits),
+        priceFit: this.getPriceFitScore(vehicle, aggregatedTraits),
+        constraintFit: this.getConstraintFitScore(vehicle, aggregatedTraits),
         preferenceAlignment: this.getAlignmentScore(
           aggregatedTraits,
           vehicle.traitWeights,
@@ -1049,6 +1081,40 @@ export class AssessmentService {
     }));
   }
 
+  private calculateRecommendationConfidence(
+    recommendations: Array<{ score: number; diagnostics: { strictMatch: boolean } }>,
+  ) {
+    if (recommendations.length === 0) {
+      return 0.3;
+    }
+
+    const [topRecommendation, secondRecommendation] = recommendations;
+    let confidence = 0.55;
+
+    if (topRecommendation.diagnostics.strictMatch) {
+      confidence += 0.2;
+    }
+
+    const topRecommendations = recommendations.slice(0, 3);
+    if (topRecommendations.every((item) => item.diagnostics.strictMatch)) {
+      confidence += 0.1;
+    }
+
+    if (secondRecommendation) {
+      const scoreGap = topRecommendation.score - secondRecommendation.score;
+      if (scoreGap >= 8) {
+        confidence += 0.15;
+      } else if (scoreGap >= 3) {
+        confidence += 0.08;
+      }
+    }
+
+    const fallbackCount = topRecommendations.filter((item) => !item.diagnostics.strictMatch).length;
+    confidence -= fallbackCount * 0.08;
+
+    return Math.max(0.3, Math.min(0.95, Number(confidence.toFixed(2))));
+  }
+
   private buildRankedVehicleRecommendations(
     vehicles: VehicleRecommendationSource[],
     aggregatedTraits: AggregatedTraits,
@@ -1058,6 +1124,7 @@ export class AssessmentService {
         const score = this.scoreVehicle(vehicle, aggregatedTraits);
         const reason = this.buildRecommendationReason(aggregatedTraits, vehicle);
         const diagnostics = this.buildRecommendationDiagnostics(aggregatedTraits, vehicle);
+        const strictMatch = this.matchesVehicleConstraints(vehicle, aggregatedTraits);
 
         return {
           vehicleId: vehicle.id,
@@ -1068,7 +1135,11 @@ export class AssessmentService {
           rank: 0,
           score,
           reason,
-          diagnostics,
+          diagnostics: {
+            ...diagnostics,
+            strictMatch,
+            constraintMisses: this.getConstraintMisses(vehicle, aggregatedTraits),
+          },
         };
       })
       .sort((left, right) => right.score - left.score);
@@ -1111,18 +1182,14 @@ export class AssessmentService {
   }
 
   private matchesVehicleConstraints(
-    vehicle: {
-      energyType?: string | null;
-      constraintRules: Array<{
-        targetType: TraitTargetType;
-        targetKey: string;
-        traitOperator: "EQ" | "NEQ" | "GT" | "GTE" | "LT" | "LTE";
-        traitThreshold: number | { toString(): string };
-      }>;
-    },
+    vehicle: VehicleScoreSource,
     aggregatedTraits: AggregatedTraits,
   ) {
     if (this.isPlugInVehicleDisqualified(vehicle, aggregatedTraits)) {
+      return false;
+    }
+
+    if (this.isVehicleOverBudget(vehicle, aggregatedTraits)) {
       return false;
     }
 
@@ -1154,7 +1221,8 @@ export class AssessmentService {
       "PERSONALITY_TRAIT",
       2,
     );
-    const constraintFit = this.getConstraintFitScore(vehicle.constraintRules, aggregatedTraits);
+    const constraintFit = this.getConstraintFitScore(vehicle, aggregatedTraits);
+    const priceFit = this.getPriceFitScore(vehicle, aggregatedTraits);
     const vectorFit = this.getCoreVectorFitScore(aggregatedTraits, vehicle);
     const energyFit = this.getEnergyAlignmentScore(aggregatedTraits, vehicle);
     const corePenalty = this.getCoreMismatchPenalty(aggregatedTraits, vehicle);
@@ -1162,14 +1230,70 @@ export class AssessmentService {
     return Math.max(
       0,
       Math.round(
-        vectorFit * 0.62 +
+        vectorFit * 0.45 +
           energyFit * 0.18 +
+          priceFit * 0.12 +
           constraintFit * 0.12 +
-          preferenceAlignment * 0.05 +
-          personalityAlignment * 0.03 -
+          preferenceAlignment * 0.08 +
+          personalityAlignment * 0.05 -
           corePenalty,
       ),
     );
+  }
+
+  private isVehicleOverBudget(
+    vehicle: Pick<VehicleScoreSource, "priceMin" | "priceMax">,
+    aggregatedTraits: AggregatedTraits,
+  ) {
+    const budgetLimit = this.getBudgetPriceLimit(aggregatedTraits);
+    const minimumVehiclePrice = vehicle.priceMin ?? vehicle.priceMax ?? 0;
+
+    return budgetLimit !== null && minimumVehiclePrice > budgetLimit;
+  }
+
+  private getBudgetPriceLimit(aggregatedTraits: AggregatedTraits) {
+    const budgetLevel = this.getTraitValue(
+      aggregatedTraits,
+      "budget_level",
+      "HARD_CONSTRAINT",
+    );
+
+    if (budgetLevel <= 0) {
+      return null;
+    }
+
+    const budgetLimits = [100_000, 160_000, 220_000, 300_000, 500_000];
+    const upperIndex = Math.min(budgetLimits.length - 1, Math.ceil(budgetLevel) - 1);
+    const lowerIndex = Math.max(0, upperIndex - 1);
+
+    if (Number.isInteger(budgetLevel)) {
+      return budgetLimits[upperIndex];
+    }
+
+    return Math.round(
+      budgetLimits[lowerIndex] +
+        (budgetLimits[upperIndex] - budgetLimits[lowerIndex]) *
+          (budgetLevel - Math.floor(budgetLevel)),
+    );
+  }
+
+  private getPriceFitScore(
+    vehicle: Pick<VehicleScoreSource, "priceMin" | "priceMax">,
+    aggregatedTraits: AggregatedTraits,
+  ) {
+    const budgetLimit = this.getBudgetPriceLimit(aggregatedTraits);
+    const vehiclePrice = vehicle.priceMin ?? vehicle.priceMax;
+
+    if (budgetLimit === null || !vehiclePrice) {
+      return 70;
+    }
+
+    if (vehiclePrice <= budgetLimit) {
+      return 100;
+    }
+
+    const overspendRatio = (vehiclePrice - budgetLimit) / budgetLimit;
+    return Math.max(0, Math.round(50 - overspendRatio * 100));
   }
 
   private getAlignmentScore(
@@ -1183,46 +1307,56 @@ export class AssessmentService {
     limit: number,
   ) {
     const prioritizedTraits = Object.entries(aggregatedTraits.byTargetType[targetType] ?? {})
-      .filter(([, value]) => value > 0)
-      .sort((left, right) => right[1] - left[1])
+      .map(([traitKey, totals]) => ({
+        traitKey,
+        value: totals.count > 0 ? totals.total / totals.count : 0,
+      }))
+      .filter((trait) => trait.value > 0)
+      .sort((left, right) => right.value - left.value)
       .slice(0, limit);
 
     if (prioritizedTraits.length === 0) {
       return 60;
     }
 
-    const totalImportance = prioritizedTraits.reduce((total, [, value]) => total + value * value, 0);
+    const totalImportance = prioritizedTraits.reduce(
+      (total, trait) => total + trait.value * trait.value,
+      0,
+    );
 
     if (totalImportance === 0) {
       return 60;
     }
 
-    const matchedImportance = prioritizedTraits.reduce((total, [traitKey, value]) => {
+    const matchedImportance = prioritizedTraits.reduce((total, trait) => {
       const matchedWeight = traitWeights.find(
-        (weight) => weight.targetType === targetType && weight.targetKey === traitKey,
+        (weight) => weight.targetType === targetType && weight.targetKey === trait.traitKey,
       );
       const normalizedWeight = Math.min(1, Number(matchedWeight?.weight ?? 0) / 10);
 
-      return total + value * value * normalizedWeight;
+      return total + trait.value * trait.value * normalizedWeight;
     }, 0);
 
     return Math.round((matchedImportance / totalImportance) * 100);
   }
 
   private getConstraintFitScore(
-    constraintRules: Array<{
-      targetType: TraitTargetType;
-      targetKey: string;
-      traitOperator: "EQ" | "NEQ" | "GT" | "GTE" | "LT" | "LTE";
-      traitThreshold: number | { toString(): string };
-    }> = [],
+    vehicle: VehicleScoreSource,
     aggregatedTraits: AggregatedTraits,
   ) {
-    if (constraintRules.length === 0) {
+    if (this.isPlugInVehicleDisqualified(vehicle, aggregatedTraits)) {
+      return 0;
+    }
+
+    if (this.isVehicleOverBudget(vehicle, aggregatedTraits)) {
+      return 0;
+    }
+
+    if (vehicle.constraintRules.length === 0) {
       return 100;
     }
 
-    const matchedCount = constraintRules.reduce((count, rule) => {
+    const matchedCount = vehicle.constraintRules.reduce((count, rule) => {
       const traitValue = this.getTraitValue(aggregatedTraits, rule.targetKey, rule.targetType);
       const threshold = Number(rule.traitThreshold);
 
@@ -1233,7 +1367,37 @@ export class AssessmentService {
       return count;
     }, 0);
 
-    return Math.round((matchedCount / constraintRules.length) * 100);
+    return Math.round((matchedCount / vehicle.constraintRules.length) * 100);
+  }
+
+  private getConstraintMisses(
+    vehicle: VehicleScoreSource,
+    aggregatedTraits: AggregatedTraits,
+  ) {
+    const misses: string[] = [];
+
+    if (this.isPlugInVehicleDisqualified(vehicle, aggregatedTraits)) {
+      misses.push("charging_or_energy_acceptance");
+    }
+
+    if (this.isVehicleOverBudget(vehicle, aggregatedTraits)) {
+      misses.push("budget");
+    }
+
+    for (const rule of vehicle.constraintRules) {
+      const traitValue = this.getTraitValue(aggregatedTraits, rule.targetKey, rule.targetType);
+      const matched = this.matchesBranchRule(
+        traitValue,
+        rule.traitOperator,
+        Number(rule.traitThreshold),
+      );
+
+      if (!matched) {
+        misses.push(`${rule.targetKey}:${rule.traitOperator}:${Number(rule.traitThreshold)}`);
+      }
+    }
+
+    return misses;
   }
 
   private getCoreVectorFitScore(aggregatedTraits: AggregatedTraits, vehicle: VehicleScoreSource) {
@@ -1364,9 +1528,15 @@ export class AssessmentService {
     return traitSnapshots.reduce<AggregatedTraits>(
       (totals, snapshot) => {
         const numericValue = Number(snapshot.traitValue);
-        totals.byKey[snapshot.traitKey] = (totals.byKey[snapshot.traitKey] ?? 0) + numericValue;
+        const globalTotals = totals.byKey[snapshot.traitKey] ?? { total: 0, count: 0 };
+        globalTotals.total += numericValue;
+        globalTotals.count += 1;
+        totals.byKey[snapshot.traitKey] = globalTotals;
         const scopedTotals = totals.byTargetType[snapshot.targetType] ?? {};
-        scopedTotals[snapshot.traitKey] = (scopedTotals[snapshot.traitKey] ?? 0) + numericValue;
+        const traitTotals = scopedTotals[snapshot.traitKey] ?? { total: 0, count: 0 };
+        traitTotals.total += numericValue;
+        traitTotals.count += 1;
+        scopedTotals[snapshot.traitKey] = traitTotals;
         totals.byTargetType[snapshot.targetType] = scopedTotals;
         const scopedMinimums = totals.minByTargetType[snapshot.targetType] ?? {};
         scopedMinimums[snapshot.traitKey] = Math.min(
@@ -1648,18 +1818,20 @@ export class AssessmentService {
       energy: this.getVehicleEnergyTypeScore(vehicle.energyType),
     };
 
-    const hasExplicitCoreScore = (Object.keys(CORE_PREFERENCE_LABELS) as CorePreferenceKey[])
-      .filter((key) => key !== "energy")
-      .some((key) => explicitScores[key] > 0);
+    const derivedScores = this.deriveVehicleCoreScoresFromTraits(vehicle.traitWeights);
 
-    if (hasExplicitCoreScore) {
-      return explicitScores;
-    }
-
-    return {
-      ...this.deriveVehicleCoreScoresFromTraits(vehicle.traitWeights),
-      energy: this.getVehicleEnergyTypeScore(vehicle.energyType),
-    };
+    return (Object.keys(CORE_PREFERENCE_LABELS) as CorePreferenceKey[]).reduce(
+      (scores, key) => ({
+        ...scores,
+        [key]:
+          key === "energy"
+            ? this.getVehicleEnergyTypeScore(vehicle.energyType)
+            : explicitScores[key] > 0
+              ? explicitScores[key]
+              : derivedScores[key],
+      }),
+      {} as CorePreferenceVector,
+    );
   }
 
   private deriveVehicleCoreScoresFromTraits(
@@ -1771,10 +1943,12 @@ export class AssessmentService {
     targetType?: TraitTargetType,
   ) {
     if (targetType) {
-      return aggregatedTraits.byTargetType[targetType]?.[traitKey] ?? 0;
+      const traitTotals = aggregatedTraits.byTargetType[targetType]?.[traitKey];
+      return traitTotals && traitTotals.count > 0 ? traitTotals.total / traitTotals.count : 0;
     }
 
-    return aggregatedTraits.byKey[traitKey] ?? 0;
+    const traitTotals = aggregatedTraits.byKey[traitKey];
+    return traitTotals && traitTotals.count > 0 ? traitTotals.total / traitTotals.count : 0;
   }
 
   private getTraitMinimum(

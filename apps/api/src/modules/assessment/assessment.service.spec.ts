@@ -269,6 +269,7 @@ describe("AssessmentService", () => {
       currentBranchKey: "social-expression",
       lifeQuestionCount: 1,
       carQuestionCount: 0,
+      coveredTraitKeys: ["social_confidence", "social-expression"],
     });
     expect(sessionUpdate).toHaveBeenCalledWith({
       where: {
@@ -319,12 +320,12 @@ describe("AssessmentService", () => {
       {
         targetType: "PERSONALITY_TRAIT",
         traitKey: "social_confidence",
-        traitValue: 1,
+        traitValue: 3,
       },
       {
         targetType: "PERSONALITY_TRAIT",
         traitKey: "social_confidence",
-        traitValue: 2,
+        traitValue: 3,
       },
     ]);
     const branchRuleFindMany = vi.fn().mockResolvedValue([
@@ -420,6 +421,7 @@ describe("AssessmentService", () => {
       currentBranchKey: "social-expression",
       lifeQuestionCount: 2,
       carQuestionCount: 0,
+      coveredTraitKeys: ["social_confidence"],
     });
     expect(sessionUpdate).toHaveBeenCalledWith({
       where: {
@@ -618,7 +620,7 @@ describe("AssessmentService", () => {
           series: "宋 PLUS",
           energyType: "ICE",
           rank: 1,
-          score: 68,
+          score: 70,
           reason: "你当前更看重空间实用性、家庭适配、使用成本，这台车在家庭适配、使用成本上更贴合你的选择。",
           diagnostics: expect.any(Object),
         },
@@ -628,7 +630,7 @@ describe("AssessmentService", () => {
           series: "Model 3",
           energyType: "ICE",
           rank: 2,
-          score: 34,
+          score: 39,
           reason: "你当前更看重空间实用性、家庭适配、使用成本，但这台车在这些维度上的匹配度偏低。",
           diagnostics: expect.any(Object),
         },
@@ -658,7 +660,7 @@ describe("AssessmentService", () => {
       data: {
         sessionId: "session_complete_1",
         personalityProfileId: "profile_steady",
-        confidenceScore: 1,
+        confidenceScore: 0.95,
         summary: "你买车时优先考虑省钱、舒适、耐用和值得买，核心诉求是稳定满足通勤和家庭需要。",
         explanation: "务实省心型",
       },
@@ -673,14 +675,14 @@ describe("AssessmentService", () => {
           resultId: "result_1",
           vehicleId: "vehicle_1",
           rank: 1,
-          score: 68,
+          score: 70,
           reason: "你当前更看重空间实用性、家庭适配、使用成本，这台车在家庭适配、使用成本上更贴合你的选择。",
         },
         {
           resultId: "result_1",
           vehicleId: "vehicle_2",
           rank: 2,
-          score: 34,
+          score: 39,
           reason: "你当前更看重空间实用性、家庭适配、使用成本，但这台车在这些维度上的匹配度偏低。",
         },
       ],
@@ -942,7 +944,7 @@ describe("AssessmentService", () => {
       brand: "丰田",
       series: "凯美瑞",
       rank: 1,
-      score: 38,
+      score: 45,
       reason: "你当前更看重家庭适配、舒适性、空间实用性，但这台车在这些维度上的匹配度偏低。",
     });
     expect(result.recommendations[1]).toMatchObject({
@@ -958,7 +960,7 @@ describe("AssessmentService", () => {
           resultId: "result_constraints_1",
           vehicleId: "vehicle_pass",
           rank: 1,
-          score: 38,
+          score: 45,
           reason: "你当前更看重家庭适配、舒适性、空间实用性，但这台车在这些维度上的匹配度偏低。",
         },
         expect.objectContaining({
@@ -2395,7 +2397,7 @@ describe("AssessmentService", () => {
             brand: "比亚迪",
             series: "宋 PLUS",
             rank: 1,
-            score: 68,
+            score: 70,
             reason: "你当前更看重空间实用性、家庭适配、使用成本，这台车在家庭适配、使用成本上更贴合你的选择。",
           },
         ],
@@ -3231,5 +3233,155 @@ describe("AssessmentService", () => {
         ],
       },
     });
+  });
+
+  it("normalizes repeated trait snapshots so quick and standard modes stay comparable", () => {
+    const service = new AssessmentService({} as never, {} as never);
+    const shortTraits = (service as unknown as {
+      aggregateTraitSnapshots: (snapshots: Array<Record<string, unknown>>) => unknown;
+    }).aggregateTraitSnapshots([
+      { targetType: "VEHICLE_PREFERENCE", traitKey: "driving_engagement", traitValue: 2 },
+      { targetType: "VEHICLE_PREFERENCE", traitKey: "driving_engagement", traitValue: 4 },
+    ]);
+    const longTraits = (service as unknown as {
+      aggregateTraitSnapshots: (snapshots: Array<Record<string, unknown>>) => unknown;
+    }).aggregateTraitSnapshots([
+      { targetType: "VEHICLE_PREFERENCE", traitKey: "driving_engagement", traitValue: 2 },
+      { targetType: "VEHICLE_PREFERENCE", traitKey: "driving_engagement", traitValue: 4 },
+      { targetType: "VEHICLE_PREFERENCE", traitKey: "driving_engagement", traitValue: 2 },
+      { targetType: "VEHICLE_PREFERENCE", traitKey: "driving_engagement", traitValue: 4 },
+    ]);
+
+    const getTraitValue = (traits: unknown) =>
+      (service as unknown as {
+        getTraitValue: (traits: unknown, key: string, type: string) => number;
+      }).getTraitValue(traits, "driving_engagement", "VEHICLE_PREFERENCE");
+
+    expect(getTraitValue(shortTraits)).toBe(3);
+    expect(getTraitValue(longTraits)).toBe(3);
+  });
+
+  it("fills missing vehicle core scores from trait weights instead of scoring them as zero", async () => {
+    const prisma = {
+      assessmentSession: {
+        findUnique: vi.fn().mockResolvedValue({ id: "session_partial_scores", status: "IN_PROGRESS" }),
+        update: vi.fn().mockResolvedValue(undefined),
+      },
+      sessionTraitSnapshot: {
+        findMany: vi.fn().mockResolvedValue([
+          { targetType: "VEHICLE_PREFERENCE", traitKey: "driving_engagement", traitValue: 5 },
+          { targetType: "VEHICLE_PREFERENCE", traitKey: "smart_features", traitValue: 5 },
+        ]),
+      },
+      personalityProfile: {
+        findMany: vi.fn().mockResolvedValue([
+          { id: "profile", code: "STEADY_PRAGMATIST", name: "name", summary: "summary", detail: "detail", rules: [] },
+        ]),
+      },
+      vehicle: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "vehicle_partial",
+            slug: "partial-score-car",
+            brand: "品牌",
+            series: "车系",
+            energyType: "ICE",
+            handlingScore: 90,
+            constraintRules: [],
+            traitWeights: [
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 10 },
+              { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 10 },
+            ],
+          },
+        ]),
+      },
+      sessionResult: {
+        create: vi.fn().mockResolvedValue({ id: "result_partial", sessionId: "session_partial_scores" }),
+      },
+      sessionVehicleRecommendation: {
+        createMany: vi.fn().mockResolvedValue(undefined),
+      },
+    };
+    const service = new AssessmentService(prisma as never, {} as never);
+
+    const result = await service.completeSession("session_partial_scores");
+    const vehicleScores = Object.fromEntries(
+      result.recommendations[0].diagnostics.vehicleScores.map((item) => [item.key, item.value]),
+    );
+
+    expect(vehicleScores.handling).toBe(90);
+    expect(vehicleScores.comfort).toBeGreaterThan(0);
+    expect(vehicleScores.smart).toBeGreaterThan(0);
+    expect(vehicleScores.family).toBeGreaterThan(0);
+  });
+
+  it("treats vehicle starting price above the mapped budget as a hard-constraint miss", async () => {
+    const prisma = {
+      assessmentSession: {
+        findUnique: vi.fn().mockResolvedValue({ id: "session_budget", status: "IN_PROGRESS" }),
+        update: vi.fn().mockResolvedValue(undefined),
+      },
+      sessionTraitSnapshot: {
+        findMany: vi.fn().mockResolvedValue([
+          { targetType: "HARD_CONSTRAINT", traitKey: "budget_level", traitValue: 1 },
+          { targetType: "VEHICLE_PREFERENCE", traitKey: "driving_engagement", traitValue: 3 },
+        ]),
+      },
+      personalityProfile: {
+        findMany: vi.fn().mockResolvedValue([
+          { id: "profile", code: "STEADY_PRAGMATIST", name: "name", summary: "summary", detail: "detail", rules: [] },
+        ]),
+      },
+      vehicle: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "vehicle_cheap",
+            slug: "budget-friendly-car",
+            brand: "品牌A",
+            series: "车系A",
+            energyType: "ICE",
+            priceMin: 80_000,
+            priceMax: 100_000,
+            constraintRules: [],
+            traitWeights: [{ targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 10 }],
+          },
+          {
+            id: "vehicle_expensive",
+            slug: "over-budget-car",
+            brand: "品牌B",
+            series: "车系B",
+            energyType: "ICE",
+            priceMin: 150_000,
+            priceMax: 180_000,
+            constraintRules: [],
+            traitWeights: [{ targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 10 }],
+          },
+        ]),
+      },
+      sessionResult: {
+        create: vi.fn().mockResolvedValue({ id: "result_budget", sessionId: "session_budget" }),
+      },
+      sessionVehicleRecommendation: {
+        createMany: vi.fn().mockResolvedValue(undefined),
+      },
+    };
+    const service = new AssessmentService(prisma as never, {} as never);
+
+    const result = await service.completeSession("session_budget");
+
+    expect(result.recommendations[0]).toMatchObject({
+      slug: "budget-friendly-car",
+      diagnostics: { strictMatch: true, constraintMisses: [] },
+    });
+    expect(result.recommendations[1]).toMatchObject({
+      slug: "over-budget-car",
+      reason: expect.stringContaining("起售价高于当前预算"),
+      diagnostics: {
+        strictMatch: false,
+        constraintMisses: expect.arrayContaining(["budget"]),
+      },
+    });
+    expect(result.recommendations[0].diagnostics.scoreBreakdown.priceFit).toBe(100);
+    expect(result.recommendations[1].diagnostics.scoreBreakdown.priceFit).toBeLessThan(100);
   });
 });

@@ -302,6 +302,36 @@ model ExternalVehicleSeries {
   @@index([source, lastSyncedAt])
 }
 
+model ExternalVehicleCandidate {
+  id              String   @id @default(cuid())
+  source          String
+  sourceSeriesId  Int
+  sourceCarId     Int
+  brandName       String
+  seriesName      String
+  carName         String
+  saleStatus      Int?
+  energyType      String
+  bodyType        String
+  priceMin        Int?
+  priceMax        Int?
+  parsedParams    Json
+  coreScores      Json
+  traitWeights    Json
+  constraintRules Json
+  dataConfidence  Decimal  @default(1) @db.Decimal(4, 2)
+  qualityStatus   String   @default("PENDING")
+  rejectReason    String?
+  generatedAt     DateTime @default(now())
+  lastCheckedAt   DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([source, sourceSeriesId, sourceCarId])
+  @@index([source, qualityStatus])
+  @@index([source, sourceSeriesId])
+}
+
 model SessionResult {
   id                   String                         @id @default(cuid())
   sessionId            String                         @unique
