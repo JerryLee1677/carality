@@ -687,11 +687,17 @@ export class AssessmentService {
 
   private async withAssessmentTransaction<T>(operation: (db: AssessmentDbClient) => Promise<T>) {
     const prismaWithTransaction = this.prisma as AssessmentDbClient & {
-      $transaction?: <R>(callback: (db: AssessmentDbClient) => Promise<R>) => Promise<R>;
+      $transaction?: <R>(
+        callback: (db: AssessmentDbClient) => Promise<R>,
+        options?: { maxWait?: number; timeout?: number },
+      ) => Promise<R>;
     };
 
     if (typeof prismaWithTransaction.$transaction === "function") {
-      return prismaWithTransaction.$transaction((db) => operation(db));
+      return prismaWithTransaction.$transaction((db) => operation(db), {
+        maxWait: 10_000,
+        timeout: 20_000,
+      });
     }
 
     return operation(this.prisma);

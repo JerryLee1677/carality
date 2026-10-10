@@ -2273,6 +2273,10 @@ describe("AssessmentService", () => {
     });
 
     expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+    expect(prisma.$transaction).toHaveBeenCalledWith(expect.any(Function), {
+      maxWait: 10_000,
+      timeout: 20_000,
+    });
     expect(tx.assessmentAnswer.create).toHaveBeenCalledTimes(1);
     expect(tx.assessmentSession.update).toHaveBeenCalledTimes(2);
     expect(tx.sessionResult.create).toHaveBeenCalledTimes(1);
