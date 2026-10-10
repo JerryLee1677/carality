@@ -17,7 +17,7 @@ Carality 是一个汽车人格测试与选车推荐网站。用户通过自适�
 | BFF | `src/app/api/` | 转发请求到 Nest API，设置登录 Cookie |
 | 后端 | `apps/api/` | 测评引擎、人格计算、车型推荐、用户与会话 |
 | 数据库 | `apps/api/prisma/` | Schema、迁移、种子数据 |
-| 静态内容 | `src/data/` | 购车指南、部分车型展示页用的本地车型数据 |
+| 静态内容 | `src/data/` | 购车指南 |
 
 **数据存储说明**
 
@@ -31,7 +31,7 @@ Carality 是一个汽车人格测试与选车推荐网站。用户通过自适�
 - **测评结果**：人格画像说明、车型推荐列表与推荐理由。
 - **用户系统**：邮箱注册 / 登录（浏览器 RSA 加密密码，服务端 scrypt 存哈希）。
 - **历史记录**：登录用户在 `/account/history` 查看已完成的测评。
-- **内容浏览**：购车指南、部分车型详情页（静态数据）。
+- **内容浏览**：购车指南、车型详情页（走评估 API）。
 
 ## 环境要求
 
@@ -156,7 +156,8 @@ Carality/
 ├── src/                    # Next.js 前端
 │   ├── app/                # 页面与 /api BFF
 │   ├── components/
-│   ├── data/               # 静态指南、展示用车型
+│   ├── data/               # 购车指南
+│   ├── modules/catalog/    # 车型目录仓储（走评估 API）
 │   └── lib/                # assessment-api、auth-session 等
 ├── apps/api/               # NestJS 后端
 │   ├── prisma/             # schema、migrations、seed-data
