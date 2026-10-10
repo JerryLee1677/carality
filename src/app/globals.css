@@ -612,6 +612,7 @@
   }
 
   .quiz-session__question {
+    position: relative;
     margin-top: 3.75rem;
     width: 100%;
     display: flex;
@@ -718,8 +719,12 @@
     background: #000;
   }
 
-  .quiz-session__status,
-  .quiz-session__error {
+  .quiz-session__question > .quiz-session__status,
+  .quiz-session__question > .quiz-session__error {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
     min-height: 2rem;
     margin-top: 1.25rem;
     text-align: center;
