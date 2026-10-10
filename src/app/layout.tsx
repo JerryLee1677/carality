@@ -16,9 +16,11 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
         <LanguageProvider>
-          <SiteHeader />
-          {children}
-          <SiteFooter />
+          <div className="flex min-h-screen flex-col">
+            <SiteHeader />
+            <div className="flex-1">{children}</div>
+            <SiteFooter />
+          </div>
         </LanguageProvider>
       </body>
     </html>
