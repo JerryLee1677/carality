@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buyingGuides } from "@/data/content/buying-guides";
-import { vehicleRepository } from "@/modules/catalog/repository/vehicle-repository";
+import {
+  vehicleRepository,
+  type CatalogVehicle,
+} from "@/modules/catalog/repository/vehicle-repository";
 
 export default async function GuideDetailPage({
   params,
@@ -15,14 +18,17 @@ export default async function GuideDetailPage({
     notFound();
   }
 
-  const relatedVehicles = guide.relatedVehicleSlugs
-    .map((vehicleSlug) => vehicleRepository.getBySlug(vehicleSlug))
-    .filter(
-      (
-        vehicle,
-      ): vehicle is NonNullable<ReturnType<typeof vehicleRepository.getBySlug>> =>
-        Boolean(vehicle),
-    );
+  const relatedVehicles = (
+    await Promise.all(
+      guide.relatedVehicleSlugs.map(async (vehicleSlug) => {
+        try {
+          return await vehicleRepository.getBySlug(vehicleSlug);
+        } catch {
+          return null;
+        }
+      }),
+    )
+  ).filter((vehicle): vehicle is CatalogVehicle => Boolean(vehicle));
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-16">
