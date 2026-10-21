@@ -10,6 +10,8 @@ import { CreateSessionResponseDto } from "./dto/create-session-response.dto";
 import { CreateSessionDto } from "./dto/create-session.dto";
 import { SubmitAnswerDto } from "./dto/submit-answer.dto";
 import { SubmitAnswerResponseDto } from "./dto/submit-answer-response.dto";
+import { deriveUserConditions, isEnergyAllowed, type UserConditions } from "../questions/user-conditions";
+import { getVehiclePoolPriority, normalizeVehicleBrand, normalizeVehicleSeries, resolveVehiclePoolPolicy, VEHICLE_POOL_VERSION, type VehiclePoolPolicy } from "../vehicles/mainstream-vehicle-pool";
 
 type TraitTargetType =
   | "HARD_CONSTRAINT"
@@ -18,6 +20,7 @@ type TraitTargetType =
   | "BRANCH_SIGNAL";
 
 type AggregatedTraits = {
+  userConditions?: UserConditions;
   byKey: Record<string, { total: number; count: number }>;
   byTargetType: Partial<Record<TraitTargetType, Record<string, { total: number; count: number }>>>;
   minByTargetType: Partial<Record<TraitTargetType, Record<string, number>>>;
@@ -74,6 +77,7 @@ type VehicleScoreSource = {
 };
 
 type VehicleRecommendationSource = VehicleScoreSource & {
+  poolPolicy?: VehiclePoolPolicy;
   id: string;
   slug: string;
   brand: string;
@@ -91,6 +95,11 @@ type ScoredVehicleRecommendation = {
   score: number;
   reason: string;
   diagnostics: {
+    poolTier: string;
+    poolVersion: string;
+    poolSource: string;
+    poolReviewedAt: string;
+    selectionNote: string;
     strictMatch: boolean;
     constraintMisses: string[];
     userPreferenceVector: Array<{ key: string; label: string; value: number }>;
@@ -469,7 +478,10 @@ export class AssessmentService {
         },
         select: {
           questionId: true,
+          question: { select: { slug: true } },
+          option: { select: { order: true } },
         },
+        orderBy: { stepIndex: "asc" },
       });
 
       const traitSnapshots = await db.sessionTraitSnapshot.findMany({
@@ -513,6 +525,11 @@ export class AssessmentService {
         carQuestionCount:
           session.carQuestionCount + (currentQuestion.type === "CAR_USAGE" ? 1 : 0),
         coveredTraitKeys: Object.keys(aggregatedTraits.byKey),
+        userConditions: deriveUserConditions(answeredQuestions),
+        answerHistory: answeredQuestions.filter((answer) => answer.question && answer.option)
+          .map((answer) => ({ slug: answer.question.slug, order: answer.option.order })),
+        selectionSeed: sessionId,
+        targetQuestionCount: session.targetQuestionCount ?? undefined,
       });
 
       if (nextQuestionResult.candidates.length > 0) {
@@ -945,7 +962,7 @@ export class AssessmentService {
   }
 
   private async getAggregatedTraitsWithDb(
-    db: Pick<PrismaService, "sessionTraitSnapshot">,
+    db: Pick<PrismaService, "sessionTraitSnapshot" | "assessmentAnswer">,
     sessionId: string,
   ) {
     const traitSnapshots = await db.sessionTraitSnapshot.findMany({
@@ -962,7 +979,12 @@ export class AssessmentService {
       },
     });
 
-    return this.aggregateTraitSnapshots(traitSnapshots);
+    const answers = await db.assessmentAnswer.findMany({
+      where: { sessionId },
+      select: { question: { select: { slug: true } }, option: { select: { order: true } } },
+      orderBy: { stepIndex: "asc" },
+    });
+    return { ...this.aggregateTraitSnapshots(traitSnapshots), userConditions: deriveUserConditions(answers) };
   }
 
   private selectPersonalityProfile<
@@ -1101,19 +1123,14 @@ export class AssessmentService {
     vehicles: VehicleRecommendationSource[],
     aggregatedTraits: AggregatedTraits,
   ) {
-    const electricRecommendations = this.buildRankedVehicleRecommendations(
-      vehicles.filter((vehicle) => this.isElectricVehicle(vehicle.energyType)),
-      aggregatedTraits,
-    );
-    const fuelRecommendations = this.buildRankedVehicleRecommendations(
-      vehicles.filter((vehicle) => !this.isElectricVehicle(vehicle.energyType)),
-      aggregatedTraits,
-    );
+    const eligibleVehicles = vehicles.filter((vehicle) =>
+      (!aggregatedTraits.userConditions || isEnergyAllowed(vehicle.energyType, aggregatedTraits.userConditions)) &&
+      !this.isVehicleOverBudget(vehicle, aggregatedTraits) &&
+      (vehicle.poolPolicy ?? resolveVehiclePoolPolicy(vehicle)).tier !== "EXCLUDED");
 
-    return this.selectDiverseRecommendations([
-      ...electricRecommendations,
-      ...fuelRecommendations,
-    ]).map((vehicle, index) => ({
+    return this.selectDiverseRecommendations(this.buildRankedVehicleRecommendations(
+      eligibleVehicles, aggregatedTraits,
+    )).map((vehicle, index) => ({
       ...vehicle,
       rank: index + 1,
     }));
@@ -1123,29 +1140,24 @@ export class AssessmentService {
     const selected: ScoredVehicleRecommendation[] = [];
     const seriesCount = new Map<string, number>();
     const brandCount = new Map<string, number>();
-    const energyCount = new Map<string, number>();
 
     const canSelect = (vehicle: ScoredVehicleRecommendation) => {
-      const seriesKey = vehicle.series || vehicle.slug;
-      const brandKey = vehicle.brand || vehicle.slug;
-      const energyKey = this.getEnergyBucket(vehicle.energyType);
+      const seriesKey = normalizeVehicleSeries(vehicle);
+      const brandKey = normalizeVehicleBrand(vehicle.brand);
 
       return (
         (seriesCount.get(seriesKey) ?? 0) < 1 &&
-        (brandCount.get(brandKey) ?? 0) < 2 &&
-        (energyCount.get(energyKey) ?? 0) < 5
+        (brandCount.get(brandKey) ?? 0) < 2
       );
     };
 
     const selectVehicle = (vehicle: ScoredVehicleRecommendation) => {
       selected.push(vehicle);
-      const seriesKey = vehicle.series || vehicle.slug;
-      const brandKey = vehicle.brand || vehicle.slug;
-      const energyKey = this.getEnergyBucket(vehicle.energyType);
+      const seriesKey = normalizeVehicleSeries(vehicle);
+      const brandKey = normalizeVehicleBrand(vehicle.brand);
 
       seriesCount.set(seriesKey, (seriesCount.get(seriesKey) ?? 0) + 1);
       brandCount.set(brandKey, (brandCount.get(brandKey) ?? 0) + 1);
-      energyCount.set(energyKey, (energyCount.get(energyKey) ?? 0) + 1);
     };
 
     for (const vehicle of scoredVehicles) {
@@ -1200,6 +1212,7 @@ export class AssessmentService {
   ) {
     const scoredVehicles = vehicles
       .map((vehicle) => {
+        const policy = vehicle.poolPolicy ?? resolveVehiclePoolPolicy(vehicle);
         const score = this.scoreVehicle(vehicle, aggregatedTraits);
         const reason = this.buildRecommendationReason(aggregatedTraits, vehicle);
         const diagnostics = this.buildRecommendationDiagnostics(aggregatedTraits, vehicle);
@@ -1216,49 +1229,26 @@ export class AssessmentService {
           reason,
           diagnostics: {
             ...diagnostics,
+            poolTier: policy.tier,
+            poolVersion: VEHICLE_POOL_VERSION,
+            poolSource: policy.source,
+            poolReviewedAt: policy.reviewedAt,
+            selectionNote: `${policy.tier === "PRIMARY" ? "主流车系主推" : "符合条件的主推车系不足，补充此车系供比较"}${!strictMatch ? "；部分用车条件未完全满足，建议确认使用条件并结合试驾比较" : ""}。`,
             strictMatch,
             constraintMisses: this.getConstraintMisses(vehicle, aggregatedTraits),
           },
         };
       })
-      .sort((left, right) => right.score - left.score);
-
-    const strictlyMatchedVehicleIds = new Set(
-      vehicles
-        .filter((vehicle) => this.matchesVehicleConstraints(vehicle, aggregatedTraits))
-        .map((vehicle) => vehicle.id),
-    );
-
-    const prioritizedVehicles = [
-      ...scoredVehicles.filter((vehicle) => strictlyMatchedVehicleIds.has(vehicle.vehicleId)),
-      ...scoredVehicles.filter((vehicle) => !strictlyMatchedVehicleIds.has(vehicle.vehicleId)),
-    ];
-
-    const recommendedVehicles =
-      strictlyMatchedVehicleIds.size > 0
-        ? prioritizedVehicles.filter((vehicle) => vehicle.diagnostics.strictMatch)
-        : prioritizedVehicles;
-
-    return recommendedVehicles
+      .sort((left, right) =>
+        getVehiclePoolPriority(left.diagnostics.poolTier) - getVehiclePoolPriority(right.diagnostics.poolTier) ||
+        Number(right.diagnostics.strictMatch) - Number(left.diagnostics.strictMatch) ||
+        right.score - left.score || left.slug.localeCompare(right.slug));
+    const strictMatches = scoredVehicles.filter((vehicle) => vehicle.diagnostics.strictMatch);
+    return (strictMatches.length > 0 ? strictMatches : scoredVehicles)
       .map((vehicle, index) => ({
         ...vehicle,
         rank: index + 1,
-      }))
-      .slice(0, 6);
-  }
-
-  private isElectricVehicle(energyType?: string | null) {
-    const normalizedEnergyType = (energyType ?? "").toUpperCase();
-
-    return (
-      normalizedEnergyType === "EV" ||
-      normalizedEnergyType === "PHEV" ||
-      normalizedEnergyType === "EREV"
-    );
-  }
-
-  private getEnergyBucket(energyType?: string | null) {
-    return this.isElectricVehicle(energyType) ? "ELECTRIC" : "FUEL";
+      }));
   }
 
   private toDiagnosticDimensions(vector: CorePreferenceVector) {
@@ -1316,18 +1306,16 @@ export class AssessmentService {
     const corePenalty = this.getCoreMismatchPenalty(aggregatedTraits, vehicle);
     const practicalFit = this.getPracticalFitScore(aggregatedTraits, vehicle);
     const dataQuality = this.getDataQualityScore(vehicle);
-    const diversityBonus = this.getRecommendationDiversityScore(vehicle);
 
     return Math.max(
       0,
       Math.round(
-        vectorFit * 0.3 +
+        vectorFit * 0.37 +
           preferenceAlignment * 0.18 +
           priceFit * 0.15 +
           energyFit * 0.13 +
           practicalFit * 0.1 +
-          dataQuality * 0.07 +
-          diversityBonus * 0.07 -
+          dataQuality * 0.07 -
           corePenalty,
       ),
     );
@@ -1340,7 +1328,7 @@ export class AssessmentService {
     const budgetLimit = this.getBudgetPriceLimit(aggregatedTraits);
     const minimumVehiclePrice = vehicle.priceMin ?? vehicle.priceMax ?? 0;
 
-    return budgetLimit !== null && minimumVehiclePrice > budgetLimit;
+    return budgetLimit !== null && (!Number.isFinite(minimumVehiclePrice) || minimumVehiclePrice <= 0 || minimumVehiclePrice > budgetLimit);
   }
 
   private getPracticalFitScore(
@@ -1366,21 +1354,10 @@ export class AssessmentService {
     return Math.max(0, Math.min(100, Math.round(confidence * 100)));
   }
 
-  private getRecommendationDiversityScore(
-    vehicle: Pick<VehicleScoreSource, "energyType" | "bodyType">,
-  ) {
-    const normalizedEnergyType = (vehicle.energyType ?? "ICE").toUpperCase();
-    const electric =
-      normalizedEnergyType === "EV" ||
-      normalizedEnergyType === "PHEV" ||
-      normalizedEnergyType === "EREV";
-    const suvOrMpv = /SUV|MPV/i.test(vehicle.bodyType ?? "");
-    const sedan = /三厢车|两厢车|轿车|掀背车/i.test(vehicle.bodyType ?? "");
-
-    return electric && suvOrMpv ? 85 : electric ? 80 : sedan ? 70 : 60;
-  }
-
   private getBudgetPriceLimit(aggregatedTraits: AggregatedTraits) {
+    if (aggregatedTraits.userConditions?.budgetAnswered) {
+      return aggregatedTraits.userConditions.budgetMax;
+    }
     const budgetLevel = this.getTraitValue(
       aggregatedTraits,
       "budget_level",
@@ -1688,6 +1665,10 @@ export class AssessmentService {
     aggregatedTraits: AggregatedTraits,
   ) {
     const energyType = (vehicle.energyType ?? "").toUpperCase();
+
+    if (aggregatedTraits.userConditions?.allowedEnergyTypes) {
+      return !isEnergyAllowed(energyType, aggregatedTraits.userConditions);
+    }
 
     if (energyType === "ICE") {
       return false;

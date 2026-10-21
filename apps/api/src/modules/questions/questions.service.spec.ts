@@ -1,8 +1,44 @@
 import { NotFoundException } from "@nestjs/common";
 import { describe, expect, it, vi } from "vitest";
 import { QuestionsService } from "./questions.service";
+import { deriveUserConditions } from "./user-conditions";
 
 describe("QuestionsService", () => {
+  it("filters irrelevant EV follow-ups before ranking candidates", async () => {
+    const service = new QuestionsService({ question: { findMany: vi.fn().mockResolvedValue(
+      ["winter-range-anxiety", "recharge-patience", "daily-reliability-priority"].map((slug) => ({
+        id: slug, slug, title: slug, description: null, branchKey: null, type: "CAR_USAGE",
+        priority: slug === "winter-range-anxiety" ? 1000 : 0, discrimination: 80, options: [],
+      })),
+    ) } } as never);
+    const result = await service.getNextQuestion({
+      answeredQuestionIds: [], currentBranchKey: null, lifeQuestionCount: 0,
+      carQuestionCount: 0, coveredTraitKeys: [],
+      userConditions: deriveUserConditions([{ question: { slug: "energy-preference" }, option: { order: 1 } }]),
+    });
+    expect(result.nextQuestion?.slug).toBe("daily-reliability-priority");
+    expect(result.candidates.map((item) => item.questionId)).toEqual(["daily-reliability-priority"]);
+  });
+
+  it("prioritizes energy confirmation after rejecting public charging waits", async () => {
+    const service = new QuestionsService({ question: { findMany: vi.fn().mockResolvedValue(
+      ["winter-range-anxiety", "energy-preference", "daily-reliability-priority"].map((slug) => ({
+        id: slug, slug, title: slug, description: null, branchKey: null, type: "CAR_USAGE",
+        priority: slug === "daily-reliability-priority" ? 1000 : 0, discrimination: 80, options: [],
+      })),
+    ) } } as never);
+    const result = await service.getNextQuestion({
+      answeredQuestionIds: [], currentBranchKey: null, lifeQuestionCount: 0,
+      carQuestionCount: 0, coveredTraitKeys: [],
+      userConditions: deriveUserConditions([
+        { question: { slug: "charging-availability" }, option: { order: 4 } },
+        { question: { slug: "recharge-patience" }, option: { order: 1 } },
+      ]),
+    });
+    expect(result.nextQuestion?.slug).toBe("energy-preference");
+    expect(result.candidates.map((item) => item.questionId)).not.toContain("winter-range-anxiety");
+  });
+
   it("returns the highest-priority active anchor question first", async () => {
     const prisma = {
       question: {
@@ -130,9 +166,9 @@ describe("QuestionsService", () => {
       candidates: [
         {
           questionId: "question_2",
-          branchFit: 100,
+          branchFit: 10,
           infoGain: 72,
-          rankingScore: 252,
+          rankingScore: 23.76,
           wasSelected: true,
         },
       ],
@@ -193,16 +229,16 @@ describe("QuestionsService", () => {
       candidates: [
         {
           questionId: "question_car",
-          branchFit: 100,
+          branchFit: 10,
           infoGain: 70,
-          rankingScore: 275,
+          rankingScore: 96.6,
           wasSelected: true,
         },
         {
           questionId: "question_life",
-          branchFit: 100,
+          branchFit: 10,
           infoGain: 60,
-          rankingScore: 210,
+          rankingScore: 20.8,
           wasSelected: false,
         },
       ],
@@ -272,7 +308,7 @@ describe("QuestionsService", () => {
     expect(result.nextQuestion?.id).toBe("question_uncovered");
     expect(result.candidates[0]).toMatchObject({
       questionId: "question_uncovered",
-      rankingScore: 265,
+      rankingScore: 38.6,
     });
   });
 });

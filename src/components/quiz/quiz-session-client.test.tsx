@@ -12,6 +12,28 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("QuizSessionClient", () => {
+  it("shows and submits all concrete choice labels from a six-option question", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => ({
+        sessionId: "session_facts", status: "in_progress", mode: "quick", targetQuestionCount: 24,
+        stepIndex: 0, nextQuestion: { id: "budget", slug: "budget-range", title: "预算", description: null,
+          branchKey: null, type: "CAR_USAGE", options: ["10 万元以内", "10–16 万元", "16–22 万元", "22–30 万元", "30–50 万元", "50 万元以上"]
+            .map((label, index) => ({ id: `budget_${index + 1}`, order: index + 1, label })),
+        },
+      }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ accepted: true, completed: true,
+        lockedQuestionId: "budget", nextQuestion: null, result: { sessionId: "session_facts" },
+      }) });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<QuizSessionClient sessionId="session_facts" />);
+    const choice = await screen.findByRole("radio", { name: "Over CNY 500k" });
+    expect(screen.getAllByRole("radio")).toHaveLength(6);
+    fireEvent.click(choice);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith("/api/quiz/session_facts/answer", expect.objectContaining({
+      body: JSON.stringify({ questionId: "budget", optionId: "budget_6" }),
+    })));
+  });
+
   beforeEach(() => {
     sessionStorage.clear();
     vi.restoreAllMocks();

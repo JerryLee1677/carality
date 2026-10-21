@@ -42,6 +42,11 @@ export type CompleteSessionResponseDto = {
     score: number;
     reason: string;
     diagnostics: {
+      poolTier: string;
+      poolVersion: string;
+      poolSource: string;
+      poolReviewedAt: string;
+      selectionNote: string;
       userPreferenceVector: Array<{
         key: string;
         label: string;

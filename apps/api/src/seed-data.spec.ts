@@ -4,14 +4,15 @@ import { questions } from "../prisma/seed-data/questions";
 import { vehicles } from "../prisma/seed-data/vehicles";
 
 describe("assessment seed data", () => {
-  it("contains at least 40 questions with five-point scale anchors", () => {
+  it("contains concrete fact choices alongside five-point preference scales", () => {
     expect(questions.length).toBeGreaterThanOrEqual(40);
-    expect(questions.every((question) => question.options.length === 5)).toBe(true);
+    expect(questions.every((question) => question.options.length >= 5)).toBe(true);
     expect(questions.map((question) => question.slug)).toEqual(
       expect.arrayContaining([
-        "income-range",
-        "family-size",
-        "charging-access",
+        "budget-range",
+        "passenger-count",
+        "charging-availability",
+        "energy-preference",
         "ownership-horizon",
         "daily-commute-distance",
         "driving-style",
@@ -32,12 +33,12 @@ describe("assessment seed data", () => {
     expect(branchRuleCount).toBeGreaterThanOrEqual(8);
   });
 
-  it("maps no charging access answers away from EV recommendations", () => {
-    const chargingQuestion = questions.find((question) => question.slug === "charging-access");
-    const stronglyDisagree = chargingQuestion?.options.find((option) => option.order === 1);
-    const stronglyAgree = chargingQuestion?.options.find((option) => option.order === 5);
+  it("records charging facts without inventing energy acceptance", () => {
+    const chargingQuestion = questions.find((question) => question.slug === "charging-availability");
+    const homeCharging = chargingQuestion?.options.find((option) => option.order === 1);
+    const noCharging = chargingQuestion?.options.find((option) => option.order === 4);
     const effectValue = (
-      option: NonNullable<typeof stronglyDisagree>,
+      option: NonNullable<typeof homeCharging>,
       targetKey: string,
     ) =>
       option.effects.find(
@@ -46,12 +47,11 @@ describe("assessment seed data", () => {
       )?.weightDelta ?? 0;
 
     expect(chargingQuestion).toBeDefined();
-    expect(effectValue(stronglyDisagree!, "charging_access")).toBeLessThanOrEqual(1);
-    expect(effectValue(stronglyDisagree!, "energy_acceptance_ice")).toBeGreaterThanOrEqual(4);
-    expect(effectValue(stronglyDisagree!, "energy_acceptance_ev")).toBe(0);
-
-    expect(effectValue(stronglyAgree!, "charging_access")).toBeGreaterThanOrEqual(4);
-    expect(effectValue(stronglyAgree!, "energy_acceptance_ev")).toBeGreaterThanOrEqual(3);
+    expect(effectValue(noCharging!, "charging_access")).toBe(1);
+    expect(effectValue(homeCharging!, "charging_access")).toBe(4);
+    expect(chargingQuestion!.options.flatMap((option) => option.effects)
+      .some((effect) => effect.targetKey.startsWith("energy_acceptance"))).toBe(false);
+    expect(chargingQuestion!.options.find((option) => option.order === 5)!.effects).toEqual([]);
   });
 
   it("contains at least 50 vehicles with trait weights and constraint rules", () => {

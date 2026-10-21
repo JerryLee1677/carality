@@ -1,5 +1,6 @@
 import type { AssessmentQuestion } from "@/lib/assessment-session";
 import type { Language } from "@/lib/i18n";
+import { extensionQuestionTranslations } from "./quiz-question-extension-translations";
 
 type QuestionTranslation = {
   title: string;
@@ -7,6 +8,23 @@ type QuestionTranslation = {
 };
 
 const questionTranslations: Record<string, QuestionTranslation> = {
+  ...extensionQuestionTranslations,
+  "budget-range": {
+    title: "What is your maximum budget for the car itself?",
+    description: "Exclude insurance and purchase tax. Above CNY 500k, no upper limit is assumed yet.",
+  },
+  "passenger-count": {
+    title: "How many people usually travel in your car, including the driver?",
+    description: "Choose your usual passenger count. Occasional full loads are considered separately.",
+  },
+  "charging-availability": {
+    title: "What charging access do you actually have day to day?",
+    description: "A fixed parking space does not guarantee a charger. Choose your actual access.",
+  },
+  "energy-preference": {
+    title: "Given charging access and refueling time, which powertrains would you consider?",
+    description: "Your choice sets the scope of later questions and recommendations. Plug-in hybrids and range extenders can also run on gasoline.",
+  },
   "income-range": {
     title: "My household's annual disposable income can support a higher car purchase budget.",
     description: "This directly affects budget and monthly payment capacity.",
@@ -27,7 +45,7 @@ const questionTranslations: Record<string, QuestionTranslation> = {
   "full-load-frequency": { title: "My car is often close to being fully loaded." },
   "recharge-patience": { title: "I can accept spending some waiting time when recharging." },
   "winter-range-anxiety": {
-    title: "I noticeably worry about range and energy consumption fluctuations in winter or extreme weather.",
+    title: "If I choose a battery electric car, I worry about range and energy consumption fluctuations in winter or extreme weather.",
   },
   "fixed-parking": { title: "I have a fixed parking spot or stable parking habits." },
   "driving-style": { title: "My driving style leans toward steady, easy, and low-hassle." },
@@ -134,6 +152,17 @@ const optionTranslations = {
   },
 } as const;
 
+const choiceTranslations: Record<string, string[]> = {
+  "budget-range": ["Up to CNY 100k", "CNY 100k–160k", "CNY 160k–220k", "CNY 220k–300k", "CNY 300k–500k", "Over CNY 500k"],
+  "passenger-count": ["1–2 people", "3–4 people", "5 people", "6–7 people", "Not sure yet"],
+  "charging-availability": ["Reliable charging at home", "Reliable charging at work", "Mainly public charging stations", "No convenient charging available", "Not sure about charging access"],
+  "energy-preference": ["Gasoline or non-plug-in hybrid only", "No pure EV; plug-in hybrid or range extender is fine", "Open to all powertrains", "EV, plug-in hybrid or range extender only", "Pure EV only", "Not sure; help me compare"],
+};
+
+export function isChoiceQuestion(slug: string) {
+  return Object.hasOwn(choiceTranslations, slug);
+}
+
 export function getQuestionText(question: AssessmentQuestion, language: Language) {
   if (language === "zh") {
     return {
@@ -146,10 +175,14 @@ export function getQuestionText(question: AssessmentQuestion, language: Language
 
   return {
     title: translation?.title ?? question.title,
-    description: translation?.description ?? question.description,
+    description: translation?.description ?? (extensionQuestionTranslations[question.slug] ? "Choose how strongly you agree with this statement." : question.description),
   };
 }
 
-export function getOptionLabel(order: 1 | 2 | 3 | 4 | 5, language: Language) {
-  return optionTranslations[language][order];
+export function getOptionLabel(order: number, language: Language, slug?: string, label?: string) {
+  if (slug && isChoiceQuestion(slug)) {
+    return language === "en" ? choiceTranslations[slug][order - 1] ?? label ?? String(order) : label ?? String(order);
+  }
+  if (label && !Object.values(optionTranslations.zh).includes(label as never)) return label;
+  return optionTranslations[language][order as 1 | 2 | 3 | 4 | 5] ?? label ?? String(order);
 }

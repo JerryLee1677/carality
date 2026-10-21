@@ -10,7 +10,7 @@ import {
   type AssessmentSessionSnapshot,
 } from "@/lib/assessment-session";
 import { useLanguage } from "@/lib/i18n";
-import { getOptionLabel, getQuestionText } from "@/lib/quiz-question-translations";
+import { getOptionLabel, getQuestionText, isChoiceQuestion } from "@/lib/quiz-question-translations";
 
 type SubmitAnswerResponse = {
   accepted: boolean;
@@ -186,10 +186,10 @@ export function QuizSessionClient({ sessionId }: { sessionId: string }) {
             {questionText.description ? <p>{questionText.description}</p> : null}
           </div>
 
-          <div className="quiz-session__options" role="radiogroup" aria-label={questionText.title}>
+          <div className={`quiz-session__options${isChoiceQuestion(question.slug) ? " quiz-session__options--choices" : ""}`} role="radiogroup" aria-label={questionText.title}>
             {question.options.map((option) => {
-              const order = option.order as 1 | 2 | 3 | 4 | 5;
-              const optionLabel = getOptionLabel(order, language);
+              const order = option.order;
+              const optionLabel = getOptionLabel(order, language, question.slug, option.label);
               const isSelected = selectedOptionId === option.id;
 
               return (
@@ -209,7 +209,7 @@ export function QuizSessionClient({ sessionId }: { sessionId: string }) {
                   <span className="quiz-session__option-label">
                     <span className="sm:hidden">{optionLabel}</span>
                     <span className="hidden sm:inline">
-                      {order === 1 || order === 3 || order === 5 ? optionLabel : ""}
+                      {isChoiceQuestion(question.slug) || order === 1 || order === 3 || order === 5 ? optionLabel : ""}
                     </span>
                   </span>
                   <span

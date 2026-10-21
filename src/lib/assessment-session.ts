@@ -67,6 +67,13 @@ export type AssessmentResult = {
     score: number;
     reason: string;
     diagnostics?: {
+      poolTier?: string;
+      poolVersion?: string;
+      poolSource?: string;
+      poolReviewedAt?: string;
+      selectionNote?: string;
+      strictMatch?: boolean;
+      constraintMisses?: string[];
       userPreferenceVector: Array<{
         key: string;
         label: string;

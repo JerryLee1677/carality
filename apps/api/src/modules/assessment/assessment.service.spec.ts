@@ -1,7 +1,33 @@
 import { describe, expect, it, vi } from "vitest";
 import { AssessmentService } from "./assessment.service";
+import { deriveUserConditions } from "../questions/user-conditions";
 
 describe("AssessmentService", () => {
+  it("never reintroduces rejected energy types through a recommendation bucket or fallback", () => {
+    const service = new AssessmentService({} as never, {} as never);
+    const userConditions = deriveUserConditions([
+      { question: { slug: "energy-preference" }, option: { order: 1 } },
+    ]);
+    const traits = { byKey: {}, byTargetType: {}, minByTargetType: {}, userConditions };
+    const vehicles = ["EV", "PHEV", "EREV", "ICE", "HEV"].map((energyType) => ({
+      id: energyType, slug: energyType, brand: energyType, series: energyType, energyType,
+      priceMin: 300_000, poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" }, traitWeights: [], constraintRules: [],
+    }));
+    const result = (service as any).buildDualBucketRankedVehicleRecommendations(vehicles, traits);
+    expect(result.map((item: { energyType: string }) => item.energyType).sort()).toEqual(["HEV", "ICE"]);
+    expect((service as any).buildDualBucketRankedVehicleRecommendations(vehicles.slice(0, 3), traits)).toEqual([]);
+  });
+
+  it("uses explicit budget facts without inferring an upper limit for 500k-plus", () => {
+    const service = new AssessmentService({} as never, {} as never);
+    const traits = { byKey: {}, byTargetType: {}, minByTargetType: {}, userConditions: deriveUserConditions([
+      { question: { slug: "budget-range" }, option: { order: 3 } },
+    ]) };
+    expect((service as any).getBudgetPriceLimit(traits)).toBe(220_000);
+    traits.userConditions = deriveUserConditions([{ question: { slug: "budget-range" }, option: { order: 6 } }]);
+    expect((service as any).getBudgetPriceLimit(traits)).toBeNull();
+  });
+
   it("resolves personality images across supported file extensions", () => {
     const service = new AssessmentService({} as never, {} as never);
 
@@ -102,7 +128,7 @@ describe("AssessmentService", () => {
       lifeQuestionCount: 0,
       carQuestionCount: 0,
     });
-    const answerFindMany = vi.fn().mockResolvedValue([{ questionId: "question_1" }]);
+    const answerFindMany = vi.fn().mockResolvedValue([{ questionId: "question_1", question: { slug: "energy-preference" }, option: { order: 1 } }]);
     const answerCreate = vi.fn().mockResolvedValue(undefined);
     const snapshotCreateMany = vi.fn().mockResolvedValue(undefined);
     const snapshotFindMany = vi.fn().mockResolvedValue([
@@ -270,6 +296,10 @@ describe("AssessmentService", () => {
       lifeQuestionCount: 1,
       carQuestionCount: 0,
       coveredTraitKeys: ["social_confidence", "social-expression"],
+      userConditions: deriveUserConditions([{ question: { slug: "energy-preference" }, option: { order: 1 } }]),
+      answerHistory: [{ slug: "energy-preference", order: 1 }],
+      selectionSeed: "session_1",
+      targetQuestionCount: undefined,
     });
     expect(sessionUpdate).toHaveBeenCalledWith({
       where: {
@@ -422,6 +452,10 @@ describe("AssessmentService", () => {
       lifeQuestionCount: 2,
       carQuestionCount: 0,
       coveredTraitKeys: ["social_confidence"],
+      userConditions: deriveUserConditions([]),
+      answerHistory: [],
+      selectionSeed: "session_2",
+      targetQuestionCount: undefined,
     });
     expect(sessionUpdate).toHaveBeenCalledWith({
       where: {
@@ -507,6 +541,7 @@ describe("AssessmentService", () => {
         modelName: "DM-i",
         recommendation: "适合偏稳健务实、重视空间与长期成本的用户",
         constraintRules: [],
+        poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
         traitWeights: [
           { targetType: "VEHICLE_PREFERENCE", targetKey: "family_fit", weight: 10 },
           { targetType: "VEHICLE_PREFERENCE", targetKey: "running_cost", weight: 9 },
@@ -521,6 +556,7 @@ describe("AssessmentService", () => {
         modelName: "后轮驱动版",
         recommendation: "适合偏表达探索、愿意尝鲜并在意科技体验的用户",
         constraintRules: [],
+        poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
         traitWeights: [
           { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 9 },
           { targetType: "PERSONALITY_TRAIT", targetKey: "novelty_seeking", weight: 8 },
@@ -542,7 +578,7 @@ describe("AssessmentService", () => {
       },
       assessmentAnswer: {
         create: vi.fn(),
-        findMany: vi.fn(),
+        findMany: vi.fn().mockResolvedValue([]),
       },
       sessionTraitSnapshot: {
         createMany: vi.fn(),
@@ -630,7 +666,7 @@ describe("AssessmentService", () => {
           series: "Model 3",
           energyType: "ICE",
           rank: 2,
-          score: 42,
+          score: 39,
           reason: "你当前更看重空间实用性、家庭适配、使用成本，但这台车在这些维度上的匹配度偏低。",
           diagnostics: expect.any(Object),
         },
@@ -683,7 +719,7 @@ describe("AssessmentService", () => {
           resultId: "result_1",
           vehicleId: "vehicle_2",
           rank: 2,
-          score: 42,
+          score: 39,
           reason: "你当前更看重空间实用性、家庭适配、使用成本，但这台车在这些维度上的匹配度偏低。",
         },
       ],
@@ -730,6 +766,7 @@ describe("AssessmentService", () => {
       sessionId: "session_external_vehicles",
     });
     const prisma = {
+      assessmentAnswer: { findMany: vi.fn().mockResolvedValue([]) },
       assessmentSession: {
         findUnique: sessionFindUnique,
         update: sessionUpdate,
@@ -762,6 +799,7 @@ describe("AssessmentService", () => {
           bodyType: "SUV",
           recommendation: "适合家庭用户",
           constraintRules: [],
+          poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
           traitWeights: [
             { targetType: "VEHICLE_PREFERENCE", targetKey: "family_fit", weight: 10 },
           ],
@@ -851,6 +889,7 @@ describe("AssessmentService", () => {
             traitThreshold: 3,
           },
         ],
+        poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
         traitWeights: [
           { targetType: "PERSONALITY_TRAIT", targetKey: "stability_preference", weight: 10 },
         ],
@@ -870,6 +909,7 @@ describe("AssessmentService", () => {
             traitThreshold: 5,
           },
         ],
+        poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
         traitWeights: [
           { targetType: "PERSONALITY_TRAIT", targetKey: "stability_preference", weight: 100 },
         ],
@@ -889,6 +929,7 @@ describe("AssessmentService", () => {
             traitThreshold: 3,
           },
         ],
+        poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
         traitWeights: [
           { targetType: "PERSONALITY_TRAIT", targetKey: "stability_preference", weight: 8 },
         ],
@@ -909,7 +950,7 @@ describe("AssessmentService", () => {
       },
       assessmentAnswer: {
         create: vi.fn(),
-        findMany: vi.fn(),
+        findMany: vi.fn().mockResolvedValue([]),
       },
       sessionTraitSnapshot: {
         createMany: vi.fn(),
@@ -966,17 +1007,17 @@ describe("AssessmentService", () => {
     expect(result.recommendations[0].diagnostics.strictMatch).toBe(true);
     expect(result.recommendations.map((item) => item.slug)).not.toContain("future-ev-x");
     expect(result.recommendations[0]).toMatchObject({
-      slug: "toyota-camry",
-      brand: "丰田",
-      series: "凯美瑞",
-      rank: 1,
-      score: 43,
-      reason: "你当前更看重家庭适配、舒适性、空间实用性，但这台车在这些维度上的匹配度偏低。",
-    });
-    expect(result.recommendations[1]).toMatchObject({
       slug: "honda-accord",
       brand: "本田",
       series: "雅阁",
+      rank: 1,
+      score: 40,
+      reason: "你当前更看重家庭适配、舒适性、空间实用性，但这台车在这些维度上的匹配度偏低。",
+    });
+    expect(result.recommendations[1]).toMatchObject({
+      slug: "toyota-camry",
+      brand: "丰田",
+      series: "凯美瑞",
       rank: 2,
     });
 
@@ -984,22 +1025,23 @@ describe("AssessmentService", () => {
       data: [
         {
           resultId: "result_constraints_1",
-          vehicleId: "vehicle_pass",
+          vehicleId: "vehicle_pass_alternative",
           rank: 1,
-          score: 43,
+          score: 40,
           reason: "你当前更看重家庭适配、舒适性、空间实用性，但这台车在这些维度上的匹配度偏低。",
         },
         expect.objectContaining({
           resultId: "result_constraints_1",
-          vehicleId: "vehicle_pass_alternative",
+          vehicleId: "vehicle_pass",
           rank: 2,
         }),
       ],
     });
   });
 
-  it("fills both energy buckets even when plug-in hard constraints are negative", async () => {
+  it("does not force plug-in fallback when strict fuel matches exist", async () => {
     const prisma = {
+      assessmentAnswer: { findMany: vi.fn().mockResolvedValue([]) },
       assessmentSession: {
         create: vi.fn(),
         findUnique: vi.fn().mockResolvedValue({
@@ -1053,6 +1095,7 @@ describe("AssessmentService", () => {
                 traitThreshold: 3,
               },
             ],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 10 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 8 },
@@ -1083,6 +1126,7 @@ describe("AssessmentService", () => {
                 traitThreshold: 2,
               },
             ],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 8 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 7 },
@@ -1113,6 +1157,7 @@ describe("AssessmentService", () => {
                 traitThreshold: 2,
               },
             ],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 7 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "comfort_space", weight: 8 },
@@ -1136,6 +1181,7 @@ describe("AssessmentService", () => {
             modelName: "双擎",
             energyType: "HEV",
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 10 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 10 },
@@ -1159,6 +1205,7 @@ describe("AssessmentService", () => {
             modelName: "燃油版",
             energyType: "ICE",
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 2 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 2 },
@@ -1182,6 +1229,7 @@ describe("AssessmentService", () => {
             modelName: "燃油版",
             energyType: "ICE",
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 6 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 4 },
@@ -1217,40 +1265,21 @@ describe("AssessmentService", () => {
     const result = await service.completeSession("session_reject_plugin_1");
 
     expect(result.sessionId).toBe("session_reject_plugin_1");
-    expect(result.recommendations).toHaveLength(5);
+    expect(result.recommendations).toHaveLength(2);
     expect(
       result.recommendations.filter((vehicle) =>
         ["EV", "PHEV", "EREV"].includes(vehicle.energyType),
       ),
-    ).toHaveLength(3);
+    ).toHaveLength(0);
     expect(
       result.recommendations.filter((vehicle) =>
         ["ICE", "HEV"].includes(vehicle.energyType),
       ),
     ).toHaveLength(2);
-    expect(
-      result.recommendations
-        .slice(0, 3)
-        .every((vehicle) => ["EV", "PHEV", "EREV"].includes(vehicle.energyType)),
-    ).toBe(true);
-    expect(
-      result.recommendations
-        .slice(3)
-        .every((vehicle) => ["ICE", "HEV"].includes(vehicle.energyType)),
-    ).toBe(true);
+    expect(result.recommendations.every((vehicle) => vehicle.diagnostics.strictMatch)).toBe(true);
 
     expect(prisma.sessionVehicleRecommendation.createMany).toHaveBeenCalledWith({
       data: expect.arrayContaining([
-        expect.objectContaining({
-          vehicleId: "vehicle_ev",
-          rank: 1,
-        }),
-        expect.objectContaining({
-          vehicleId: "vehicle_phev",
-        }),
-        expect.objectContaining({
-          vehicleId: "vehicle_erev",
-        }),
         expect.objectContaining({
           vehicleId: "vehicle_ice",
         }),
@@ -1261,8 +1290,9 @@ describe("AssessmentService", () => {
     });
   });
 
-  it("uses plug-in vehicles as fallback results when negative charging answers leave the electric bucket empty", async () => {
+  it("keeps an electric bucket empty when only fuel matches charging constraints", async () => {
     const prisma = {
+      assessmentAnswer: { findMany: vi.fn().mockResolvedValue([]) },
       assessmentSession: {
         create: vi.fn(),
         findUnique: vi.fn().mockResolvedValue({
@@ -1320,6 +1350,7 @@ describe("AssessmentService", () => {
                 traitThreshold: 3,
               },
             ],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 10 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 8 },
@@ -1340,6 +1371,7 @@ describe("AssessmentService", () => {
                 traitThreshold: 2,
               },
             ],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 8 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 7 },
@@ -1360,6 +1392,7 @@ describe("AssessmentService", () => {
                 traitThreshold: 3,
               },
             ],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 9 },
             ],
@@ -1384,31 +1417,12 @@ describe("AssessmentService", () => {
     const result = await service.completeSession("session_negative_plugin_once_1");
 
     expect(result.sessionId).toBe("session_negative_plugin_once_1");
-    expect(result.recommendations).toHaveLength(3);
+    expect(result.recommendations).toHaveLength(1);
     expect(result.recommendations[0]).toMatchObject({
-      slug: "tesla-model-3",
-      brand: "特斯拉",
-      series: "Model 3",
-      rank: 1,
-      energyType: "EV",
-      diagnostics: {
-        userPreferenceVector: expect.arrayContaining([
-          { key: "energy", label: "能源类型", value: 0 },
-        ]),
-      },
-    });
-    expect(result.recommendations[1]).toMatchObject({
-      slug: "byd-song-plus-dmi",
-      brand: "比亚迪",
-      series: "宋 PLUS",
-      rank: 2,
-      energyType: "PHEV",
-    });
-    expect(result.recommendations[2]).toMatchObject({
       slug: "lynkco-03-plus",
       brand: "领克",
       series: "03+",
-      rank: 3,
+      rank: 1,
       energyType: "ICE",
       diagnostics: {
         userPreferenceVector: expect.arrayContaining([
@@ -1423,16 +1437,8 @@ describe("AssessmentService", () => {
     expect(prisma.sessionVehicleRecommendation.createMany).toHaveBeenCalledWith({
       data: [
         expect.objectContaining({
-          vehicleId: "vehicle_ev",
-          rank: 1,
-        }),
-        expect.objectContaining({
-          vehicleId: "vehicle_phev",
-          rank: 2,
-        }),
-        expect.objectContaining({
           vehicleId: "vehicle_ice",
-          rank: 3,
+          rank: 1,
         }),
       ],
     });
@@ -1440,6 +1446,7 @@ describe("AssessmentService", () => {
 
   it("scores vehicle traits against matching target types when keys overlap", async () => {
     const prisma = {
+      assessmentAnswer: { findMany: vi.fn().mockResolvedValue([]) },
       assessmentSession: {
         create: vi.fn(),
         findUnique: vi.fn().mockResolvedValue({
@@ -1485,6 +1492,7 @@ describe("AssessmentService", () => {
             modelName: "车型A",
             recommendation: "static",
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               {
                 targetType: "PERSONALITY_TRAIT",
@@ -1501,6 +1509,7 @@ describe("AssessmentService", () => {
             modelName: "车型B",
             recommendation: "static",
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               {
                 targetType: "VEHICLE_PREFERENCE",
@@ -1557,6 +1566,7 @@ describe("AssessmentService", () => {
 
   it("falls back to safe non plug-in vehicles when strict hard constraints exclude every active vehicle", async () => {
     const prisma = {
+      assessmentAnswer: { findMany: vi.fn().mockResolvedValue([]) },
       assessmentSession: {
         create: vi.fn(),
         findUnique: vi.fn().mockResolvedValue({
@@ -1605,6 +1615,7 @@ describe("AssessmentService", () => {
                 traitThreshold: 5,
               },
             ],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               {
                 targetType: "PERSONALITY_TRAIT",
@@ -1654,6 +1665,7 @@ describe("AssessmentService", () => {
 
   it("matches hard constraints against the rule target type when keys overlap before falling back", async () => {
     const prisma = {
+      assessmentAnswer: { findMany: vi.fn().mockResolvedValue([]) },
       assessmentSession: {
         create: vi.fn(),
         findUnique: vi.fn().mockResolvedValue({
@@ -1706,6 +1718,7 @@ describe("AssessmentService", () => {
                 traitThreshold: 5,
               },
             ],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               {
                 targetType: "PERSONALITY_TRAIT",
@@ -1729,6 +1742,7 @@ describe("AssessmentService", () => {
                 traitThreshold: 5,
               },
             ],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               {
                 targetType: "VEHICLE_PREFERENCE",
@@ -1776,6 +1790,7 @@ describe("AssessmentService", () => {
 
   it("penalizes vehicles that miss the user's strongest performance and tech preferences", async () => {
     const prisma = {
+      assessmentAnswer: { findMany: vi.fn().mockResolvedValue([]) },
       assessmentSession: {
         create: vi.fn(),
         findUnique: vi.fn().mockResolvedValue({
@@ -1816,6 +1831,7 @@ describe("AssessmentService", () => {
           {
             id: "vehicle_commuter",
             slug: "commuter-car",
+            priceMin: 150_000,
             brand: "品牌通勤",
             series: "系列通勤",
             modelName: "城市版",
@@ -1825,6 +1841,7 @@ describe("AssessmentService", () => {
               { targetType: "HARD_CONSTRAINT", targetKey: "energy_acceptance_ice", traitOperator: "GTE", traitThreshold: 3 },
               { targetType: "HARD_CONSTRAINT", targetKey: "monthly_payment_sensitivity", traitOperator: "GTE", traitThreshold: 3 },
             ],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "running_cost", weight: 10 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "daily_reliability", weight: 10 },
@@ -1834,6 +1851,7 @@ describe("AssessmentService", () => {
           {
             id: "vehicle_performance",
             slug: "performance-tech-car",
+            priceMin: 150_000,
             brand: "品牌性能",
             series: "系列性能",
             modelName: "高阶版",
@@ -1843,6 +1861,7 @@ describe("AssessmentService", () => {
               { targetType: "HARD_CONSTRAINT", targetKey: "charging_access", traitOperator: "GTE", traitThreshold: 3 },
               { targetType: "HARD_CONSTRAINT", targetKey: "energy_acceptance_ev", traitOperator: "GTE", traitThreshold: 3 },
             ],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 10 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 10 },
@@ -1897,6 +1916,7 @@ describe("AssessmentService", () => {
 
   it("prioritizes vehicles whose core scores match a tech-and-handling-heavy preference vector", async () => {
     const prisma = {
+      assessmentAnswer: { findMany: vi.fn().mockResolvedValue([]) },
       assessmentSession: {
         create: vi.fn(),
         findUnique: vi.fn().mockResolvedValue({
@@ -1937,6 +1957,7 @@ describe("AssessmentService", () => {
           {
             id: "vehicle_commuter",
             slug: "commuter-sedan",
+            priceMin: 150_000,
             brand: "品牌通勤",
             series: "通勤轿车",
             modelName: "",
@@ -1954,6 +1975,7 @@ describe("AssessmentService", () => {
             reliabilityScore: 85,
             familyScore: 62,
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "running_cost", weight: 10 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "daily_reliability", weight: 9 },
@@ -1962,6 +1984,7 @@ describe("AssessmentService", () => {
           {
             id: "vehicle_tech",
             slug: "tech-performance-ev",
+            priceMin: 150_000,
             brand: "品牌性能",
             series: "科技性能轿车",
             modelName: "",
@@ -1979,6 +2002,7 @@ describe("AssessmentService", () => {
             reliabilityScore: 65,
             familyScore: 44,
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 10 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 10 },
@@ -2021,6 +2045,7 @@ describe("AssessmentService", () => {
 
   it("prefers EV recommendations when the user has charging access and explicitly accepts EV", async () => {
     const prisma = {
+      assessmentAnswer: { findMany: vi.fn().mockResolvedValue([]) },
       assessmentSession: {
         create: vi.fn(),
         findUnique: vi.fn().mockResolvedValue({
@@ -2058,6 +2083,7 @@ describe("AssessmentService", () => {
           {
             id: "vehicle_ice",
             slug: "premium-ice-suv",
+            priceMin: 150_000,
             brand: "品牌燃油",
             series: "燃油豪华 SUV",
             modelName: "",
@@ -2076,6 +2102,7 @@ describe("AssessmentService", () => {
             reliabilityScore: 82,
             familyScore: 86,
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "comfort_space", weight: 8 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "brand_expression", weight: 8 },
@@ -2085,6 +2112,7 @@ describe("AssessmentService", () => {
           {
             id: "vehicle_ev",
             slug: "smart-ev-sedan",
+            priceMin: 150_000,
             brand: "品牌纯电",
             series: "智能纯电轿车",
             modelName: "",
@@ -2103,6 +2131,7 @@ describe("AssessmentService", () => {
             reliabilityScore: 60,
             familyScore: 44,
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 10 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "design_presence", weight: 8 },
@@ -2227,6 +2256,7 @@ describe("AssessmentService", () => {
                 traitThreshold: 5,
               },
             ],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               {
                 targetType: "PERSONALITY_TRAIT",
@@ -2340,6 +2370,7 @@ describe("AssessmentService", () => {
         modelName: "DM-i",
         recommendation: "static",
         constraintRules: [],
+        poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
         traitWeights: [
           { targetType: "VEHICLE_PREFERENCE", targetKey: "family_fit", weight: 10 },
           { targetType: "VEHICLE_PREFERENCE", targetKey: "running_cost", weight: 9 },
@@ -2521,6 +2552,7 @@ describe("AssessmentService", () => {
             modelName: "高阶版",
             recommendation: "static",
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 10 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 10 },
@@ -2548,7 +2580,7 @@ describe("AssessmentService", () => {
       },
       assessmentAnswer: {
         create: vi.fn(),
-        findMany: vi.fn(),
+        findMany: vi.fn().mockResolvedValue([]),
       },
       sessionTraitSnapshot: {
         createMany: vi.fn(),
@@ -2847,7 +2879,7 @@ describe("AssessmentService", () => {
       },
       assessmentAnswer: {
         create: vi.fn(),
-        findMany: vi.fn(),
+        findMany: vi.fn().mockResolvedValue([]),
       },
       sessionTraitSnapshot: {
         createMany: vi.fn(),
@@ -2938,12 +2970,14 @@ describe("AssessmentService", () => {
         designScore: 70,
         reliabilityScore: 84,
         familyScore: 90,
+        poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
         traitWeights: [],
         constraintRules: [],
       },
     ]);
 
     const prisma = {
+      assessmentAnswer: { findMany: vi.fn().mockResolvedValue([]) },
       assessmentSession: {
         create: vi.fn(),
         findUnique: sessionFindUnique,
@@ -3073,7 +3107,7 @@ describe("AssessmentService", () => {
     });
   });
 
-  it("recomputes persisted result recommendations with current charging hard constraints for both buckets", async () => {
+  it("recomputes persisted recommendations without forcing stale electric fallback", async () => {
     const sessionFindUnique = vi.fn().mockResolvedValue({
       id: "session_result_stale_ev",
       result: {
@@ -3093,6 +3127,7 @@ describe("AssessmentService", () => {
               brand: "特斯拉",
               series: "Model Y",
               energyType: "EV",
+              poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
               traitWeights: [],
               constraintRules: [],
             },
@@ -3117,6 +3152,7 @@ describe("AssessmentService", () => {
         designScore: 88,
         reliabilityScore: 80,
         familyScore: 86,
+        poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
         traitWeights: [],
         constraintRules: [],
       },
@@ -3136,12 +3172,14 @@ describe("AssessmentService", () => {
         designScore: 64,
         reliabilityScore: 92,
         familyScore: 88,
+        poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
         traitWeights: [],
         constraintRules: [],
       },
     ]);
 
     const prisma = {
+      assessmentAnswer: { findMany: vi.fn().mockResolvedValue([]) },
       assessmentSession: {
         create: vi.fn(),
         findUnique: sessionFindUnique,
@@ -3184,15 +3222,8 @@ describe("AssessmentService", () => {
 
     const result = await service.getSessionResult("session_result_stale_ev");
 
-    expect(result.recommendations).toHaveLength(2);
+    expect(result.recommendations).toHaveLength(1);
     expect(result.recommendations[0]).toMatchObject({
-      slug: "tesla-model-y",
-      brand: "特斯拉",
-      series: "Model Y",
-      energyType: "EV",
-      diagnostics: expect.any(Object),
-    });
-    expect(result.recommendations[1]).toMatchObject({
       slug: "toyota-rav4",
       brand: "丰田",
       series: "RAV4",
@@ -3293,6 +3324,7 @@ describe("AssessmentService", () => {
 
   it("fills missing vehicle core scores from trait weights instead of scoring them as zero", async () => {
     const prisma = {
+      assessmentAnswer: { findMany: vi.fn().mockResolvedValue([]) },
       assessmentSession: {
         findUnique: vi.fn().mockResolvedValue({ id: "session_partial_scores", status: "IN_PROGRESS" }),
         update: vi.fn().mockResolvedValue(undefined),
@@ -3318,6 +3350,7 @@ describe("AssessmentService", () => {
             energyType: "ICE",
             handlingScore: 90,
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [
               { targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 10 },
               { targetType: "VEHICLE_PREFERENCE", targetKey: "smart_features", weight: 10 },
@@ -3347,6 +3380,7 @@ describe("AssessmentService", () => {
 
   it("treats vehicle starting price above the mapped budget as a hard-constraint miss", async () => {
     const prisma = {
+      assessmentAnswer: { findMany: vi.fn().mockResolvedValue([]) },
       assessmentSession: {
         findUnique: vi.fn().mockResolvedValue({ id: "session_budget", status: "IN_PROGRESS" }),
         update: vi.fn().mockResolvedValue(undefined),
@@ -3373,6 +3407,7 @@ describe("AssessmentService", () => {
             priceMin: 80_000,
             priceMax: 100_000,
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [{ targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 10 }],
           },
           {
@@ -3384,6 +3419,7 @@ describe("AssessmentService", () => {
             priceMin: 150_000,
             priceMax: 180_000,
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [{ targetType: "VEHICLE_PREFERENCE", targetKey: "driving_engagement", weight: 10 }],
           },
         ]),
@@ -3408,6 +3444,7 @@ describe("AssessmentService", () => {
 
   it("limits recommendations to one series and two vehicles per brand", async () => {
     const prisma = {
+      assessmentAnswer: { findMany: vi.fn().mockResolvedValue([]) },
       assessmentSession: {
         findUnique: vi.fn().mockResolvedValue({ id: "session_diversity", status: "IN_PROGRESS" }),
         update: vi.fn().mockResolvedValue(undefined),
@@ -3433,6 +3470,7 @@ describe("AssessmentService", () => {
             priceMin: 100_000,
             priceMax: 120_000,
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [],
           },
           {
@@ -3444,6 +3482,7 @@ describe("AssessmentService", () => {
             priceMin: 100_000,
             priceMax: 120_000,
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [],
           },
           ...Array.from({ length: 4 }, (_, index) => ({
@@ -3455,6 +3494,7 @@ describe("AssessmentService", () => {
             priceMin: 100_000,
             priceMax: 120_000,
             constraintRules: [],
+            poolPolicy: { tier: "PRIMARY", source: "isolated scoring fixture", reviewedAt: "2026-10-16" },
             traitWeights: [],
           })),
         ]),

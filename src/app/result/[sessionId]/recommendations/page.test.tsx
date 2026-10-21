@@ -16,6 +16,29 @@ describe("RecommendationsPage", () => {
     vi.resetAllMocks();
   });
 
+  it("explains an empty eligible pool without suggesting results are still generating", async () => {
+    assessmentApiFetchMock.mockResolvedValue({
+      json: async () => ({ personalityProfile: { name: "务实省心型" }, recommendations: [] }),
+    });
+    render(await RecommendationsPage({ params: Promise.resolve({ sessionId: "empty" }) }));
+    expect(screen.getByText("暂无符合条件的主流车型")).toBeInTheDocument();
+    expect(screen.getByText(/当前车型池中没有满足预算/)).toBeInTheDocument();
+    expect(screen.queryByText(/正在生成/)).not.toBeInTheDocument();
+  });
+
+  it("displays every selected vehicle and explains supplemental selection", async () => {
+    const selectionNote = "符合条件的主推车系不足，补充此车系供比较。";
+    assessmentApiFetchMock.mockResolvedValue({
+      json: async () => ({ personalityProfile: { name: "务实省心型" }, recommendations:
+        Array.from({ length: 5 }, (_, index) => ({ slug: `car-${index}`, brand: "品牌", series: `车系${index}`,
+          energyType: "ICE", rank: index + 1, reason: "符合用车偏好", diagnostics: index === 4 ? { selectionNote } : undefined })) }),
+    });
+    render(await RecommendationsPage({ params: Promise.resolve({ sessionId: "supplement" }) }));
+    expect(screen.getAllByRole("link", { name: "查看车型详情" })).toHaveLength(5);
+    expect(screen.getByText(selectionNote)).toBeInTheDocument();
+    expect(screen.getByText(/该类别暂不推荐/)).toBeInTheDocument();
+  });
+
   it("renders recommended vehicles for the completed session", async () => {
     assessmentApiFetchMock.mockResolvedValue({
       json: async () => ({

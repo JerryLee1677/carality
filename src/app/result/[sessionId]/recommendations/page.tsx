@@ -86,7 +86,7 @@ export default async function RecommendationsPage({
 
                 {section.items.length > 0 ? (
                   <div className="recommendation-group__list">
-                    {section.items.slice(0, 3).map((vehicle) => (
+                    {section.items.map((vehicle) => (
                       <article key={vehicle.slug} className="recommendation-card">
                         <div className="recommendation-card__meta">
                           <p className="recommendation-card__rank">Top {vehicle.rank}</p>
@@ -96,6 +96,7 @@ export default async function RecommendationsPage({
                         </div>
 
                         <p className="recommendation-card__reason">{vehicle.reason}</p>
+                        {vehicle.diagnostics?.selectionNote ? <p className="recommendation-card__reason">{vehicle.diagnostics.selectionNote}</p> : null}
 
                         <div className="recommendation-card__aside">
                           <Link
@@ -112,7 +113,7 @@ export default async function RecommendationsPage({
                   <div className="recommendations-empty recommendations-empty--compact">
                     <h3 className="recommendations-empty__title">暂无可展示车型</h3>
                     <p className="recommendations-empty__body">
-                      当前这一类没有足够的推荐结果，系统会继续保留另一类车型供你参考。
+                      当前没有符合预算、能源及其他用车条件的主流车系，该类别暂不推荐。
                     </p>
                   </div>
                 )}
@@ -121,9 +122,9 @@ export default async function RecommendationsPage({
           </div>
         ) : (
           <div className="recommendations-empty">
-            <h2 className="recommendations-empty__title">推荐结果生成中</h2>
+            <h2 className="recommendations-empty__title">暂无符合条件的主流车型</h2>
             <p className="recommendations-empty__body">
-              当前还没有可展示的车型推荐，你可以先返回人格结果页，稍后再次查看。
+              当前车型池中没有满足预算、能源及其他用车条件的主流车辆。可以重新测评调整条件，或稍后查看更新后的车型池。
             </p>
           </div>
         )}

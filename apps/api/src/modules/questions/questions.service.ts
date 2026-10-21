@@ -3,6 +3,8 @@ import { PrismaService } from "../../common/prisma/prisma.service";
 import type { NextQuestionInput } from "./next-question-input.type";
 import type { NextQuestionResult } from "./next-question-result.type";
 import type { QuestionSummary } from "./question-summary.type";
+import { deriveUserConditions, getConditionQuestionPriority, isQuestionEligible } from "./user-conditions";
+import { getQuestionMetadata, hasSufficientInformation, isScenarioEligible, stableQuestionJitter } from "./question-selection-metadata";
 
 type QuestionRecordWithOptions = {
   id: string;
@@ -38,15 +40,23 @@ export class QuestionsService {
   }
 
   async getNextQuestion(input: NextQuestionInput): Promise<NextQuestionResult> {
+    const history = input.answerHistory ?? [];
+    const userConditions = input.userConditions ?? deriveUserConditions([]);
+    if (input.targetQuestionCount && hasSufficientInformation(history, userConditions, input.targetQuestionCount)) {
+      return { nextQuestion: null, candidates: [] };
+    }
+    const answeredTopics = new Set(history.map((answer) => getQuestionMetadata(answer.slug).topic));
+    const dimensionCounts = new Map<string, number>();
+    for (const answer of history) {
+      const { dimension } = getQuestionMetadata(answer.slug);
+      dimensionCounts.set(dimension, (dimensionCounts.get(dimension) ?? 0) + 1);
+    }
     const candidates = await this.prisma.question.findMany({
       where: {
         status: "ACTIVE",
         id: {
           notIn: input.answeredQuestionIds,
         },
-        OR: input.currentBranchKey
-          ? [{ branchKey: input.currentBranchKey }, { branchKey: null }]
-          : [{ branchKey: null }],
       },
       include: {
         options: {
@@ -68,19 +78,26 @@ export class QuestionsService {
     });
 
     const ranked = candidates
+      .filter((candidate) => isQuestionEligible(candidate.slug, userConditions) &&
+        isScenarioEligible(candidate.slug, userConditions) &&
+        !answeredTopics.has(getQuestionMetadata(candidate.slug).topic))
       .map((candidate) => {
         const branchFit =
           candidate.branchKey && candidate.branchKey === input.currentBranchKey
-            ? 100
+            ? 10
             : candidate.branchKey === null
-              ? 40
+              ? 3
               : 0;
         const infoGain = candidate.discrimination ?? 0;
         const coverageBonus = this.getTraitCoverageBonus(candidate, input);
+        const dimension = getQuestionMetadata(candidate.slug).dimension;
+        const dimensionBonus = dimension === "facts" || dimension === "unknown" ? 0 : 70 / (1 + (dimensionCounts.get(dimension) ?? 0));
         const rankingScore =
-          (candidate.priority ?? 0) +
+          getConditionQuestionPriority(candidate.slug) +
+          (candidate.priority ?? 0) * 0.1 +
           branchFit +
-          infoGain +
+          infoGain * 0.08 + dimensionBonus +
+          (input.selectionSeed ? stableQuestionJitter(input.selectionSeed, history.length, candidate.slug) : 0) +
           this.getTypeBalanceBonus(candidate.type, input) +
           coverageBonus;
 
@@ -88,10 +105,10 @@ export class QuestionsService {
           candidate,
           branchFit,
           infoGain,
-          rankingScore,
+          rankingScore: Number(rankingScore.toFixed(3)),
         };
       })
-      .sort((left, right) => right.rankingScore - left.rankingScore);
+      .sort((left, right) => right.rankingScore - left.rankingScore || left.candidate.slug.localeCompare(right.candidate.slug));
 
     return {
       nextQuestion: ranked[0] ? this.toQuestionSummary(ranked[0].candidate) : null,
@@ -131,11 +148,11 @@ export class QuestionsService {
     const diff = input.lifeQuestionCount - input.carQuestionCount;
 
     if (diff >= 2) {
-      return questionType === "CAR_USAGE" ? 25 : -40;
+      return questionType === "CAR_USAGE" ? 3 : -3;
     }
 
     if (diff <= -2) {
-      return questionType === "LIFE_STYLE" ? 25 : -40;
+      return questionType === "LIFE_STYLE" ? 3 : -3;
     }
 
     return 0;
