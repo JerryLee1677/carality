@@ -131,6 +131,9 @@ describe("QuizSessionClient", () => {
       method: "GET",
     });
     expect(screen.getAllByText("Strongly Disagree")[0]).toBeInTheDocument();
+    expect(screen.getAllByText("Somewhat Disagree")[0]).toBeInTheDocument();
+    expect(screen.getAllByText("Neutral")[0]).toBeInTheDocument();
+    expect(screen.getAllByText("Somewhat Agree")[0]).toBeInTheDocument();
     expect(screen.getAllByText("Strongly Agree")[0]).toBeInTheDocument();
   });
 

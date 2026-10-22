@@ -34,7 +34,7 @@ export type QuestionSeed = {
 
 const SCALE_LABELS: Record<1 | 2 | 3 | 4 | 5, string> = {
   1: "强烈不认同",
-  2: "不太认同",
+  2: "比较不认同",
   3: "中立",
   4: "比较认同",
   5: "强烈认同",

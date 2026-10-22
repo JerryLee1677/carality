@@ -25,6 +25,10 @@ describe("concrete quiz choices", () => {
   });
 
   it("keeps agreement translations and unknown server choices usable", () => {
+    expect(getOptionLabel(2, "zh", "driving-style", "不太认同")).toBe("比较不认同");
+    expect(getOptionLabel(2, "zh", "driving-style", "比较不认同")).toBe("比较不认同");
+    expect(getOptionLabel(4, "zh", "driving-style", "比较认同")).toBe("比较认同");
+    expect(getOptionLabel(2, "en", "driving-style", "不太认同")).toBe("Somewhat Disagree");
     expect(getOptionLabel(4, "en", "driving-style", "比较认同")).toBe("Somewhat Agree");
     expect(getOptionLabel(6, "en", "future-question", "Custom choice")).toBe("Custom choice");
   });

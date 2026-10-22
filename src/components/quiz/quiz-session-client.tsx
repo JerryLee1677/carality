@@ -206,12 +206,7 @@ export function QuizSessionClient({ sessionId }: { sessionId: string }) {
                       void submitSelectedOption(question.id, option.id);
                     }}
                   />
-                  <span className="quiz-session__option-label">
-                    <span className="sm:hidden">{optionLabel}</span>
-                    <span className="hidden sm:inline">
-                      {isChoiceQuestion(question.slug) || order === 1 || order === 3 || order === 5 ? optionLabel : ""}
-                    </span>
-                  </span>
+                  <span className="quiz-session__option-label">{optionLabel}</span>
                   <span
                     className={`quiz-session__option-circle ${
                       isSelected ? "quiz-session__option-circle--active" : ""

@@ -145,7 +145,7 @@ const optionTranslations = {
   },
   zh: {
     1: "强烈不认同",
-    2: "不太认同",
+    2: "比较不认同",
     3: "中立",
     4: "比较认同",
     5: "强烈认同",
@@ -179,10 +179,19 @@ export function getQuestionText(question: AssessmentQuestion, language: Language
   };
 }
 
+const scaleLabelsZh = new Set([
+  "强烈不认同",
+  "不太认同",
+  "比较不认同",
+  "中立",
+  "比较认同",
+  "强烈认同",
+]);
+
 export function getOptionLabel(order: number, language: Language, slug?: string, label?: string) {
   if (slug && isChoiceQuestion(slug)) {
     return language === "en" ? choiceTranslations[slug][order - 1] ?? label ?? String(order) : label ?? String(order);
   }
-  if (label && !Object.values(optionTranslations.zh).includes(label as never)) return label;
+  if (label && !scaleLabelsZh.has(label)) return label;
   return optionTranslations[language][order as 1 | 2 | 3 | 4 | 5] ?? label ?? String(order);
 }
