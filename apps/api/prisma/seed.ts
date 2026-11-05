@@ -12,8 +12,54 @@ function requireDatabaseUrl() {
   }
 }
 
+const DESTRUCTIVE_CONFIRM_VALUE = "YES";
+
+function describeDatabaseTarget() {
+  try {
+    const parsed = new URL(process.env.DATABASE_URL ?? "");
+
+    return `${parsed.host}${parsed.pathname}`;
+  } catch {
+    return "（DATABASE_URL 无法解析）";
+  }
+}
+
+/**
+ * 本脚本会删除全部测评会话、结果和车型数据，先确认目标库可以清，避免误指向生产库。
+ *
+ * 注意：本文件在导入时会自动执行 main()，因此单元测试请传入 mock 客户端，不要 import 本文件。
+ */
+export async function assertSeedAllowed(prisma: PrismaClient) {
+  if (
+    process.env.NODE_ENV === "production" &&
+    process.env.SEED_ALLOW_PRODUCTION !== DESTRUCTIVE_CONFIRM_VALUE
+  ) {
+    throw new Error(
+      `NODE_ENV=production，拒绝执行会清空全部数据的种子脚本（目标库：${describeDatabaseTarget()}）。` +
+        "确认无误请显式设置 SEED_ALLOW_PRODUCTION=YES。",
+    );
+  }
+
+  const [users, sessions] = await Promise.all([
+    prisma.user.count(),
+    prisma.assessmentSession.count(),
+  ]);
+
+  if (
+    (users > 0 || sessions > 0) &&
+    process.env.SEED_CONFIRM_DESTRUCTIVE !== DESTRUCTIVE_CONFIRM_VALUE
+  ) {
+    throw new Error(
+      `目标库 ${describeDatabaseTarget()} 已有 ${users} 个用户、${sessions} 条测评会话，` +
+        "本脚本会连同题目、车型一起删除。确认这是开发库后，加 SEED_CONFIRM_DESTRUCTIVE=YES 重新执行。",
+    );
+  }
+}
+
 async function resetDatabase() {
   const prisma = new PrismaClient();
+
+  await assertSeedAllowed(prisma);
 
   await prisma.sessionVehicleRecommendation.deleteMany();
   await prisma.sessionResult.deleteMany();

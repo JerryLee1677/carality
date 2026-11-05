@@ -20,26 +20,21 @@ describe("VehiclesController", () => {
     const vehiclesService = {
       findActiveRecommendationVehicles: vi.fn().mockResolvedValue(vehicles),
     };
-    const controller = new VehiclesController(vehiclesService as never);
+    const controller = new VehiclesController(vehiclesService as never, {} as never);
 
     await expect(controller.listVehicles()).resolves.toEqual({ vehicles });
     expect(vehiclesService.findActiveRecommendationVehicles).toHaveBeenCalled();
   });
 
-  it("returns one vehicle by slug", async () => {
-    const vehicles = [
-      {
-        slug: "byd-song-plus-dmi",
-        brand: "比亚迪",
-      },
-      {
+  it("returns one vehicle looked up by slug", async () => {
+    const vehiclesService = {
+      findVehicleBySlug: vi.fn().mockResolvedValue({
         slug: "tesla-model-3",
         brand: "特斯拉",
-      },
-    ];
-    const controller = new VehiclesController({
-      findActiveRecommendationVehicles: vi.fn().mockResolvedValue(vehicles),
-    } as never);
+      }),
+    };
+    const prisma = {};
+    const controller = new VehiclesController(vehiclesService as never, prisma as never);
 
     await expect(controller.getVehicle("tesla-model-3")).resolves.toEqual({
       vehicle: {
@@ -47,5 +42,15 @@ describe("VehiclesController", () => {
         brand: "特斯拉",
       },
     });
+    expect(vehiclesService.findVehicleBySlug).toHaveBeenCalledWith(prisma, "tesla-model-3");
+  });
+
+  it("returns 404 when the slug is not in the active pool", async () => {
+    const controller = new VehiclesController(
+      { findVehicleBySlug: vi.fn().mockResolvedValue(null) } as never,
+      {} as never,
+    );
+
+    await expect(controller.getVehicle("missing-slug")).rejects.toThrow("Vehicle not found");
   });
 });

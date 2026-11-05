@@ -736,7 +736,7 @@ describe("AssessmentService", () => {
     });
   });
 
-  it("uses external vehicle data when a vehicle service is provided", async () => {
+  it("uses the vehicle service catalog and still persists recommendations", async () => {
     const sessionFindUnique = vi.fn().mockResolvedValue({
       id: "session_external_vehicles",
       status: "IN_PROGRESS",
@@ -815,7 +815,6 @@ describe("AssessmentService", () => {
           familyScore: 100,
         },
       ]),
-      usesExternalVehicleSource: vi.fn().mockReturnValue(true),
     };
     const service = new (AssessmentService as any)(
       prisma,
@@ -836,7 +835,7 @@ describe("AssessmentService", () => {
       brand: "比亚迪",
       energyType: "PHEV",
     });
-    expect(recommendationCreateMany).not.toHaveBeenCalled();
+    expect(recommendationCreateMany).toHaveBeenCalledTimes(1);
   });
 
   it("prioritizes strict matches before same-bucket fallback when hard constraints fail", async () => {
@@ -3059,36 +3058,6 @@ describe("AssessmentService", () => {
                 code: true,
                 name: true,
                 summary: true,
-              },
-            },
-            recommendations: {
-              orderBy: {
-                rank: "asc",
-              },
-              select: {
-                rank: true,
-                score: true,
-                reason: true,
-                vehicle: {
-                  select: {
-                    slug: true,
-                    brand: true,
-                    series: true,
-                    energyType: true,
-                    handlingScore: true,
-                    comfortScore: true,
-                    spaceScore: true,
-                    smartScore: true,
-                    powerScore: true,
-                    economyScore: true,
-                    brandScore: true,
-                    designScore: true,
-                    reliabilityScore: true,
-                    familyScore: true,
-                    traitWeights: true,
-                    constraintRules: true,
-                  },
-                },
               },
             },
           },

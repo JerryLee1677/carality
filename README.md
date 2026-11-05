@@ -22,7 +22,6 @@ Carality 是一个汽车人格测试与选车推荐网站。用户通过自适�
 **数据存储说明**
 
 - **PostgreSQL**：题目、测评会话、用户账号、登录会话、人格结果等仍由后端数据库管理。
-- **飞书多维表格（可选车型数据源）**：配置 `FEISHU_*` 环境变量后，车型目录、推荐车型、标签、权重和约束规则从飞书 Base 读取。
 - **静态 TS 文件**：购车指南仍读取 `src/data/content/buying-guides.ts`，不经过数据库。
 
 ## 当前功能
@@ -62,20 +61,6 @@ cp apps/api/.env.example apps/api/.env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/carality_assessment"
 PORT="4010"
 ```
-
-可选：使用飞书多维表格管理车型数据：
-
-```env
-FEISHU_APP_ID="cli_xxx"
-FEISHU_APP_SECRET="xxx"
-FEISHU_BASE_TOKEN="Tmk6bKTBSaFJ1OspL4YcyLzEnod"
-FEISHU_VEHICLES_TABLE_ID="tbl1UIzGFpqfKbgm"
-FEISHU_VEHICLE_TAGS_TABLE_ID="tbl6nOMwNiwFj9en"
-FEISHU_VEHICLE_WEIGHTS_TABLE_ID="tblgWpb6Lsa1DQY8"
-FEISHU_VEHICLE_RULES_TABLE_ID="tbl21NFxHRRxfoD0"
-```
-
-真实 `FEISHU_APP_SECRET` 只放在本地或部署环境变量中，不要提交到 Git。
 
 可选：同步懂车帝车系原始数据到外部车型表：
 
@@ -120,6 +105,9 @@ brew services start postgresql@16
 pnpm db:migrate    # 应用 apps/api/prisma/migrations
 pnpm db:seed       # 导入题目、人格、车型等样例数据
 ```
+
+> `pnpm db:seed` 会先删除全部题目、车型、测评会话与结果再导入。目标库里已有用户或会话时需要显式确认：
+> `SEED_CONFIRM_DESTRUCTIVE=YES pnpm db:seed`；生产环境另需 `SEED_ALLOW_PRODUCTION=YES`。执行前请先核对 `DATABASE_URL` 指向的是开发库。
 
 ### 5. 启动应用（需要两个终端）
 

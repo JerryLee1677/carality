@@ -14,6 +14,8 @@ async function main() {
         const rows = vehicles.filter((vehicle) => resolveVehiclePoolPolicy(vehicle).tier === tier);
         return [tier, { vehicles: rows.length, series: new Set(rows.map(normalizeVehicleSeries)).size,
           under100k: rows.filter((vehicle) => vehicle.priceMin > 0 && vehicle.priceMin <= 100_000).length,
+          // 起售价缺失的车型在有预算时会被整批排除，这里显式报数，避免“车型凭空消失”。
+          missingPrice: rows.filter((vehicle) => !(Number(vehicle.priceMin) > 0)).length,
           energyTypes: [...new Set(rows.map((vehicle) => vehicle.energyType))],
           examples: rows.slice(0, 10).map((vehicle) => `${vehicle.brand} ${vehicle.series}`) }];
       })),

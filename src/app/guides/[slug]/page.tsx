@@ -5,6 +5,7 @@ import {
   vehicleRepository,
   type CatalogVehicle,
 } from "@/modules/catalog/repository/vehicle-repository";
+import { getServerCopy } from "@/lib/copy/server";
 
 export default async function GuideDetailPage({
   params,
@@ -12,6 +13,7 @@ export default async function GuideDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const copy = await getServerCopy();
   const guide = buyingGuides.find((item) => item.slug === slug);
 
   if (!guide) {
@@ -40,7 +42,7 @@ export default async function GuideDetailPage({
 
       {relatedVehicles.length > 0 ? (
         <section className="mt-10">
-          <h2 className="text-2xl font-semibold">相关车型</h2>
+          <h2 className="text-2xl font-semibold">{copy.guides.relatedVehicles}</h2>
           <div className="mt-4 grid gap-4 md:grid-cols-3">
             {relatedVehicles.map((vehicle) => (
               <Link

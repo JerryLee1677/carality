@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { vehicleRepository } from "@/modules/catalog/repository/vehicle-repository";
+import { format } from "@/lib/copy";
+import { getServerCopy } from "@/lib/copy/server";
 
 export default async function CarDetailPage({
   params,
@@ -7,6 +9,7 @@ export default async function CarDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const copy = await getServerCopy();
   const vehicle = await vehicleRepository.getBySlug(slug);
 
   if (!vehicle) {
@@ -20,9 +23,14 @@ export default async function CarDetailPage({
       </h1>
       <p className="mt-4 text-slate-600">{vehicle.summary}</p>
       <div className="mt-8 grid gap-4 rounded-3xl bg-white p-8 shadow-sm">
-        <p>指导价区间：¥{vehicle.priceMin.toLocaleString()} - ¥{vehicle.priceMax.toLocaleString()}</p>
-        <p>能源类型：{vehicle.energyType}</p>
-        <p>车身类型：{vehicle.bodyType}</p>
+        <p>
+          {format(copy.carDetail.priceRange, {
+            min: vehicle.priceMin.toLocaleString(),
+            max: vehicle.priceMax.toLocaleString(),
+          })}
+        </p>
+        <p>{format(copy.carDetail.energyType, { value: vehicle.energyType })}</p>
+        <p>{format(copy.carDetail.bodyType, { value: vehicle.bodyType })}</p>
         <p>{vehicle.recommendation}</p>
       </div>
     </main>

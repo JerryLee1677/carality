@@ -8,14 +8,14 @@ describe("HomePage", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: /Personality\. Meets Performance\./i,
+        name: /人格，遇见性能。/,
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByRole("link", { name: /Take the Test/i })).toHaveAttribute("href", "/quiz");
-    expect(screen.getByRole("link", { name: /Learn more/i })).toHaveAttribute("href", "/guides");
-    expect(screen.getByRole("heading", { name: /Your data stays yours\./i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Powered by real data\./i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /One dashboard for every decision\./i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /开始测试/ })).toHaveAttribute("href", "/quiz");
+    expect(screen.getByRole("link", { name: /了解更多/ })).toHaveAttribute("href", "/guides");
+    expect(screen.getByRole("heading", { name: /你的数据始终属于你/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /由真实数据驱动/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /一个仪表盘，搞定每个决策/ })).toBeInTheDocument();
   });
 });

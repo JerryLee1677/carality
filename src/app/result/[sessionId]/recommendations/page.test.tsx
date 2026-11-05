@@ -1,6 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { zhCopy } from "@/lib/copy";
 import RecommendationsPage from "./page";
 
 const { assessmentApiFetchMock } = vi.hoisted(() => ({
@@ -35,6 +36,9 @@ describe("RecommendationsPage", () => {
     });
     render(await RecommendationsPage({ params: Promise.resolve({ sessionId: "supplement" }) }));
     expect(screen.getAllByRole("link", { name: "查看车型详情" })).toHaveLength(5);
+    expect(document.querySelector(".recommendations-hero__body")?.textContent).toBe(
+      `${zhCopy.recommendations.introPrefix} 务实省心型 ${zhCopy.recommendations.introSuffix}`,
+    );
     expect(screen.getByText(selectionNote)).toBeInTheDocument();
     expect(screen.getByText(/该类别暂不推荐/)).toBeInTheDocument();
   });

@@ -2,8 +2,11 @@ import React from "react";
 import Link from "next/link";
 import { assessmentApiFetch } from "@/lib/assessment-api";
 import type { AssessmentResult } from "@/lib/assessment-session";
+import { type Copy, format } from "@/lib/copy";
+import { getServerCopy } from "@/lib/copy/server";
 
 type RecommendationBucket = "electric" | "fuel";
+type RecommendationsCopy = Copy["recommendations"];
 
 function getRecommendationBucket(energyType: string): RecommendationBucket {
   const normalizedEnergyType = energyType.toUpperCase();
@@ -15,14 +18,12 @@ function getRecommendationBucket(energyType: string): RecommendationBucket {
   return "fuel";
 }
 
-function getBucketLabel(bucket: RecommendationBucket) {
-  return bucket === "electric" ? "电车推荐" : "油车推荐";
+function getBucketLabel(bucket: RecommendationBucket, copy: RecommendationsCopy) {
+  return bucket === "electric" ? copy.electricTitle : copy.fuelTitle;
 }
 
-function getBucketDescription(bucket: RecommendationBucket) {
-  return bucket === "electric"
-    ? "纯电、插混和增程都归在这里，优先看使用感受和补能便利性。"
-    : "燃油和混动都归在这里，优先看省心、稳定和传统驾驶习惯。";
+function getBucketDescription(bucket: RecommendationBucket, copy: RecommendationsCopy) {
+  return bucket === "electric" ? copy.electricDescription : copy.fuelDescription;
 }
 
 export default async function RecommendationsPage({
@@ -31,6 +32,7 @@ export default async function RecommendationsPage({
   params: Promise<{ sessionId: string }>;
 }) {
   const { sessionId } = await params;
+  const copy = await getServerCopy();
   const response = await assessmentApiFetch(`/assessment/sessions/${sessionId}/result`, {
     method: "GET",
   });
@@ -43,30 +45,40 @@ export default async function RecommendationsPage({
     (vehicle) => getRecommendationBucket(vehicle.energyType) === "fuel",
   );
   const recommendationSections = [
-    { key: "electric", title: getBucketLabel("electric"), description: getBucketDescription("electric"), items: electricRecommendations },
-    { key: "fuel", title: getBucketLabel("fuel"), description: getBucketDescription("fuel"), items: fuelRecommendations },
+    {
+      key: "electric",
+      title: getBucketLabel("electric", copy.recommendations),
+      description: getBucketDescription("electric", copy.recommendations),
+      items: electricRecommendations,
+    },
+    {
+      key: "fuel",
+      title: getBucketLabel("fuel", copy.recommendations),
+      description: getBucketDescription("fuel", copy.recommendations),
+      items: fuelRecommendations,
+    },
   ] as const;
 
   return (
     <main className="shell py-8 sm:py-10">
       <section className="recommendations-hero">
         <p className="recommendations-hero__eyebrow">
-          Vehicle Match
+          {copy.recommendations.eyebrow}
         </p>
         <div className="recommendations-hero__row">
           <div className="recommendations-hero__content">
-            <h1 className="recommendations-hero__title">适合你人格的车型方向</h1>
+            <h1 className="recommendations-hero__title">{copy.recommendations.title}</h1>
             <p className="recommendations-hero__body">
-              基于你的人格画像
+              {copy.recommendations.introPrefix}
               <span className="recommendations-hero__highlight"> {headline} </span>
-              ，这里是当前更匹配的车型建议，你可以继续查看每台车的匹配理由与详情。
+              {copy.recommendations.introSuffix}
             </p>
           </div>
           <Link
             href={`/result/${sessionId}`}
             className="race-button race-button-ghost recommendations-hero__action"
           >
-            返回人格结果
+            {copy.recommendations.back}
           </Link>
         </div>
       </section>
@@ -81,7 +93,9 @@ export default async function RecommendationsPage({
                     <p className="recommendation-group__eyebrow">{section.title}</p>
                     <h2 className="recommendation-group__title">{section.description}</h2>
                   </div>
-                  <p className="recommendation-group__count">{section.items.length} 辆</p>
+                  <p className="recommendation-group__count">
+                    {format(copy.recommendations.groupCount, { count: section.items.length })}
+                  </p>
                 </div>
 
                 {section.items.length > 0 ? (
@@ -89,7 +103,9 @@ export default async function RecommendationsPage({
                     {section.items.map((vehicle) => (
                       <article key={vehicle.slug} className="recommendation-card">
                         <div className="recommendation-card__meta">
-                          <p className="recommendation-card__rank">Top {vehicle.rank}</p>
+                          <p className="recommendation-card__rank">
+                            {format(copy.recommendations.rankLabel, { rank: vehicle.rank })}
+                          </p>
                           <h3 className="recommendation-card__title">
                             {vehicle.brand} {vehicle.series}
                           </h3>
@@ -103,7 +119,7 @@ export default async function RecommendationsPage({
                             href={`/cars/${vehicle.slug}`}
                             className="race-button race-button-primary recommendation-card__button"
                           >
-                            查看车型详情
+                            {copy.recommendations.viewDetail}
                           </Link>
                         </div>
                       </article>
@@ -111,10 +127,8 @@ export default async function RecommendationsPage({
                   </div>
                 ) : (
                   <div className="recommendations-empty recommendations-empty--compact">
-                    <h3 className="recommendations-empty__title">暂无可展示车型</h3>
-                    <p className="recommendations-empty__body">
-                      当前没有符合预算、能源及其他用车条件的主流车系，该类别暂不推荐。
-                    </p>
+                    <h3 className="recommendations-empty__title">{copy.recommendations.emptyGroupTitle}</h3>
+                    <p className="recommendations-empty__body">{copy.recommendations.emptyGroupBody}</p>
                   </div>
                 )}
               </section>
@@ -122,10 +136,8 @@ export default async function RecommendationsPage({
           </div>
         ) : (
           <div className="recommendations-empty">
-            <h2 className="recommendations-empty__title">暂无符合条件的主流车型</h2>
-            <p className="recommendations-empty__body">
-              当前车型池中没有满足预算、能源及其他用车条件的主流车辆。可以重新测评调整条件，或稍后查看更新后的车型池。
-            </p>
+            <h2 className="recommendations-empty__title">{copy.recommendations.emptyTitle}</h2>
+            <p className="recommendations-empty__body">{copy.recommendations.emptyBody}</p>
           </div>
         )}
       </section>

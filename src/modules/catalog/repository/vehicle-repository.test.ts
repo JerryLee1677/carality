@@ -67,4 +67,38 @@ describe("vehicleRepository", () => {
       brand: "特斯拉",
     });
   });
+
+  it("returns null instead of throwing when the API reports 404", async () => {
+    process.env.ASSESSMENT_API_BASE_URL = "http://api.test";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 404,
+        headers: {
+          get: () => "application/json",
+        },
+        text: () => Promise.resolve('{"message":"Vehicle not found"}'),
+      }),
+    );
+
+    await expect(vehicleRepository.getBySlug("missing-slug")).resolves.toBeNull();
+  });
+
+  it("still surfaces upstream failures other than 404", async () => {
+    process.env.ASSESSMENT_API_BASE_URL = "http://api.test";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 503,
+        headers: {
+          get: () => "text/plain",
+        },
+        text: () => Promise.resolve("upstream down"),
+      }),
+    );
+
+    await expect(vehicleRepository.getBySlug("tesla-model-3")).rejects.toThrow("upstream down");
+  });
 });

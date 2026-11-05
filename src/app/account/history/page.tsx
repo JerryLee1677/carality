@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { AUTH_SESSION_CHANGE_EVENT, logoutAuthSession } from "@/lib/auth-session";
+import { useLanguage } from "@/lib/i18n";
 
 type HistoryItem = {
   sessionId: string;
@@ -17,6 +18,7 @@ type HistoryItem = {
 
 export default function AccountHistoryPage() {
   const router = useRouter();
+  const { translations } = useLanguage();
   const [items, setItems] = React.useState<HistoryItem[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -35,7 +37,7 @@ export default function AccountHistoryPage() {
 
         if (!response.ok) {
           const message = await response.text();
-          throw new Error(message || "加载历史记录失败");
+          throw new Error(message || translations.history.loadFailed);
         }
 
         const payload = (await response.json()) as HistoryItem[];
@@ -47,7 +49,7 @@ export default function AccountHistoryPage() {
           return;
         }
 
-        const message = loadError instanceof Error ? loadError.message : "加载历史记录失败";
+        const message = loadError instanceof Error ? loadError.message : translations.history.loadFailed;
         setError(message);
       } finally {
         if (isMounted) {
@@ -67,7 +69,7 @@ export default function AccountHistoryPage() {
       isMounted = false;
       window.removeEventListener(AUTH_SESSION_CHANGE_EVENT, handleAuthSessionChange);
     };
-  }, [router]);
+  }, [router, translations]);
 
   async function handleLogout() {
     await logoutAuthSession().catch(() => null);
@@ -79,33 +81,33 @@ export default function AccountHistoryPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="display-font text-2xl font-semibold tracking-[0.12em] text-[var(--color-text)]">
-              历史测试结果
+              {translations.history.title}
             </h1>
             <p className="mt-2 text-sm text-[var(--color-muted)]">
-              只记录登录后开始的测试会话。
+              {translations.history.subtitle}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Button className="race-button race-button-ghost" as="button" type="button" onClick={handleLogout}>
-              退出登录
+              {translations.history.logout}
             </Button>
             <Link href="/quiz" className="race-button race-button-primary">
-              去做新测试
+              {translations.history.newTest}
             </Link>
           </div>
         </div>
 
         {isLoading ? (
-          <p className="mt-8 text-sm text-[var(--color-muted)]">加载中...</p>
+          <p className="mt-8 text-sm text-[var(--color-muted)]">{translations.history.loading}</p>
         ) : error ? (
           <p className="mt-8 rounded-2xl border border-[rgba(217,106,44,0.3)] bg-[rgba(217,106,44,0.08)] px-4 py-3 text-sm text-[var(--color-text)]">
             {error}
           </p>
         ) : items.length === 0 ? (
           <div className="mt-10 rounded-3xl border border-[var(--color-line)] bg-white/60 p-6 text-center">
-            <p className="text-sm text-[var(--color-muted)]">还没有历史记录</p>
+            <p className="text-sm text-[var(--color-muted)]">{translations.history.empty}</p>
             <Link href="/quiz" className="race-button race-button-primary mt-5 inline-flex">
-              开始第一次测试
+              {translations.history.emptyCta}
             </Link>
           </div>
         ) : (
@@ -120,17 +122,17 @@ export default function AccountHistoryPage() {
                     <p className="text-xs uppercase tracking-[0.22em] text-[var(--color-muted)]">
                       {item.profileName
                         ? `${item.profileName} · ${item.profileCode ?? ""}`.trim()
-                        : "结果生成中"}
+                        : translations.history.pending}
                     </p>
                     <p className="mt-2 text-sm text-[var(--color-text)]">
-                      {item.summary ?? "完成后可在结果页查看详细解析与推荐车型。"}
+                      {item.summary ?? translations.history.pendingSummary}
                     </p>
                   </div>
                   <Link
                     href={`/result/${item.sessionId}`}
                     className="race-button race-button-ghost text-center"
                   >
-                    查看结果
+                    {translations.history.viewResult}
                   </Link>
                 </div>
               </article>

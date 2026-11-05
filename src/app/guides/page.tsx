@@ -1,11 +1,14 @@
 import React from "react";
 import Link from "next/link";
 import { buyingGuides } from "@/data/content/buying-guides";
+import { getServerCopy } from "@/lib/copy/server";
 
-export default function GuidesPage() {
+export default async function GuidesPage() {
+  const copy = await getServerCopy();
+
   return (
     <main className="mx-auto max-w-5xl px-6 py-16">
-      <h1 className="text-4xl font-semibold tracking-tight">购车指南</h1>
+      <h1 className="text-4xl font-semibold tracking-tight">{copy.site.guides}</h1>
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         {buyingGuides.map((guide) => (
           <Link

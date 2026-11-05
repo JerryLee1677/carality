@@ -42,7 +42,7 @@ describe("StartQuizButton", () => {
   it("creates a backend session with the selected mode, caches the snapshot, and navigates to the session page", async () => {
     render(<StartQuizButton mode="quick" />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Select Speed" }));
+    fireEvent.click(screen.getByRole("button", { name: "选择极速版" }));
 
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith("/api/quiz/session", {

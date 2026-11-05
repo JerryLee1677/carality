@@ -1,0 +1,137 @@
+/**
+ * 简体中文文案，是全站唯一的文案源。
+ *
+ * 约定：
+ * 1. 页面与组件不再内联用户可见文案，一律从这里取；
+ * 2. 新增命名空间后，`src/lib/copy/copy.test.ts` 会把它列为「未翻译」，
+ *    直到 `en.ts` 补齐同名同结构的命名位置为止；
+ * 3. 带占位符的文案用 `{name}` 配合 `format()`，不要在 JSX 里拼句子。
+ */
+export const zh = {
+  metadata: {
+    title: "Carality",
+    description: "汽车人格测试与购车推荐平台",
+  },
+  site: {
+    subtitle: "汽车人格匹配",
+    quiz: "汽车人格测试",
+    guides: "购车指南",
+    contact: "联系我们",
+    login: "登录",
+    register: "注册",
+    history: "历史记录",
+    logout: "退出",
+    footerDescription: "用汽车人格帮你更快缩小车型选择范围，先有判断，再去看参数。",
+  },
+  home: {
+    title: "人格，遇见性能。",
+    body: "通过人格测试发现你的驾驶 DNA，把你的特质匹配到最合适的车辆。",
+    primaryCta: "开始测试",
+    secondaryCta: "了解更多",
+    matchScore: "匹配分数",
+    comfort: "舒适",
+    performance: "性能",
+    efficiency: "能效",
+    privacyTitle: "你的数据始终属于你。",
+    privacyBody: "我们从不出售或共享你的结果。匿名测评无需注册，也不与任何身份关联。",
+    dataTitle: "由真实数据驱动。",
+    dataBody: "引擎会把你的答案映射到车型特质模型，从主流车池中筛出真正匹配的车系。",
+    previewTitle: "一个仪表盘，搞定每个决策。",
+    previewBody: "人格画像、高分车型和推荐理由，全部集中在一个页面里查看。",
+    personality: "人格画像",
+    adventurer: "冒险家",
+    topMatch: "最佳匹配",
+    sportSuv: "运动 SUV",
+  },
+  quiz: {
+    title: "选择你的模式。",
+    subtitle: "选择适合当前日程的测试体验，两种模式同样匿名。",
+    recommended: "推荐",
+    standard: "标准版",
+    standardDescription: "56 题。完整深挖算法，用于高精度车型匹配。",
+    selectStandard: "选择标准版",
+    speedMode: "极速版",
+    speedDescription: "24 题。不到 2 分钟快速了解你的核心驾驶人格。",
+    selectSpeed: "选择极速版",
+    sessionTitle: "当前答题会话没有可恢复的题目",
+    sessionBody: "这通常是因为页面被刷新，或者会话缓存已丢失。先重新开始一次测评，后面再继续完善会话恢复。",
+    restart: "重新开始",
+    standardQuiz: "标准测试",
+    quickQuiz: "极速测试",
+    questionOf: "第 {current} / {total} 题",
+    submitting: "正在提交答案...",
+    submitError: "答案提交失败：{message}",
+    submitErrorFallback: "当前答案提交失败，请刷新页面后重试。",
+    privacy: "你的数据已加密并匿名化，隐私保护内建于产品。",
+  },
+  auth: {
+    loginSubtitle: "登录后可保存并查看历史测试结果。",
+    registerSubtitle: "暂不做邮箱验证，也暂不支持找回密码。",
+    emailLabel: "Email",
+    passwordLabel: "Password",
+    loginSubmitting: "登录中...",
+    registerAndLogin: "注册并登录",
+    registerSubmitting: "注册中...",
+    toRegister: "去注册",
+    toLogin: "已有账号去登录",
+    keyFetchFailed: "获取加密公钥失败",
+    loginFailed: "登录失败",
+    registerFailed: "注册失败",
+  },
+  history: {
+    title: "历史测试结果",
+    subtitle: "只记录登录后开始的测试会话。",
+    logout: "退出登录",
+    newTest: "去做新测试",
+    loading: "加载中...",
+    empty: "还没有历史记录",
+    emptyCta: "开始第一次测试",
+    pending: "结果生成中",
+    pendingSummary: "完成后可在结果页查看详细解析与推荐车型。",
+    viewResult: "查看结果",
+    loadFailed: "加载历史记录失败",
+  },
+  result: {
+    eyebrow: "你的汽车人格",
+    codeLabel: "人格代号 {code}",
+    imagePlaceholder: "Personality Image",
+    matchScoreLabel: "匹配度",
+    decisionStyle: "决策方式",
+    strengths: "你的优势",
+    cautions: "你的注意点",
+    lifeScenes: "生活场景",
+    usageHabits: "用车习惯",
+    coreDimensions: "核心维度",
+  },
+  recommendations: {
+    eyebrow: "Vehicle Match",
+    title: "适合你人格的车型方向",
+    introPrefix: "基于你的人格画像",
+    introSuffix: "，这里是当前更匹配的车型建议，你可以继续查看每台车的匹配理由与详情。",
+    back: "返回人格结果",
+    electricTitle: "电车推荐",
+    electricDescription: "纯电、插混和增程都归在这里，优先看使用感受和补能便利性。",
+    fuelTitle: "油车推荐",
+    fuelDescription: "燃油和混动都归在这里，优先看省心、稳定和传统驾驶习惯。",
+    groupCount: "{count} 辆",
+    rankLabel: "Top {rank}",
+    viewDetail: "查看车型详情",
+    emptyGroupTitle: "暂无可展示车型",
+    emptyGroupBody: "当前没有符合预算、能源及其他用车条件的主流车系，该类别暂不推荐。",
+    emptyTitle: "暂无符合条件的主流车型",
+    emptyBody: "当前车型池中没有满足预算、能源及其他用车条件的主流车辆。可以重新测评调整条件，或稍后查看更新后的车型池。",
+  },
+  carDetail: {
+    priceRange: "指导价区间：¥{min} - ¥{max}",
+    energyType: "能源类型：{value}",
+    bodyType: "车身类型：{value}",
+  },
+  guides: {
+    relatedVehicles: "相关车型",
+  },
+};
+
+export type Copy = typeof zh;
+
+/** 英文只翻译已经支持的命名空间；缺失的命名空间整体回落中文。 */
+export type PartialCopy = { [Key in keyof Copy]?: Copy[Key] };

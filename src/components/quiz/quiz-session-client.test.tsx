@@ -1,6 +1,7 @@
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { LanguageProvider } from "@/lib/i18n";
 import { QuizSessionClient } from "./quiz-session-client";
 
 const pushMock = vi.fn();
@@ -10,6 +11,15 @@ vi.mock("next/navigation", () => ({
     push: pushMock,
   }),
 }));
+
+/** 这些用例只关注答题机制，语言固定为英文后备，不与默认语言耦合。 */
+function renderClient(sessionId: string) {
+  return render(
+    <LanguageProvider initialLanguage="en">
+      <QuizSessionClient sessionId={sessionId} />
+    </LanguageProvider>,
+  );
+}
 
 describe("QuizSessionClient", () => {
   it("shows and submits all concrete choice labels from a six-option question", async () => {
@@ -25,7 +35,7 @@ describe("QuizSessionClient", () => {
         lockedQuestionId: "budget", nextQuestion: null, result: { sessionId: "session_facts" },
       }) });
     vi.stubGlobal("fetch", fetchMock);
-    render(<QuizSessionClient sessionId="session_facts" />);
+    renderClient("session_facts");
     const choice = await screen.findByRole("radio", { name: "Over CNY 500k" });
     expect(screen.getAllByRole("radio")).toHaveLength(6);
     fireEvent.click(choice);
@@ -121,7 +131,7 @@ describe("QuizSessionClient", () => {
       }),
     );
 
-    render(<QuizSessionClient sessionId="session_123" />);
+    renderClient("session_123");
 
     await waitFor(() => {
       expect(screen.getByText("If friends go car shopping or test-driving together, I usually organize the order and comparison points.")).toBeInTheDocument();
@@ -191,7 +201,7 @@ describe("QuizSessionClient", () => {
         }),
     );
 
-    render(<QuizSessionClient sessionId="session_auto" />);
+    renderClient("session_auto");
 
     await waitFor(() => {
       expect(
@@ -260,7 +270,7 @@ describe("QuizSessionClient", () => {
         }),
     );
 
-    render(<QuizSessionClient sessionId="session_error" />);
+    renderClient("session_error");
 
     await waitFor(() => {
       expect(
@@ -324,7 +334,7 @@ describe("QuizSessionClient", () => {
         ),
     );
 
-    render(<QuizSessionClient sessionId="session_once" />);
+    renderClient("session_once");
 
     await waitFor(() => {
       expect(

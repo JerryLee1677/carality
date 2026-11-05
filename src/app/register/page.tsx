@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { notifyAuthSessionChanged } from "@/lib/auth-session";
 import { readFriendlyErrorMessage } from "@/lib/api-error-message";
+import { useLanguage } from "@/lib/i18n";
 import { encryptPassword } from "@/lib/rsa-client";
 
 type PublicKeyResponse = {
@@ -26,6 +27,7 @@ function resolveSourceUrl(sourceUrl: string | null) {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { translations } = useLanguage();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -45,7 +47,7 @@ export default function RegisterPage() {
     try {
       const keyResponse = await fetch("/api/auth/public-key", { method: "GET" });
       if (!keyResponse.ok) {
-        throw new Error("获取加密公钥失败");
+        throw new Error(translations.auth.keyFetchFailed);
       }
 
       const { publicKeyPem } = (await keyResponse.json()) as PublicKeyResponse;
@@ -60,7 +62,7 @@ export default function RegisterPage() {
       });
 
       if (!registerResponse.ok) {
-        throw new Error(await readFriendlyErrorMessage(registerResponse, "注册失败"));
+        throw new Error(await readFriendlyErrorMessage(registerResponse, translations.auth.registerFailed));
       }
 
       const loginResponse = await fetch("/api/auth/login", {
@@ -72,13 +74,13 @@ export default function RegisterPage() {
       });
 
       if (!loginResponse.ok) {
-        throw new Error(await readFriendlyErrorMessage(loginResponse, "登录失败"));
+        throw new Error(await readFriendlyErrorMessage(loginResponse, translations.auth.loginFailed));
       }
 
       notifyAuthSessionChanged();
       router.replace(resolveSourceUrl(sourceUrl));
     } catch (submitError) {
-      const message = submitError instanceof Error ? submitError.message : "注册失败";
+      const message = submitError instanceof Error ? submitError.message : translations.auth.registerFailed;
       setError(message);
     } finally {
       setIsSubmitting(false);
@@ -89,16 +91,16 @@ export default function RegisterPage() {
     <main className="shell py-10">
       <section className="dashboard-panel mx-auto max-w-lg p-6 sm:p-8">
         <h1 className="display-font text-2xl font-semibold tracking-[0.12em] text-[var(--color-text)]">
-          注册
+            {translations.site.register}
         </h1>
         <p className="mt-2 text-sm text-[var(--color-muted)]">
-          暂不做邮箱验证，也暂不支持找回密码。
+            {translations.auth.registerSubtitle}
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <label className="block">
             <span className="text-xs uppercase tracking-[0.24em] text-[var(--color-muted)]">
-              Email
+              {translations.auth.emailLabel}
             </span>
             <input
               value={email}
@@ -112,7 +114,7 @@ export default function RegisterPage() {
 
           <label className="block">
             <span className="text-xs uppercase tracking-[0.24em] text-[var(--color-muted)]">
-              Password
+              {translations.auth.passwordLabel}
             </span>
             <input
               value={password}
@@ -138,13 +140,13 @@ export default function RegisterPage() {
               type="submit"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "注册中..." : "注册并登录"}
+              {isSubmitting ? translations.auth.registerSubmitting : translations.auth.registerAndLogin}
             </Button>
             <Link
               href={sourceUrl ? `/login?sourceUrl=${encodeURIComponent(sourceUrl)}` : "/login"}
               className="race-button race-button-ghost text-center"
             >
-              已有账号去登录
+              {translations.auth.toLogin}
             </Link>
           </div>
         </form>

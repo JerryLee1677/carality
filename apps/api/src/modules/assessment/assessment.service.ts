@@ -655,7 +655,7 @@ export class AssessmentService {
       },
     });
 
-    if (rankedRecommendations.length > 0 && !this.usesExternalVehicleSource()) {
+    if (rankedRecommendations.length > 0) {
       await db.sessionVehicleRecommendation.createMany({
         data: rankedRecommendations.map((vehicle) => ({
           resultId: result.id,
@@ -735,10 +735,6 @@ export class AssessmentService {
         recommendationStatus: "ACTIVE",
       },
     });
-  }
-
-  private usesExternalVehicleSource() {
-    return this.vehiclesService?.usesExternalVehicleSource() ?? false;
   }
 
   async getCurrentSession(sessionId: string): Promise<{
@@ -832,36 +828,6 @@ export class AssessmentService {
                 code: true,
                 name: true,
                 summary: true,
-              },
-            },
-            recommendations: {
-              orderBy: {
-                rank: "asc",
-              },
-              select: {
-                rank: true,
-                score: true,
-                reason: true,
-                vehicle: {
-                  select: {
-                    slug: true,
-                    brand: true,
-                    series: true,
-                    energyType: true,
-                    handlingScore: true,
-                    comfortScore: true,
-                    spaceScore: true,
-                    smartScore: true,
-                    powerScore: true,
-                    economyScore: true,
-                    brandScore: true,
-                    designScore: true,
-                    reliabilityScore: true,
-                    familyScore: true,
-                    traitWeights: true,
-                    constraintRules: true,
-                  },
-                },
               },
             },
           },
