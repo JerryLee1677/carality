@@ -62,7 +62,7 @@ export const zh = {
     submitting: "正在提交答案...",
     submitError: "答案提交失败：{message}",
     submitErrorFallback: "当前答案提交失败，请刷新页面后重试。",
-    privacy: "你的数据已加密并匿名化，隐私保护内建于产品。",
+    privacy: "匿名会话无需注册即可开始，答案只用于生成你的人格画像与车型推荐。",
   },
   auth: {
     loginSubtitle: "登录后可保存并查看历史测试结果。",

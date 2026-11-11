@@ -58,6 +58,7 @@ export const en: PartialCopy = {
     submitting: "Submitting your answer...",
     submitError: "Answer submission failed: {message}",
     submitErrorFallback: "We couldn't submit this answer. Please refresh and try again.",
-    privacy: "Your data is encrypted and anonymized. Privacy is built in.",
+    privacy:
+      "Start an anonymous session without signing up. Your answers only feed your personality profile and vehicle recommendations.",
   },
 };
